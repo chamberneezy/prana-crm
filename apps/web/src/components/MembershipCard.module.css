@@ -1,0 +1,67 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.renewal {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-bg);
+  color: var(--amber-fg);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.segments {
+  display: grid;
+  gap: 3px;
+}
+
+.segment {
+  height: 8px;
+  border-radius: 2px;
+  background: var(--mist);
+}
+
+.used {
+  background: var(--sage);
+}
+
+.unlimitedBar {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--sage);
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.left {
+  color: var(--text-1);
+}

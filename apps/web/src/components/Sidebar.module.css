@@ -1,0 +1,50 @@
+.sidebar {
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: var(--sidebar-width);
+  padding: 20px 14px;
+  background: var(--bg-sidebar);
+  color: var(--text-on-dark);
+}
+
+/* The mark is charcoal and copper; on ink it is inverted, never redrawn. */
+.logo {
+  width: 36px;
+  margin: 0 0 16px 8px;
+  filter: brightness(0) invert(0.9);
+}
+
+.item {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-on-dark);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.item:hover {
+  color: var(--white);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 1px;
+}
+
+.active {
+  background: var(--sage-deep);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.foot {
+  margin-top: auto;
+  padding-top: 16px;
+}

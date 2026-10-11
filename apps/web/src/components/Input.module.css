@@ -1,0 +1,59 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font: var(--text-label);
+  color: var(--text-2);
+}
+
+.control {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 10px 12px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition-color);
+}
+
+.multiline {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.readOnly,
+.readOnly:focus {
+  border-color: var(--border-divider);
+  background: var(--surface-readonly);
+  color: var(--text-2);
+  box-shadow: none;
+}
+
+.invalid,
+.invalid:focus {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px var(--blush);
+}
+
+.error {
+  font-size: 12px;
+  color: var(--text-attention);
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-3);
+}

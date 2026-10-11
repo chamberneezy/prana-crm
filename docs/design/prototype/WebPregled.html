@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web · Pregled · Prana CRM</title>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/bundle.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;family=Cormorant+Garamond:ital,wght@1,500&amp;family=Montserrat:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2a322e}a:hover{color:#5c6b58}
+</style>
+<style>body{background:#f4efea}</style>
+<script src="assets/react.production.min.js"></script>
+<script src="assets/react-dom.production.min.js"></script>
+<script src="assets/bundle.js"></script>
+<script src="assets/dclogic.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<template id="tpl">
+<div style="min-height: 980px; display: flex; flex-wrap: wrap; background: var(--linen); font-family: var(--font-ui); color: var(--ink);">
+  <x-import component-from-global-scope="YogaCRM.Sidebar" items="{{nav}}" active="overview" logo-src="/_blob/0ddb75ad5382d4cb8d3056f0fcfdf42d" style="display: flex; align-self: stretch;"></x-import>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 48px 48px; box-sizing: border-box;">
+    <div style="max-width: 1160px; display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-muted);">Nedjelja, 11.10.2026.</span>
+        <x-import component-from-global-scope="YogaCRM.PageHeader" title="Pregled">
+          <a href="WebUvoz.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border-radius: 8px; background: var(--ink); color: var(--white); text-decoration: none; font-size: 14px; font-weight: 600;">Novi član</a>
+        </x-import>
+      </div>
+
+      <section aria-label="Brojke" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px;">
+          <x-import component-from-global-scope="YogaCRM.Stat" label="Aktivni članovi" value="42"></x-import>
+        </div>
+        <div style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px;">
+          <x-import component-from-global-scope="YogaCRM.Stat" label="Ističu ovaj tjedan" value="2"></x-import>
+        </div>
+        <div style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px;">
+          <x-import component-from-global-scope="YogaCRM.Stat" label="Dugovanja" value="65,00 €" attention="{{yes}}"></x-import>
+        </div>
+        <div style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px;">
+          <x-import component-from-global-scope="YogaCRM.Stat" label="Uplate u listopadu" value="1.180,00 €"></x-import>
+        </div>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; align-items: start;">
+        <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+          <x-import component-from-global-scope="YogaCRM.ClassTable" date="Danas · Nedjelja, 11.10." classes="{{today}}"></x-import>
+          <x-import component-from-global-scope="YogaCRM.ClassTable" date="Sutra · Ponedjeljak, 12.10." classes="{{tomorrow}}"></x-import>
+          <a href="WebRaspored.dc.html" style="align-self: flex-start; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep);">Cijeli raspored ›</a>
+        </div>
+
+        <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; min-width: 0;">
+          <div style="padding: 20px 20px 12px; display: flex; flex-direction: column; gap: 12px;">
+            <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Za provjeru</h2>
+            <x-import component-from-global-scope="YogaCRM.Notice" title="1 neplaćena uplata">Marko Kovač, 1× tjedno · 65,00 €.</x-import>
+          </div>
+          <template data-sc="for" list="{{attention}}" as="m" hint-placeholder-count="3">
+            <a href="WebProfil.dc.html" style="display: block; text-decoration: none; color: inherit;">
+              <x-import component-from-global-scope="YogaCRM.MemberRow" name="{{m.name}}" sub="{{m.sub}}" status="{{m.status}}" status-label="{{m.label}}"></x-import>
+            </a>
+          </template>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</template>
+<script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      yes: true,
+      nav: [
+        { id: 'overview', label: 'Pregled' },
+        { id: 'schedule', label: 'Raspored' },
+        { id: 'classes', label: 'Vrste satova' },
+        { id: 'members', label: 'Članovi' },
+        { id: 'plans', label: 'Karte i članarine' },
+        { id: 'payments', label: 'Uplate' }
+      ],
+      today: [
+        { time: '09:00–11:00', title: 'Ashtanga Mysore', color: 'var(--class-ashtanga)', teacher: 'Mario', booked: 6, capacity: 12 }
+      ],
+      tomorrow: [
+        { time: '09:00–10:00', title: 'Joga za kralježnicu', color: 'var(--class-spine)', teacher: 'Mario', booked: 5, capacity: 12 },
+        { time: '17:00–19:00', title: 'Ashtanga Mysore', color: 'var(--class-ashtanga)', teacher: 'Mario', booked: 8, capacity: 12 }
+      ],
+      attention: [
+        { name: 'Ana Horvat', sub: '2× tjedno · 6/8 dolazaka', status: 'expiring', label: 'Ističe za 3 dana' },
+        { name: 'Marko Kovač', sub: '1× tjedno · 65,00 €', status: 'unpaid', label: 'Neplaćeno' },
+        { name: 'Iva Babić', sub: '3× tjedno · 9/12 dolazaka', status: 'expiring', label: 'Ističe za 5 dana' }
+      ]
+    };
+  }
+}
+</script>
+<script src="assets/renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@1,500&family=Montserrat:wght@400;500;600;700&display=swap");
+/* Font shorthands the components use. Families come from tokens.json (--font-display, --font-ui, --font-signature). */
+:root {
+  --text-page-title: 600 28px/1.2 var(--font-display);
+  --text-card-title: 600 22px/1.25 var(--font-display);
+  --text-metric: 600 26px/1.2 var(--font-ui);
+  --text-heading: 600 16px/1.4 var(--font-ui);
+  --text-body: 400 14px/1.6 var(--font-ui);
+  --text-small: 400 13px/1.6 var(--font-ui);
+  --text-label: 600 12px/1.4 var(--font-ui);
+  --text-overline: 600 11px/1.4 var(--font-ui);
+  --text-signature: italic 500 26px/1.1 var(--font-signature);
+}
+input::placeholder, textarea::placeholder { color: var(--stone-dot); }

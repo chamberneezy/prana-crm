@@ -1,0 +1,78 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-height);
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--primary);
+  color: var(--white);
+  border: 0;
+  font-weight: 600;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.secondary {
+  background: var(--surface-card);
+  color: var(--text-1);
+  border: 1px solid var(--border-field);
+  font-weight: 500;
+}
+
+.secondary:hover:not(:disabled) {
+  border-color: var(--sage);
+}
+
+.secondary:focus-visible {
+  border-color: var(--border-focus);
+}
+
+.ghost {
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--text-2);
+  border: 0;
+  font-weight: 500;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--mist);
+  color: var(--text-1);
+}
+
+.attention {
+  background: var(--surface-card);
+  color: var(--clay-text);
+  border: 1px solid var(--terracotta);
+  font-weight: 600;
+}
+
+.attention:hover:not(:disabled) {
+  background: var(--blush);
+}
+
+.sm {
+  min-height: 32px;
+  padding: 7px 14px;
+  font-size: 13px;
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Web · Uvoz upisnice</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ds/yogacrm/components/bundle.css">
+<script src="ds/yogacrm/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;family=Cormorant+Garamond:ital,wght@1,500&amp;family=Montserrat:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2a322e}a:hover{color:#5c6b58}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-wrap: wrap; background: var(--linen); font-family: var(--font-ui); color: var(--ink);">
+  <x-import component-from-global-scope="YogaCRM.Sidebar" items="{{nav}}" active="members" logo-src="/_blob/0ddb75ad5382d4cb8d3056f0fcfdf42d" style="display: flex; align-self: stretch;"></x-import>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 48px 48px; box-sizing: border-box;">
+    <div style="max-width: 960px; display: flex; flex-direction: column; gap: 20px;">
+      <a href="WebClanovi.dc.html" style="align-self: flex-start; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep);">‹ Članovi</a>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <x-import component-from-global-scope="YogaCRM.PageHeader" title="Novi član"></x-import>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-muted);">Uvezite ispunjenu upisnicu. Polja se popune sama, a Vi samo provjerite.</p>
+      </div>
+
+      <section aria-label="Uvoz PDF-a" style="background: var(--white); border: 2px dashed var(--sage); border-radius: 10px; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;">
+        <span style="width: 64px; height: 64px; border-radius: 999px; background: var(--mist); color: var(--sage-ink); display: flex; align-items: center; justify-content: center;">
+          <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5M12 18v-6M9 15l3-3 3 3"></path></svg>
+        </span>
+        <span style="font-size: 18px; font-weight: 600;">Povucite PDF upisnice ovamo</span>
+        <span style="font-size: 13px; color: var(--ink-muted);">PDF, JPG ili PNG · do 20 MB · jedna upisnica po datoteci</span>
+        <a href="WebProvjera.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border-radius: 8px; background: var(--ink); color: var(--white); text-decoration: none; font-size: 14px; font-weight: 600; margin-top: 6px;">Odaberite datoteku</a>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+        <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 18px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--ink);">
+          <span style="width: 44px; height: 44px; border-radius: 10px; background: var(--mist); color: var(--sage-ink); display: flex; align-items: center; justify-content: center; flex: none;">
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"></path></svg>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 15px; font-weight: 600;">Upiši ručno</span>
+            <span style="font-size: 13px; color: var(--ink-muted);">Prazna upisnica na zaslonu.</span>
+          </span>
+        </a>
+        <div style="display: flex; align-items: center; gap: 14px; padding: 18px; background: var(--white); border: 1px solid var(--line); border-radius: 10px;">
+          <span style="width: 44px; height: 44px; border-radius: 10px; background: var(--mist); color: var(--sage-ink); display: flex; align-items: center; justify-content: center; flex: none;">
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 15px; font-weight: 600;">Papirnata upisnica?</span>
+            <span style="font-size: 13px; color: var(--ink-muted);">Fotografirajte je u iPhone aplikaciji. Član se pojavi i ovdje.</span>
+          </span>
+        </div>
+      </div>
+
+      <p style="margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink-muted);">PDF s tekstom čita se izravno. Skenirani PDF i fotografije prepoznaju se u pregledniku, pa datoteka ne odlazi drugim servisima. Original se sprema uz profil člana.</p>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      nav: [
+        { id: 'overview', label: 'Pregled' },
+        { id: 'schedule', label: 'Raspored' },
+        { id: 'classes', label: 'Vrste satova' },
+        { id: 'members', label: 'Članovi' },
+        { id: 'plans', label: 'Karte i članarine' },
+        { id: 'payments', label: 'Uplate' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-11T12:00:00Z"},
+  "title": "Prana CRM · iOS i web",
+  "launch": {"view": "canvas"},
+  "pages": [{"id": "ios", "name": "iOS"}, {"id": "web", "name": "Web"}],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "Pregled", "is_interactive": true, "radius": 28, "page": "ios"},
+    "Raspored.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "Raspored", "is_interactive": true, "radius": 28, "page": "ios"},
+    "VrsteSatova.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "Vrste satova", "is_interactive": true, "radius": 28, "page": "ios"},
+    "Clanovi.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "Članovi", "is_interactive": true, "radius": 28, "page": "ios"},
+    "Profil.dc.html": {"x": 1880, "y": 0, "w": 390, "h": 1320, "title": "Profil člana", "is_interactive": true, "radius": 28, "page": "ios"},
+    "NoviClan.dc.html": {"x": 0, "y": 1700, "w": 390, "h": 844, "title": "Novi član", "is_interactive": true, "radius": 28, "page": "ios"},
+    "Skeniranje.dc.html": {"x": 470, "y": 1700, "w": 390, "h": 1680, "title": "Provjera skenirane upisnice", "is_interactive": true, "radius": 28, "page": "ios"},
+    "WebPregled.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 980, "title": "Web · Pregled", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebRaspored.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 980, "title": "Web · Raspored", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebVrsteSatova.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 980, "title": "Web · Vrste satova", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebClanovi.dc.html": {"x": 0, "y": 1360, "w": 1440, "h": 1000, "title": "Web · Članovi", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebProfil.dc.html": {"x": 1520, "y": 1360, "w": 1440, "h": 1000, "title": "Web · Profil člana", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebUvoz.dc.html": {"x": 0, "y": 2740, "w": 1440, "h": 900, "title": "Web · Uvoz upisnice", "is_interactive": true, "expand": "fill", "page": "web"},
+    "WebProvjera.dc.html": {"x": 1520, "y": 2740, "w": 1440, "h": 1420, "title": "Web · Provjera podataka", "is_interactive": true, "expand": "fill", "page": "web"}
+  },
+  "order": ["Main.dc.html", "Raspored.dc.html", "VrsteSatova.dc.html", "Clanovi.dc.html", "Profil.dc.html", "NoviClan.dc.html", "Skeniranje.dc.html", "WebPregled.dc.html", "WebRaspored.dc.html", "WebVrsteSatova.dc.html", "WebClanovi.dc.html", "WebProfil.dc.html", "WebUvoz.dc.html", "WebProvjera.dc.html"],
+  "notes": {
+    "row1": {"x": 0, "y": -300, "text": "Svakodnevni rad", "kind": "title1", "maxW": 2270, "page": "ios"},
+    "row2": {"x": 0, "y": 1400, "text": "Upis novog člana · skeniranje upisnice", "kind": "title1", "maxW": 860, "page": "ios"},
+    "web1": {"x": 0, "y": -300, "text": "Web · svakodnevni rad", "kind": "title1", "maxW": 4480, "page": "web"},
+    "web2": {"x": 0, "y": 1060, "text": "Web · članovi", "kind": "title1", "maxW": 2960, "page": "web"},
+    "web3": {"x": 0, "y": 2440, "text": "Web · upis iz PDF-a", "kind": "title1", "maxW": 2960, "page": "web"}
+  },
+  "designSystems": [
+    {"title": "Yoga CRM", "namespace": "yogacrm", "artifact": "https://claude.ai/code/artifact/a69f0341-7dd7-4cb2-b840-5e99fb350ea8", "version": "1791713753-6dd5", "copiedAt": "2026-10-11T12:00:00Z"}
+  ]
+}

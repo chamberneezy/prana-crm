@@ -1,0 +1,47 @@
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  outline: none;
+}
+
+.box {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-xs);
+  background: var(--surface-card);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  transition: var(--transition-color);
+}
+
+.checked {
+  border-color: var(--sage-deep);
+  background: var(--sage-deep);
+}
+
+.invalid {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px var(--blush);
+}
+
+.checkbox:focus-visible .box {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.label {
+  font: var(--text-small);
+  color: var(--text-2);
+}
+
+.required {
+  color: var(--text-1);
+}

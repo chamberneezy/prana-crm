@@ -1,0 +1,76 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 48px 48px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1160px;
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demoName {
+  margin: 0;
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onInk {
+  display: inline-flex;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: var(--ink);
+}
+
+@media (max-width: 767px) {
+  .main {
+    padding: 24px 16px 32px;
+  }
+}

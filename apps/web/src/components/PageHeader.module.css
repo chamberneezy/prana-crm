@@ -1,0 +1,14 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  flex: 1;
+  min-width: 160px;
+  margin: 0;
+  font: var(--text-page-title);
+  color: var(--text-1);
+}

@@ -1,0 +1,106 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 24px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  color: var(--text-1);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font: var(--text-card-title);
+}
+
+.text {
+  margin: 0;
+  font: var(--text-small);
+  color: var(--text-2);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionTitle {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-divider);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.fields,
+.footer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.footer {
+  align-items: end;
+}
+
+.labelled {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font: var(--text-label);
+  color: var(--text-2);
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+.signatureBox {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 64px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-readonly);
+}
+
+.signature {
+  overflow: hidden;
+  font: var(--text-signature);
+  white-space: nowrap;
+}
+
+.signatureHint {
+  flex: none;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.consentNeeded {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-attention);
+}

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.wrangler/
+.DS_Store
+*.local
+*.tsbuildinfo
+
+# secrets: never commit
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# test output
+playwright-report/
+test-results/
+
+# loose copies of docs/design/screens
+/WebPregled.png
+/Skeniranje.png

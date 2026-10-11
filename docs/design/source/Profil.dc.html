@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Profil člana</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ds/yogacrm/components/bundle.css">
+<script src="ds/yogacrm/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;family=Cormorant+Garamond:ital,wght@1,500&amp;family=Montserrat:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2a322e}a:hover{color:#5c6b58}
+</style>
+</helmet>
+<div style="width: 390px; height: 1320px; position: relative; overflow: hidden; box-sizing: border-box; background: var(--linen); font-family: var(--font-ui); color: var(--ink);">
+  <main style="padding: 52px 16px 108px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="Clanovi.dc.html" style="display: inline-flex; align-items: center; gap: 2px; min-height: 44px; text-decoration: none; font-size: 14px; font-weight: 600; color: var(--sage-deep);">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+        Članovi
+      </a>
+      <x-import component-from-global-scope="YogaCRM.Button" variant="ghost" size="sm">Uredi</x-import>
+    </div>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <x-import component-from-global-scope="YogaCRM.Avatar" name="Ana Horvat" size="{{avatar}}"></x-import>
+        <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+          <h1 style="margin: 0; font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.25;">Ana Horvat</h1>
+          <span style="font-size: 13px; color: var(--ink-muted);">Članica od 02.09.2026.</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <x-import component-from-global-scope="YogaCRM.StatusChip" status="expiring">Ističe za 3 dana</x-import>
+        <x-import component-from-global-scope="YogaCRM.Tag" kind="plan">2× tjedno</x-import>
+        <x-import component-from-global-scope="YogaCRM.Tag" kind="flag">Student</x-import>
+      </div>
+    </section>
+
+    <section aria-label="Zdravstvena napomena" style="background: var(--blush); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 12px; font-weight: 600; color: var(--clay-text);">Zdravstvena napomena</span>
+      <span style="font-size: 14px; color: var(--ink);">Hernija L5</span>
+    </section>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Članarina</h2>
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="font-size: 16px; font-weight: 600;">2× tjedno · listopad</span>
+        <span style="font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;">6/8</span>
+      </div>
+      <div role="img" aria-label="Iskorišteno 6 od 8 dolazaka" style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px;">
+        <sc-for list="{{segments}}" as="seg" hint-placeholder-count="8">
+          <span style="height: 8px; border-radius: 999px; background: {{seg.color}};"></span>
+        </sc-for>
+      </div>
+      <span style="font-size: 13px; color: var(--amber-fg);">Vrijedi do 14.10.2026.</span>
+      <x-import component-from-global-scope="YogaCRM.Button" variant="primary" style="width: 100%; min-height: 48px;">Produži članarinu</x-import>
+    </section>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 2px;">
+      <h2 style="margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Kontakt</h2>
+      <a href="mailto:ana.horvat@example.com" style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); text-decoration: none; color: var(--ink); font-size: 14px;"><span style="color: var(--muted); font-size: 13px;">E-mail</span><span>ana.horvat@example.com</span></a>
+      <a href="tel:+385912345678" style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); text-decoration: none; color: var(--ink); font-size: 14px; font-variant-numeric: tabular-nums;"><span style="color: var(--muted); font-size: 13px;">Telefon</span><span>091 234 5678</span></a>
+      <div style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; font-variant-numeric: tabular-nums;"><span style="color: var(--muted); font-size: 13px;">Datum rođenja</span><span>14.03.2004. (22 god.)</span></div>
+    </section>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 2px;">
+      <h2 style="margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Zadnji dolasci</h2>
+      <sc-for list="{{visits}}" as="v" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft);">
+          <span style="width: 10px; height: 22px; border-radius: 999px; background: {{v.color}}; flex: none;"></span>
+          <span style="flex: 1; font-size: 14px;">{{v.name}}</span>
+          <span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;">{{v.date}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 2px;">
+      <h2 style="margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Uplate</h2>
+      <div style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; font-variant-numeric: tabular-nums;"><span>02.09.2026. · 2× tjedno</span><span style="font-weight: 600;">65,00 €</span></div>
+    </section>
+
+    <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Upisnica</h2>
+      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; color: var(--ink);">
+        <span style="width: 40px; height: 40px; border-radius: 8px; background: var(--mist); color: var(--sage-ink); display: flex; align-items: center; justify-content: center; flex: none;">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
+        </span>
+        <span style="display: flex; flex-direction: column; flex: 1;">
+          <span style="font-size: 14px; font-weight: 600;">Skenirana upisnica</span>
+          <span style="font-size: 12px; color: var(--muted);">Fotografija · 02.09.2026.</span>
+        </span>
+        <span style="color: var(--muted);">›</span>
+      </a>
+      <div style="display: flex; flex-direction: column; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line-soft); font-size: 13px; color: var(--ink-muted);">
+        <span>✓ Potvrda točnosti podataka</span>
+        <span>✓ Obavijesti e-mailom</span>
+      </div>
+    </section>
+  </main>
+
+  <nav aria-label="Glavna navigacija" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; box-sizing: border-box; padding: 6px 8px 0; background: var(--white); border-top: 1px solid var(--line); display: flex; justify-content: space-around; align-items: flex-start;">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 64px; padding-top: 4px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--muted);">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
+      Pregled
+    </a>
+    <a href="Raspored.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 64px; padding-top: 4px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--muted);">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+      Raspored
+    </a>
+    <a href="NoviClan.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 64px; margin-top: -24px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--ink);">
+      <span style="width: 56px; height: 56px; border-radius: 999px; background: var(--ink); color: var(--white); display: flex; align-items: center; justify-content: center; border: 4px solid var(--linen); box-sizing: border-box;">
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"></path></svg>
+      </span>
+      Upis
+    </a>
+    <a href="Clanovi.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 64px; padding-top: 4px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--ink);">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Članovi
+    </a>
+    <a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 64px; padding-top: 4px; text-decoration: none; font-size: 11px; font-weight: 600; color: var(--muted);">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg>
+      Uplate
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const used = 6, total = 8;
+    return {
+      avatar: 56,
+      segments: Array.from({ length: total }, (_, i) => ({ color: i < used ? 'var(--sage)' : 'var(--mist)' })),
+      visits: [
+        { name: 'Black Lotus Yoga', color: 'var(--class-black-lotus)', date: 'Sri, 07.10.' },
+        { name: 'Ashtanga Mysore', color: 'var(--class-ashtanga)', date: 'Pon, 05.10.' },
+        { name: 'Joga za kralježnicu', color: 'var(--class-spine)', date: 'Sri, 30.09.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

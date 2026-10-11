@@ -1,0 +1,53 @@
+/* Type shorthands the components use. Families come from tokens.css. */
+:root {
+  --text-page-title: 600 28px/1.2 var(--font-display);
+  --text-card-title: 600 22px/1.25 var(--font-display);
+  --text-metric: 600 26px/1.2 var(--font-ui);
+  --text-heading: 600 16px/1.4 var(--font-ui);
+  --text-body: 400 14px/1.6 var(--font-ui);
+  --text-small: 400 13px/1.6 var(--font-ui);
+  --text-label: 600 12px/1.4 var(--font-ui);
+  --text-overline: 600 11px/1.4 var(--font-ui);
+  --text-signature: italic 500 26px/1.1 var(--font-signature);
+  /* Motion is quick colour transitions only. */
+  --transition-color: background-color 0.12s, border-color 0.12s, color 0.12s, box-shadow 0.12s;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text-1);
+  font: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea {
+  font-family: var(--font-ui);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--stone-dot);
+}
+
+a {
+  color: var(--ink);
+}
+
+a:hover {
+  color: var(--sage-deep);
+}

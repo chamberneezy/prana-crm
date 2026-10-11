@@ -1,0 +1,32 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.plan {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.flag {
+  padding: 4px 9px;
+  border: 1px dashed var(--sage);
+  background: transparent;
+  color: var(--sage-ink);
+}
+
+.health {
+  background: var(--blush);
+  color: var(--clay-text);
+}
+
+.neutral {
+  background: var(--mist);
+  color: var(--sage-ink);
+}

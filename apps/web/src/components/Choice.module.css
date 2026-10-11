@@ -1,0 +1,64 @@
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.grid {
+  display: grid;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.inline .option {
+  min-height: var(--control-height);
+  justify-content: center;
+  padding: 9px 16px;
+  text-align: center;
+}
+
+.grid .option {
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.option:hover {
+  border-color: var(--sage);
+}
+
+.option:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.selected,
+.selected:hover {
+  border-color: var(--border-focus);
+  background: var(--surface-selected);
+}
+
+.label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.grid .label {
+  font-size: 14px;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--text-2);
+}

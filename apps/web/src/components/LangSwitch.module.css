@@ -1,0 +1,40 @@
+.switch {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+}
+
+.option {
+  padding: 7px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: -2px;
+}
+
+.selected {
+  background: var(--mist);
+  color: var(--text-1);
+}
+
+.dark {
+  border-color: var(--ink-muted);
+}
+
+.dark .option {
+  color: var(--field);
+}
+
+.dark .selected {
+  background: var(--sage-deep);
+  color: var(--white);
+}

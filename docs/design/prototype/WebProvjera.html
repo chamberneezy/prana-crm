@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web · Provjera podataka · Prana CRM</title>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/bundle.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;family=Cormorant+Garamond:ital,wght@1,500&amp;family=Montserrat:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2a322e}a:hover{color:#5c6b58}
+</style>
+<style>body{background:#f4efea}</style>
+<script src="assets/react.production.min.js"></script>
+<script src="assets/react-dom.production.min.js"></script>
+<script src="assets/bundle.js"></script>
+<script src="assets/dclogic.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<template id="tpl">
+<div style="min-height: 1420px; display: flex; flex-wrap: wrap; background: var(--linen); font-family: var(--font-ui); color: var(--ink);">
+  <x-import component-from-global-scope="YogaCRM.Sidebar" items="{{nav}}" active="members" logo-src="/_blob/0ddb75ad5382d4cb8d3056f0fcfdf42d" style="display: flex; align-self: stretch;"></x-import>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 48px 48px; box-sizing: border-box;">
+    <div style="max-width: 1160px; display: flex; flex-direction: column; gap: 20px;">
+      <a href="WebUvoz.dc.html" style="align-self: flex-start; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep);">‹ Uvoz upisnice</a>
+      <x-import component-from-global-scope="YogaCRM.PageHeader" title="Provjerite podatke">
+        <a href="WebUvoz.dc.html" style="display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--field); background: var(--white); text-decoration: none; font-size: 14px; color: var(--ink);">Druga datoteka</a>
+      </x-import>
+
+      <template data-sc="if" value="{{saved}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <x-import component-from-global-scope="YogaCRM.Toast" action="Poništi" on-action="{{undo}}">{{savedText}}</x-import>
+          <a href="WebProfil.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep);">Otvori profil ›</a>
+        </div>
+      </template>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+        <section aria-label="Izvorni dokument" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Izvornik</h2>
+            <span style="font-size: 12px; color: var(--muted);">upisnica-scan-0412.pdf · 1 str.</span>
+          </div>
+          <div style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 28px 26px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--line);">
+              <span style="font-family: var(--font-display); font-weight: 600; font-size: 16px;">Prijava za članstvo</span>
+              <img src="/_blob/0ddb75ad5382d4cb8d3056f0fcfdf42d" alt="Prana" style="width: 32px;">
+            </div>
+            <template data-sc="for" list="{{paper}}" as="p" hint-placeholder-count="9">
+              <div style="display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; margin: 0 -8px; border-radius: 6px; border: 1.5px solid {{p.border}}; background: {{p.bg}};">
+                <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">{{p.label}}</span>
+                <span style="font-family: var(--font-signature); font-style: italic; font-weight: 500; font-size: 20px; line-height: 1.2; border-bottom: 1px dotted var(--field);">{{p.value}}</span>
+              </div>
+            </template>
+          </div>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink-muted);">
+            <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--terracotta); background: var(--blush);"></span>Za provjeru</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--line);"></span>Prepoznato sigurno</span>
+          </div>
+        </section>
+
+        <section aria-label="Prepoznati podaci" style="flex: 1.4 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+          <x-import component-from-global-scope="YogaCRM.Notice" title="2 polja za provjeru">Broj mobitela ima jednu nečitljivu znamenku, a zdravstvena napomena je djelomično nejasna. Ostalo je prepoznato sigurno.</x-import>
+          <x-import component-from-global-scope="YogaCRM.UpisnicaForm" initial="{{initial}}" place="Zagreb" date="11.10.2026." on-save="{{save}}" on-cancel="{{noop}}"></x-import>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</template>
+<script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { saved: false, name: '' };
+  }
+  renderVals() {
+    const ok = { border: 'transparent', bg: 'transparent' };
+    const check = { border: 'var(--terracotta)', bg: 'var(--blush)' };
+    const f = (label, value, unsure) => ({ label, value, ...(unsure ? check : ok) });
+    return {
+      nav: [
+        { id: 'overview', label: 'Pregled' },
+        { id: 'schedule', label: 'Raspored' },
+        { id: 'classes', label: 'Vrste satova' },
+        { id: 'members', label: 'Članovi' },
+        { id: 'plans', label: 'Karte i članarine' },
+        { id: 'payments', label: 'Uplate' }
+      ],
+      noop: () => {},
+      saved: this.state.saved,
+      savedText: (this.state.name || 'Član') + ' je spremljena kao novi član.',
+      save: (v) => this.setState({ saved: true, name: v.name }),
+      undo: () => this.setState({ saved: false }),
+      initial: {
+        name: 'Lucija Perić', email: 'lucija.peric@example.com', phone: '098 76? 4321', dob: '22.07.1991.',
+        student: false, plan: '2x', health: true, healthText: 'Bol u lijevom koljenu (meniskus?)', consent: true, news: true
+      },
+      paper: [
+        f('Ime i prezime', 'Lucija Perić'),
+        f('E-mail', 'lucija.peric@example.com'),
+        f('Broj mobitela', '098 76? 4321', true),
+        f('Datum rođenja', '22.07.1991.'),
+        f('Student / umirovljenik', 'NE'),
+        f('Članstvo', '2× tjedno'),
+        f('Zdravstvene poteškoće', 'DA · Bol u lijevom koljenu (meniskus?)', true),
+        f('Suglasnosti', '✓ točnost podataka  ✓ e-mail obavijesti'),
+        f('Mjesto, datum i potpis', 'Zagreb, 11.10.2026. · L. Perić')
+      ]
+    };
+  }
+}
+</script>
+<script src="assets/renderer.js"></script>
+</body>
+</html>

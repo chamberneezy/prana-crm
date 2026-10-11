@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<title>Web · Profil člana</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ds/yogacrm/components/bundle.css">
+<script src="ds/yogacrm/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&amp;family=Cormorant+Garamond:ital,wght@1,500&amp;family=Montserrat:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2a322e}a:hover{color:#5c6b58}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: var(--linen); font-family: var(--font-ui); color: var(--ink);">
+  <x-import component-from-global-scope="YogaCRM.Sidebar" items="{{nav}}" active="members" logo-src="/_blob/0ddb75ad5382d4cb8d3056f0fcfdf42d" style="display: flex; align-self: stretch;"></x-import>
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px 48px 48px; box-sizing: border-box;">
+    <div style="max-width: 1160px; display: flex; flex-direction: column; gap: 20px;">
+      <a href="WebClanovi.dc.html" style="align-self: flex-start; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep);">‹ Članovi</a>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; align-items: start;">
+        <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+          <x-import component-from-global-scope="YogaCRM.MemberProfile" member="{{member}}" status="expiring" since="02.09.2026." on-edit="{{noop}}"></x-import>
+
+          <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Upisnica</h2>
+            <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; color: var(--ink);">
+              <span style="width: 40px; height: 40px; border-radius: 8px; background: var(--mist); color: var(--sage-ink); display: flex; align-items: center; justify-content: center; flex: none;">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path><path d="M14 2v5h5M16 13H8M16 17H8M10 9H8"></path></svg>
+              </span>
+              <span style="display: flex; flex-direction: column; flex: 1;">
+                <span style="font-size: 14px; font-weight: 600;">upisnica-ana-horvat.pdf</span>
+                <span style="font-size: 12px; color: var(--muted);">Uvezeno 02.09.2026. · prepoznato automatski</span>
+              </span>
+              <span style="font-size: 13px; font-weight: 600; color: var(--sage-deep);">Otvori</span>
+            </a>
+          </section>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0;">
+          <section style="display: flex; flex-direction: column; gap: 10px;">
+            <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Članarina · listopad</h2>
+            <x-import component-from-global-scope="YogaCRM.MembershipCard" plan="2× tjedno" used="{{used}}" total="{{total}}" renewal="14.10."></x-import>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <x-import component-from-global-scope="YogaCRM.Button" variant="primary">Produži članarinu</x-import>
+              <x-import component-from-global-scope="YogaCRM.Button" variant="secondary">Zamrzni</x-import>
+            </div>
+          </section>
+
+          <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;">
+            <h2 style="margin: 0; padding: 14px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Zadnji dolasci</h2>
+            <sc-for list="{{visits}}" as="v" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line-soft); font-size: 14px;">
+                <span style="width: 10px; height: 22px; border-radius: 999px; background: {{v.color}}; flex: none;"></span>
+                <span style="flex: 1;">{{v.name}}</span>
+                <span style="font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;">{{v.date}}</span>
+              </div>
+            </sc-for>
+          </section>
+
+          <section style="background: var(--white); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;">
+            <h2 style="margin: 0; padding: 14px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Uplate</h2>
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line-soft); font-size: 14px; font-variant-numeric: tabular-nums;">
+              <span>02.09.2026. · 2× tjedno · gotovina</span>
+              <span style="font-weight: 600;">65,00 €</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      nav: [
+        { id: 'overview', label: 'Pregled' },
+        { id: 'schedule', label: 'Raspored' },
+        { id: 'classes', label: 'Vrste satova' },
+        { id: 'members', label: 'Članovi' },
+        { id: 'plans', label: 'Karte i članarine' },
+        { id: 'payments', label: 'Uplate' }
+      ],
+      noop: () => {},
+      used: 6,
+      total: 8,
+      member: {
+        name: 'Ana Horvat', email: 'ana.horvat@example.com', phone: '091 234 5678', dob: '14.03.2004.',
+        student: true, plan: '2x', health: true, healthText: 'Hernija L5', consent: true, news: true
+      },
+      visits: [
+        { name: 'Black Lotus Yoga', color: 'var(--class-black-lotus)', date: 'Sri, 07.10.' },
+        { name: 'Ashtanga Mysore', color: 'var(--class-ashtanga)', date: 'Pon, 05.10.' },
+        { name: 'Joga za kralježnicu', color: 'var(--class-spine)', date: 'Sri, 30.09.' },
+        { name: 'Ashtanga Mysore', color: 'var(--class-ashtanga)', date: 'Pon, 28.09.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

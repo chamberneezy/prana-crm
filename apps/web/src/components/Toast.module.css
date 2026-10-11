@@ -1,0 +1,43 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 440px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--ink);
+  color: var(--white);
+  font-size: 13px;
+  box-shadow: var(--shadow-float);
+}
+
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.text {
+  flex: 1;
+}
+
+.action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mist-strong);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action:hover {
+  color: var(--white);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 3px;
+}

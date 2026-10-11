@@ -1,0 +1,60 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.active {
+  background: var(--status-active-bg);
+  color: var(--status-active-fg);
+}
+
+.active .dot {
+  background: var(--status-active-dot);
+}
+
+.expiring {
+  background: var(--status-expiring-bg);
+  color: var(--status-expiring-fg);
+}
+
+.expiring .dot {
+  background: var(--status-expiring-dot);
+}
+
+.unpaid {
+  background: var(--status-unpaid-bg);
+  color: var(--status-unpaid-fg);
+}
+
+.unpaid .dot {
+  background: var(--status-unpaid-dot);
+}
+
+.frozen {
+  background: var(--status-frozen-bg);
+  color: var(--status-frozen-fg);
+}
+
+.frozen .dot {
+  background: var(--status-frozen-dot);
+}
+
+.trial {
+  padding: 4px 9px;
+  border: 1px dashed var(--sage);
+  background: var(--status-trial-bg);
+  color: var(--status-trial-fg);
+}
