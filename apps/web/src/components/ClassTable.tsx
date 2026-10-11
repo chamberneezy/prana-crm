@@ -9,6 +9,7 @@ export interface ClassItem {
   color: string;
   teacher: string;
   booked: number;
+  /** 0 = no limit set: the count is shown without a bar. */
   capacity: number;
   waitlist?: number;
 }
@@ -18,9 +19,11 @@ export interface ClassTableProps {
   date?: string;
   classes: ClassItem[];
   compact?: boolean;
+  /** Shown in place of the rows when there are no classes. */
+  emptyText?: string;
 }
 
-export function ClassTable({ date, classes, compact = false }: ClassTableProps) {
+export function ClassTable({ date, classes, compact = false, emptyText }: ClassTableProps) {
   const { t } = useLang();
   return (
     <div className={styles.card}>
@@ -45,17 +48,20 @@ export function ClassTable({ date, classes, compact = false }: ClassTableProps) 
                 </span>
                 <span className={styles.teacher} role="cell">{c.teacher}</span>
                 <span className={styles.occupancy} role="cell">
-                  <span className={styles.bar}>
-                    <span className={cx(styles.fill, full && styles.full)} style={{ width: `${pct}%` }} />
-                  </span>
+                  {c.capacity > 0 && (
+                    <span className={styles.bar}>
+                      <span className={cx(styles.fill, full && styles.full)} style={{ width: `${pct}%` }} />
+                    </span>
+                  )}
                   <span className={styles.count}>
-                    {c.booked}/{c.capacity}
+                    {c.capacity > 0 ? `${c.booked}/${c.capacity}` : c.booked}
                     {c.waitlist ? ` · +${c.waitlist}` : ''}
                   </span>
                 </span>
               </div>
             );
           })}
+          {classes.length === 0 && emptyText && <div className={styles.empty}>{emptyText}</div>}
         </div>
       </div>
     </div>

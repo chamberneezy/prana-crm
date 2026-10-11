@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { signIn } from './users';
+import { openSection, signInToOverview } from './users';
 
 test.beforeEach(async ({ page }) => {
-  await signIn(page);
-  await expect(page.getByRole('heading', { name: 'Članovi' })).toBeVisible();
+  await signInToOverview(page);
+  await openSection(page, 'Članovi');
 });
 
 test('filter, search and open a profile', async ({ page }) => {

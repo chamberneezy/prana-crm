@@ -235,6 +235,8 @@ export const membershipViewSchema = membershipSchema.extend({
   visits_used: z.number().int(),
   price_cents: cents.nullable(),
   paid_cents: cents,
+  /** The end of the following membership when this one is already renewed; otherwise null. */
+  renewed_until: isoDate.nullable(),
 }).meta({ id: 'MembershipView' });
 
 export const memberSummarySchema = z.object({
@@ -502,6 +504,7 @@ export type SessionsResponse = z.infer<typeof sessionsResponseSchema>;
 export type SessionDetailResponse = z.infer<typeof sessionDetailResponseSchema>;
 export type VisitResponse = z.infer<typeof visitResponseSchema>;
 export type PlansResponse = z.infer<typeof plansResponseSchema>;
+export type PlanResponse = z.infer<typeof planResponseSchema>;
 export type MembershipResponse = z.infer<typeof membershipResponseSchema>;
 export type PaymentsResponse = z.infer<typeof paymentsResponseSchema>;
 export type PaymentResponse = z.infer<typeof paymentResponseSchema>;

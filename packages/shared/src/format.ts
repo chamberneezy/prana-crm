@@ -81,3 +81,18 @@ export function displayToIsoDate(display: string): string | null {
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
   return date.toISOString().slice(0, 10);
 }
+
+/** "65", "65,5", "65.50" or "1.180,00" → cents; null if it isn't an amount. */
+export function parseMoney(text: string): number | null {
+  const cleaned = text.replace(/[\s€]/g, '');
+  if (!cleaned) return null;
+  // With a comma present, dots are thousands separators; without one, a dot is the decimal point.
+  const normalised = cleaned.includes(',') ? cleaned.replace(/\./g, '').replace(',', '.') : cleaned;
+  if (!/^\d+(\.\d{1,2})?$/.test(normalised)) return null;
+  return Math.round(Number(normalised) * 100);
+}
+
+/** 6500 → "65,00": the amount as typed into a field, without the euro sign. */
+export function formatMoneyInput(cents: number): string {
+  return formatMoney(cents).replace(/\s?€$/, '');
+}

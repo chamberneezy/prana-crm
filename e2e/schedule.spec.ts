@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { signIn } from './users';
+import { openSection, signInToOverview } from './users';
 
 /** Today's date in the studio's time zone, as YYYY-MM-DD. */
 const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Zagreb' }).format(new Date());
 
 test.beforeEach(async ({ page }) => {
-  await signIn(page);
-  await expect(page.getByRole('heading', { name: 'Članovi' })).toBeVisible();
+  await signInToOverview(page);
+  await openSection(page, 'Članovi');
 });
 
 test('schedule a session from a class type and check a member in', async ({ page }) => {

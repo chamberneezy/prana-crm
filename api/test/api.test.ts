@@ -279,6 +279,8 @@ describe('plans, memberships and payments', () => {
     // Still on the current period, but no longer flagged as expiring.
     expect(body.summary).toMatchObject({ status: 'active', days_left: 3 });
     expect(body.summary.membership.id).toBe(current.id);
+    expect(body.summary.membership.renewed_until).toBe(body.membership.period_end);
+    expect(current.renewed_until).toBeNull();
   });
 
   it('starts a membership for a member who has none', async () => {

@@ -68,7 +68,8 @@ export async function loadMemberFacts(db: Db, businessId: string, today: string,
     if (!current || !found) continue;
 
     const paid_cents = paidBy.get(current.id) ?? 0;
-    const renewed = list.some((m) => m.row !== current && m.row.period_start > current.period_end);
+    const following = list.filter((m) => m.row !== current && m.row.period_start > current.period_end).map((m) => m.row.period_end);
+    const renewed = following.length > 0;
     const result = deriveMemberStatus({ ...current, plan_code: found.plan_code, price_cents: found.price_cents, paid_cents, renewed }, today);
     facts.set(id, {
       ...result,
@@ -80,6 +81,7 @@ export async function loadMemberFacts(db: Db, businessId: string, today: string,
         visits_used: usedBy.get(current.id) ?? 0,
         price_cents: found.price_cents,
         paid_cents,
+        renewed_until: renewed ? following.reduce((latest, end) => (end > latest ? end : latest)) : null,
       },
       last_visit_at: null,
     });

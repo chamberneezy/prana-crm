@@ -12,3 +12,15 @@ export async function signIn(page: Page, user = OWNER) {
   await page.getByLabel('Lozinka').fill(user.password);
   await page.getByRole('button', { name: 'Prijava', exact: true }).click();
 }
+
+/** Signs in as the owner and waits for the overview, where the app opens. */
+export async function signInToOverview(page: Page) {
+  await signIn(page);
+  await expect(page.getByRole('heading', { name: 'Pregled' })).toBeVisible();
+}
+
+/** Opens a section from the sidebar and waits for its page title. */
+export async function openSection(page: Page, name: string) {
+  await page.getByRole('navigation').getByRole('button', { name, exact: true }).click();
+  await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageFromDob, displayToIsoDate, formatDate, formatDayMonth, formatMoney, formatTime, formatTimeRange, isoToDisplayDate } from './format';
+import { ageFromDob, displayToIsoDate, formatDate, formatDayMonth, formatMoney, formatTime, formatMoneyInput, formatTimeRange, isoToDisplayDate, parseMoney } from './format';
 
 describe('formatMoney', () => {
   it('uses comma decimals and the euro sign after the amount', () => {
@@ -62,5 +62,26 @@ describe('display and ISO dates', () => {
     expect(displayToIsoDate('31.02.2000.')).toBeNull();
     expect(displayToIsoDate('22.13.1991.')).toBeNull();
     expect(displayToIsoDate('')).toBeNull();
+  });
+});
+
+describe('parseMoney', () => {
+  it('reads amounts the way they are typed in Croatia', () => {
+    expect(parseMoney('65')).toBe(6500);
+    expect(parseMoney('65,00')).toBe(6500);
+    expect(parseMoney('65,5')).toBe(6550);
+    expect(parseMoney('65.50')).toBe(6550);
+    expect(parseMoney('1.180,00 €')).toBe(118000);
+    expect(parseMoney(' 0,05 ')).toBe(5);
+  });
+  it('rejects anything that is not an amount', () => {
+    expect(parseMoney('')).toBeNull();
+    expect(parseMoney('abc')).toBeNull();
+    expect(parseMoney('-5')).toBeNull();
+    expect(parseMoney('65,123')).toBeNull();
+  });
+  it('round-trips with the field format', () => {
+    expect(formatMoneyInput(118000)).toBe('1.180,00');
+    expect(parseMoney(formatMoneyInput(118000))).toBe(118000);
   });
 });

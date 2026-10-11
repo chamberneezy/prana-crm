@@ -3,12 +3,16 @@ import { FileText } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
 import { ApiClientError, apiFile, errorMessage } from '../api/client';
-import { useMember, useUpdateMember } from '../api/queries';
+import { useFreezeMembership, useMember, useUpdateMember } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
-import { Card, EmptyState, MemberProfile, MembershipCard, Notice, UpisnicaForm } from '../components';
+import { Button, Card, EmptyState, MemberProfile, MembershipCard, Notice, SidePanel, UpisnicaForm } from '../components';
 import { useLang } from '../i18n';
 import { fieldErrors, memberToUpisnica, planLabel, statusLabel, type UpisnicaErrors, upisnicaToPatch, validateUpisnica } from '../lib/member';
 import styles from './MemberProfileScreen.module.css';
+import { AddMembershipForm, FreezeMembershipForm, RenewMembershipForm } from './MembershipForm';
+import { PaymentForm } from './PaymentForm';
+
+type Panel = 'renew' | 'freeze' | 'add' | 'payment' | null;
 
 export function MemberProfileScreen() {
   const { id = '' } = useParams();
@@ -21,6 +25,9 @@ export function MemberProfileScreen() {
   const [editing, setEditing] = useState(false);
   const [errors, setErrors] = useState<UpisnicaErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
+  const [panel, setPanel] = useState<Panel>(null);
+  // The hook needs an id before the member has loaded; it is only called once there is a membership.
+  const unfreeze = useFreezeMembership(data?.summary.membership?.id ?? '');
   const fallback = { generic: t('error.generic'), offline: t('error.offline') };
 
   const back = (
@@ -149,6 +156,35 @@ export function MemberProfileScreen() {
                 <EmptyState title={t('profileScreen.noMembership.title')}>{t('profileScreen.noMembership.body')}</EmptyState>
               </Card>
             )}
+            {membership && summary.debt_cents > 0 && <Notice title={t('membershipActions.debt.title', { amount: formatMoney(summary.debt_cents) })}>{t('membershipActions.debt.body')}</Notice>}
+            <div className={styles.actions}>
+              {!membership && <Button onClick={() => setPanel('add')}>{t('membershipActions.add')}</Button>}
+              {membership &&
+                (membership.renewed_until ? (
+                  <span className={styles.renewed}>{t('membershipActions.renewed', { date: isoToDisplayDate(membership.renewed_until) })}</span>
+                ) : (
+                  <Button onClick={() => setPanel('renew')}>{t('membershipActions.renew')}</Button>
+                ))}
+              {membership &&
+                (summary.status === 'frozen' ? (
+                  <Button
+                    variant="secondary"
+                    disabled={unfreeze.isPending}
+                    onClick={() =>
+                      unfreeze.mutate(null, {
+                        onSuccess: () => toast({ message: t('toast.membershipUnfrozen') }),
+                        onError: (err) => setFailure(errorMessage(err, lang, fallback)),
+                      })
+                    }
+                  >
+                    {t('membershipActions.unfreeze')}
+                  </Button>
+                ) : (
+                  <Button variant="secondary" onClick={() => setPanel('freeze')}>
+                    {t('membershipActions.freeze')}
+                  </Button>
+                ))}
+            </div>
           </section>
 
           <section className={styles.listCard}>
@@ -166,7 +202,12 @@ export function MemberProfileScreen() {
           </section>
 
           <section className={styles.listCard}>
-            <h2 className={styles.overline}>{t('profileScreen.payments')}</h2>
+            <div className={styles.listHead}>
+              <h2 className={styles.overline}>{t('profileScreen.payments')}</h2>
+              <Button variant="secondary" size="sm" onClick={() => setPanel('payment')}>
+                {t('payments.record')}
+              </Button>
+            </div>
             {payments.map((p) => (
               <div key={p.id} className={styles.row}>
                 <span className={styles.rowMain}>{[formatDate(p.paid_at), p.plan_name, t(`method.${p.method}`)].filter(Boolean).join(' · ')}</span>
@@ -177,6 +218,27 @@ export function MemberProfileScreen() {
           </section>
         </div>
       </div>
+
+      {panel === 'add' && (
+        <SidePanel title={t('membershipForm.addTitle')} onClose={() => setPanel(null)}>
+          <AddMembershipForm memberId={member.id} onDone={() => setPanel(null)} />
+        </SidePanel>
+      )}
+      {panel === 'renew' && membership && (
+        <SidePanel title={t('membershipForm.renewTitle')} onClose={() => setPanel(null)}>
+          <RenewMembershipForm membership={membership} onDone={() => setPanel(null)} />
+        </SidePanel>
+      )}
+      {panel === 'freeze' && membership && (
+        <SidePanel title={t('membershipForm.freezeTitle')} onClose={() => setPanel(null)}>
+          <FreezeMembershipForm membership={membership} onDone={() => setPanel(null)} />
+        </SidePanel>
+      )}
+      {panel === 'payment' && (
+        <SidePanel title={t('payments.record')} onClose={() => setPanel(null)}>
+          <PaymentForm member={summary} onDone={() => setPanel(null)} />
+        </SidePanel>
+      )}
     </>
   );
 }

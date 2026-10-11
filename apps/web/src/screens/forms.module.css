@@ -70,3 +70,67 @@
   gap: 10px;
   padding-top: 4px;
 }
+
+/* A chosen or found member: avatar, name and the usual line under it. */
+.chosen,
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+}
+
+.result {
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.result:hover {
+  background: var(--surface-hover);
+}
+
+.result:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.chosenText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.chosenText strong {
+  font-weight: 600;
+}
+
+.chosenText span {
+  color: var(--text-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  margin: -8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.noResults {
+  padding: 8px;
+  color: var(--text-2);
+  font-size: 13px;
+}
