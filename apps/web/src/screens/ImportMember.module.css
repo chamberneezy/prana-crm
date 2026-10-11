@@ -1,0 +1,163 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 960px;
+}
+
+.back {
+  align-self: flex-start;
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 56px 24px;
+  border: 2px dashed var(--sage);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  text-align: center;
+  transition: var(--transition-color);
+}
+
+.zoneOver {
+  border-color: var(--sage-deep);
+  background: var(--surface-selected);
+}
+
+.zoneIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--mist);
+  color: var(--sage-ink);
+}
+
+.zoneTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.zoneLimits {
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+/* The real file input stays in the page for assistive tech and tests, but out of sight. */
+.fileInput {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0 0 0 0);
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-3);
+  font-size: 14px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.stepDone {
+  color: var(--sage-deep);
+}
+
+.stepNow {
+  color: var(--text-1);
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 16px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  color: var(--text-1);
+  text-decoration: none;
+  transition: var(--transition-color);
+}
+
+a.option:hover {
+  border-color: var(--sage);
+  color: var(--text-1);
+}
+
+a.option:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.optionIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: var(--mist);
+  color: var(--sage-ink);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.optionText strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.optionText span {
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.footer {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.6;
+}

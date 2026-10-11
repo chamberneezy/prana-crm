@@ -1,0 +1,217 @@
+{
+  "description": "Labels above their values, two columns, every option printed with a tick box. Checks +385 phones, upper-case names and e-mails, and dates without leading zeros.",
+  "lines": [
+    {
+      "text": "Ime i prezime",
+      "x": 40,
+      "y": 100,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "MARKO KOVAČ",
+      "x": 40,
+      "y": 118,
+      "width": 61.6,
+      "height": 12
+    },
+    {
+      "text": "E-mail",
+      "x": 40,
+      "y": 150,
+      "width": 33.6,
+      "height": 12
+    },
+    {
+      "text": "Broj mobitela",
+      "x": 300,
+      "y": 150,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "Marko.Kovac@Example.com",
+      "x": 40,
+      "y": 168,
+      "width": 128.8,
+      "height": 12
+    },
+    {
+      "text": "+385 98 765 4321",
+      "x": 300,
+      "y": 168,
+      "width": 89.6,
+      "height": 12
+    },
+    {
+      "text": "Datum rođenja",
+      "x": 40,
+      "y": 200,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "Student / umirovljenik?",
+      "x": 300,
+      "y": 200,
+      "width": 128.8,
+      "height": 12
+    },
+    {
+      "text": "2.11.1979",
+      "x": 40,
+      "y": 218,
+      "width": 50.4,
+      "height": 12
+    },
+    {
+      "text": "☑ NE",
+      "x": 300,
+      "y": 218,
+      "width": 22.4,
+      "height": 12
+    },
+    {
+      "text": "☐ DA",
+      "x": 350,
+      "y": 218,
+      "width": 22.4,
+      "height": 12
+    },
+    {
+      "text": "Odaberite članstvo",
+      "x": 40,
+      "y": 255,
+      "width": 100.8,
+      "height": 12
+    },
+    {
+      "text": "☑ 1× tjedno",
+      "x": 40,
+      "y": 275,
+      "width": 61.6,
+      "height": 12
+    },
+    {
+      "text": "☐ 2× tjedno",
+      "x": 300,
+      "y": 275,
+      "width": 61.6,
+      "height": 12
+    },
+    {
+      "text": "≈ 4 dolaska mjesečno",
+      "x": 40,
+      "y": 289,
+      "width": 112.0,
+      "height": 12
+    },
+    {
+      "text": "≈ 8 dolazaka mjesečno",
+      "x": 300,
+      "y": 289,
+      "width": 117.6,
+      "height": 12
+    },
+    {
+      "text": "☐ 3× tjedno",
+      "x": 40,
+      "y": 310,
+      "width": 61.6,
+      "height": 12
+    },
+    {
+      "text": "☐ Neograničeno",
+      "x": 300,
+      "y": 310,
+      "width": 78.4,
+      "height": 12
+    },
+    {
+      "text": "≈ 12 dolazaka mjesečno",
+      "x": 40,
+      "y": 324,
+      "width": 123.2,
+      "height": 12
+    },
+    {
+      "text": "Svi satovi u rasporedu",
+      "x": 300,
+      "y": 324,
+      "width": 123.2,
+      "height": 12
+    },
+    {
+      "text": "Postoji li nešto što bi učitelj trebao znati (npr. zdravstveni problemi vezani uz određene vježbe i položaje)?",
+      "x": 40,
+      "y": 350,
+      "width": 500,
+      "height": 12
+    },
+    {
+      "text": "☑ Ne",
+      "x": 40,
+      "y": 370,
+      "width": 22.4,
+      "height": 12
+    },
+    {
+      "text": "☐ Da, molimo navedite",
+      "x": 100,
+      "y": 370,
+      "width": 117.6,
+      "height": 12
+    },
+    {
+      "text": "[x] Potvrđujem da su navedeni podaci točni i da ću učitelja obavijestiti o okolnostima koje mogu utjecati na moje sigurno vježbanje.",
+      "x": 40,
+      "y": 410,
+      "width": 510,
+      "height": 12
+    },
+    {
+      "text": "[x] Želim primati obavijesti o rasporedu, radionicama i novostima studija putem e-maila.",
+      "x": 40,
+      "y": 435,
+      "width": 460,
+      "height": 12
+    },
+    {
+      "text": "Mjesto i datum",
+      "x": 40,
+      "y": 480,
+      "width": 78.4,
+      "height": 12
+    },
+    {
+      "text": "Potpis",
+      "x": 320,
+      "y": 480,
+      "width": 33.6,
+      "height": 12
+    },
+    {
+      "text": "Varaždin, 2.9.2026",
+      "x": 40,
+      "y": 498,
+      "width": 100.8,
+      "height": 12
+    }
+  ],
+  "expected": {
+    "name": "Marko Kovač",
+    "email": "marko.kovac@example.com",
+    "phone": "098 765 4321",
+    "dob": "02.11.1979.",
+    "student": false,
+    "plan": "1x",
+    "health": false,
+    "healthText": "",
+    "consent": true,
+    "news": true,
+    "place": "Varaždin",
+    "date": "02.09.2026.",
+    "signaturePresent": false,
+    "needsReview": []
+  }
+}

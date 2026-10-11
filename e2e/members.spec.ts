@@ -9,12 +9,18 @@ test.beforeEach(async ({ page }) => {
 test('filter, search and open a profile', async ({ page }) => {
   const list = page.getByRole('region', { name: 'Popis članova' });
 
+  // Each filter chip carries its count, and the list shows exactly that many members.
+  // (Other flows add members to the same database, so the counts are read rather than fixed.)
+  const count = async (chip: RegExp) => Number(((await page.getByRole('tab', { name: chip }).textContent()) ?? '').replace(/\D/g, ''));
+
   await page.getByRole('tab', { name: /^Neplaćeno/ }).click();
-  await expect(list.getByRole('button')).toHaveCount(1);
+  await expect(page.getByRole('tab', { name: /^Neplaćeno/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(list.getByRole('button')).toHaveCount(await count(/^Neplaćeno/));
   await expect(list.getByRole('button', { name: /Marko Kovač/ })).toContainText('Neplaćeno');
+  for (const row of await list.getByRole('button').all()) await expect(row).toContainText('Neplaćeno');
 
   await page.getByRole('tab', { name: /^Svi/ }).click();
-  await expect(list.getByRole('button')).toHaveCount(8);
+  await expect(list.getByRole('button')).toHaveCount(await count(/^Svi/));
   await page.getByRole('searchbox').fill('simic');
   // The search is applied a moment after typing stops.
   await expect(page).toHaveURL(/q=simic/);
@@ -34,7 +40,9 @@ test('filter, search and open a profile', async ({ page }) => {
 test('add a member manually', async ({ page }) => {
   const name = `Proba Testić ${Date.now().toString().slice(-6)}`;
   await page.getByRole('button', { name: 'Novi član' }).click();
+  await page.getByRole('link', { name: /Upiši ručno/ }).click();
   await expect(page.getByRole('heading', { name: 'Novi član' })).toBeVisible();
+  await expect(page.getByText('Prijava za članstvo')).toBeVisible();
 
   await page.getByLabel('Ime i prezime').fill(name);
   await page.getByLabel('E-mail').fill('proba.testic@example.com');

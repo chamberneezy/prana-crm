@@ -45,15 +45,15 @@ export function NewMember() {
 
   return (
     <div className={styles.page}>
-      <Link to="/clanovi" className={styles.back}>
-        ‹ {t('profileScreen.back')}
+      <Link to="/clanovi/novi" className={styles.back}>
+        ‹ {t('review.back')}
       </Link>
       <div className={styles.intro}>
         <PageHeader title={t('newMember.title')} />
         <p>{t('newMember.manualIntro')}</p>
       </div>
       {failure && <Notice>{failure}</Notice>}
-      <UpisnicaForm errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi')} />
+      <UpisnicaForm errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi/novi')} />
     </div>
   );
 }

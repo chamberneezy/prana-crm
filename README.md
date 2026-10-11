@@ -14,7 +14,7 @@ packages/shared/   zod schemas (the API contract), member-status rules, date and
 docs/              handoffs, the design export, openapi.json (generated)
 ```
 
-`apps/ios/` and `fixtures/upisnica/` arrive in later milestones.
+`fixtures/upisnica/` holds the upisnica parser's test cases, shared with the iOS app. `apps/ios/` arrives later.
 
 ## Running locally
 

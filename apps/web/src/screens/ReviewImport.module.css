@@ -1,0 +1,143 @@
+.back {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.saved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.link {
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--ink);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-attention);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.original {
+  display: flex;
+  flex: 1 1 340px;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fields {
+  display: flex;
+  flex: 1.4 1 460px;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.originalHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.overline {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+
+.fileName {
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  line-height: 0;
+}
+
+.page img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Outlines over the page image. The fill is multiplied in, so the text underneath stays readable. */
+.region {
+  position: absolute;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-xs);
+}
+
+.regionCheck {
+  border-color: var(--terracotta);
+  background: var(--blush);
+  mix-blend-mode: multiply;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 2px;
+}
+
+.swatchCheck {
+  border-color: var(--terracotta);
+  background: var(--blush);
+}

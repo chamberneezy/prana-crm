@@ -1,0 +1,84 @@
+{
+  "description": "Label and value on one line. Labels have no diacritics and one is misread (l for I). There is no newsletter sentence, which is not a reason for review.",
+  "lines": [
+    {
+      "text": "lme i prezime: iva babić-KOVAČEVIĆ",
+      "x": 40,
+      "y": 100,
+      "width": 190.4,
+      "height": 12
+    },
+    {
+      "text": "E-mail: IVA.BABIC@EXAMPLE.COM",
+      "x": 40,
+      "y": 125,
+      "width": 162.4,
+      "height": 12
+    },
+    {
+      "text": "Broj mobitela: 0038595 111 2233",
+      "x": 40,
+      "y": 150,
+      "width": 173.6,
+      "height": 12
+    },
+    {
+      "text": "Datum rodenja: 21/06/1992",
+      "x": 40,
+      "y": 175,
+      "width": 140.0,
+      "height": 12
+    },
+    {
+      "text": "Student / umirovljenik? NE",
+      "x": 40,
+      "y": 200,
+      "width": 145.6,
+      "height": 12
+    },
+    {
+      "text": "Odaberite clanstvo: Neograničeno",
+      "x": 40,
+      "y": 225,
+      "width": 179.2,
+      "height": 12
+    },
+    {
+      "text": "Postoji li nesto sto bi ucitelj trebao znati? Ne",
+      "x": 40,
+      "y": 250,
+      "width": 268.8,
+      "height": 12
+    },
+    {
+      "text": "(x) Potvrdujem da su navedeni podaci tocni.",
+      "x": 40,
+      "y": 285,
+      "width": 240.8,
+      "height": 12
+    },
+    {
+      "text": "Mjesto i datum: Zagreb 5.10.2026.",
+      "x": 40,
+      "y": 320,
+      "width": 184.8,
+      "height": 12
+    }
+  ],
+  "expected": {
+    "name": "Iva Babić-Kovačević",
+    "email": "iva.babic@example.com",
+    "phone": "095 111 2233",
+    "dob": "21.06.1992.",
+    "student": false,
+    "plan": "unl",
+    "health": false,
+    "healthText": "",
+    "consent": true,
+    "news": false,
+    "place": "Zagreb",
+    "date": "05.10.2026.",
+    "signaturePresent": false,
+    "needsReview": []
+  }
+}

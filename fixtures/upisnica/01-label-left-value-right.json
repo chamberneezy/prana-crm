@@ -1,0 +1,182 @@
+{
+  "description": "A digital form exported as PDF: each label on the left, its value on the same row. Only the chosen plan is printed; consents carry tick marks.",
+  "lines": [
+    {
+      "text": "Prijava za članstvo",
+      "x": 40,
+      "y": 40,
+      "width": 106.4,
+      "height": 12
+    },
+    {
+      "text": "Ime i prezime",
+      "x": 40,
+      "y": 100,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "Ana Horvat",
+      "x": 200,
+      "y": 100,
+      "width": 56.0,
+      "height": 12
+    },
+    {
+      "text": "E-mail",
+      "x": 40,
+      "y": 125,
+      "width": 33.6,
+      "height": 12
+    },
+    {
+      "text": "ana.horvat@example.com",
+      "x": 200,
+      "y": 125,
+      "width": 123.2,
+      "height": 12
+    },
+    {
+      "text": "Broj mobitela",
+      "x": 40,
+      "y": 150,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "091 234 5678",
+      "x": 200,
+      "y": 150,
+      "width": 67.2,
+      "height": 12
+    },
+    {
+      "text": "Datum rođenja",
+      "x": 40,
+      "y": 175,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "14.03.1988.",
+      "x": 200,
+      "y": 175,
+      "width": 61.6,
+      "height": 12
+    },
+    {
+      "text": "Student / umirovljenik?",
+      "x": 40,
+      "y": 200,
+      "width": 128.8,
+      "height": 12
+    },
+    {
+      "text": "DA",
+      "x": 200,
+      "y": 200,
+      "width": 11.2,
+      "height": 12
+    },
+    {
+      "text": "Odaberite članstvo",
+      "x": 40,
+      "y": 235,
+      "width": 100.8,
+      "height": 12
+    },
+    {
+      "text": "2× tjedno",
+      "x": 200,
+      "y": 235,
+      "width": 50.4,
+      "height": 12
+    },
+    {
+      "text": "Postoji li nešto što bi učitelj trebao znati (npr. zdravstveni problemi vezani uz određene vježbe i položaje)?",
+      "x": 40,
+      "y": 270,
+      "width": 500,
+      "height": 12
+    },
+    {
+      "text": "Da",
+      "x": 40,
+      "y": 290,
+      "width": 11.2,
+      "height": 12
+    },
+    {
+      "text": "Molimo navedite",
+      "x": 40,
+      "y": 315,
+      "width": 84.0,
+      "height": 12
+    },
+    {
+      "text": "Hernija L5, izbjegavati duboke pretklone.",
+      "x": 40,
+      "y": 333,
+      "width": 229.6,
+      "height": 12
+    },
+    {
+      "text": "✓ Potvrđujem da su navedeni podaci točni i da ću učitelja obavijestiti o okolnostima koje mogu utjecati na moje sigurno vježbanje.",
+      "x": 40,
+      "y": 370,
+      "width": 510,
+      "height": 12
+    },
+    {
+      "text": "○ Želim primati obavijesti o rasporedu, radionicama i novostima studija putem e-maila.",
+      "x": 40,
+      "y": 395,
+      "width": 460,
+      "height": 12
+    },
+    {
+      "text": "Mjesto i datum",
+      "x": 40,
+      "y": 440,
+      "width": 78.4,
+      "height": 12
+    },
+    {
+      "text": "Potpis",
+      "x": 320,
+      "y": 440,
+      "width": 33.6,
+      "height": 12
+    },
+    {
+      "text": "Zagreb, 11.10.2026.",
+      "x": 40,
+      "y": 458,
+      "width": 106.4,
+      "height": 12
+    },
+    {
+      "text": "Ana Horvat",
+      "x": 320,
+      "y": 458,
+      "width": 56.0,
+      "height": 12
+    }
+  ],
+  "expected": {
+    "name": "Ana Horvat",
+    "email": "ana.horvat@example.com",
+    "phone": "091 234 5678",
+    "dob": "14.03.1988.",
+    "student": true,
+    "plan": "2x",
+    "health": true,
+    "healthText": "Hernija L5, izbjegavati duboke pretklone.",
+    "consent": true,
+    "news": false,
+    "place": "Zagreb",
+    "date": "11.10.2026.",
+    "signaturePresent": false,
+    "needsReview": []
+  }
+}

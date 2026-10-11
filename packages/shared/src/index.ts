@@ -6,4 +6,5 @@ export * from './text';
 export * from './status';
 export * from './schemas';
 export * from './openapi';
+export * from './upisnica';
 export * from './i18n';

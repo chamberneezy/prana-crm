@@ -1,0 +1,196 @@
+{
+  "description": "What must be flagged: an unreadable digit, an invalid e-mail, a missing date of birth, choices with no tick mark, a low-confidence note, consents with no tick mark, and a date that does not exist. Nothing is guessed.",
+  "lines": [
+    {
+      "text": "Ime i prezime",
+      "x": 40,
+      "y": 100,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "Lucija Perić",
+      "x": 200,
+      "y": 100,
+      "width": 67.2,
+      "height": 12,
+      "confidence": 0.95
+    },
+    {
+      "text": "E-mail",
+      "x": 40,
+      "y": 125,
+      "width": 33.6,
+      "height": 12
+    },
+    {
+      "text": "lucija.peric@example",
+      "x": 200,
+      "y": 125,
+      "width": 112.0,
+      "height": 12,
+      "confidence": 0.9
+    },
+    {
+      "text": "Broj mobitela",
+      "x": 40,
+      "y": 150,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "098 76? 4321",
+      "x": 200,
+      "y": 150,
+      "width": 67.2,
+      "height": 12,
+      "confidence": 0.5
+    },
+    {
+      "text": "Datum rođenja",
+      "x": 40,
+      "y": 175,
+      "width": 72.8,
+      "height": 12
+    },
+    {
+      "text": "Student / umirovljenik?",
+      "x": 40,
+      "y": 200,
+      "width": 128.8,
+      "height": 12
+    },
+    {
+      "text": "NE DA",
+      "x": 200,
+      "y": 200,
+      "width": 28.0,
+      "height": 12
+    },
+    {
+      "text": "Odaberite članstvo",
+      "x": 40,
+      "y": 235,
+      "width": 100.8,
+      "height": 12
+    },
+    {
+      "text": "1× tjedno",
+      "x": 40,
+      "y": 255,
+      "width": 50.4,
+      "height": 12
+    },
+    {
+      "text": "2× tjedno",
+      "x": 170,
+      "y": 255,
+      "width": 50.4,
+      "height": 12
+    },
+    {
+      "text": "3× tjedno",
+      "x": 300,
+      "y": 255,
+      "width": 50.4,
+      "height": 12
+    },
+    {
+      "text": "Neograničeno",
+      "x": 430,
+      "y": 255,
+      "width": 67.2,
+      "height": 12
+    },
+    {
+      "text": "Postoji li nešto što bi učitelj trebao znati (npr. zdravstveni problemi vezani uz određene vježbe i položaje)?",
+      "x": 40,
+      "y": 290,
+      "width": 500,
+      "height": 12
+    },
+    {
+      "text": "Ne",
+      "x": 40,
+      "y": 310,
+      "width": 11.2,
+      "height": 12
+    },
+    {
+      "text": "Da, molimo navedite",
+      "x": 100,
+      "y": 310,
+      "width": 106.4,
+      "height": 12
+    },
+    {
+      "text": "Molimo navedite",
+      "x": 40,
+      "y": 335,
+      "width": 84.0,
+      "height": 12
+    },
+    {
+      "text": "Bol u lijevom koljenu (meniskus?)",
+      "x": 40,
+      "y": 353,
+      "width": 184.8,
+      "height": 12,
+      "confidence": 0.45
+    },
+    {
+      "text": "Potvrđujem da su navedeni podaci točni i da ću učitelja obavijestiti o okolnostima koje mogu utjecati na moje sigurno vježbanje.",
+      "x": 40,
+      "y": 390,
+      "width": 510,
+      "height": 12
+    },
+    {
+      "text": "Želim primati obavijesti o rasporedu, radionicama i novostima studija putem e-maila.",
+      "x": 40,
+      "y": 415,
+      "width": 460,
+      "height": 12
+    },
+    {
+      "text": "Mjesto i datum",
+      "x": 40,
+      "y": 460,
+      "width": 78.4,
+      "height": 12
+    },
+    {
+      "text": "Zagreb, 31.02.2026.",
+      "x": 40,
+      "y": 478,
+      "width": 106.4,
+      "height": 12
+    }
+  ],
+  "expected": {
+    "name": "Lucija Perić",
+    "email": "lucija.peric@example",
+    "phone": "098 76? 4321",
+    "dob": "",
+    "student": false,
+    "plan": "2x",
+    "health": true,
+    "healthText": "Bol u lijevom koljenu (meniskus?)",
+    "consent": false,
+    "news": false,
+    "place": "Zagreb",
+    "date": "",
+    "signaturePresent": false,
+    "needsReview": [
+      "email",
+      "phone",
+      "dob",
+      "student",
+      "plan",
+      "healthText",
+      "consent",
+      "news",
+      "date"
+    ]
+  }
+}

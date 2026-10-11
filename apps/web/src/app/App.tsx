@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { ApiClientError } from '../api/client';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
 import { LangProvider, useLang } from '../i18n';
+import { ImportMember } from '../screens/ImportMember';
 import { Login } from '../screens/Login';
 import { MemberProfileScreen } from '../screens/MemberProfileScreen';
 import { Members } from '../screens/Members';
@@ -38,8 +39,7 @@ function SignedIn() {
         <Route path="raspored" element={<Schedule />} />
         <Route path="vrste-satova" element={<Offerings />} />
         <Route path="clanovi" element={<Members />} />
-        {/* Importing a scanned form arrives with M5; until then "Novi član" is the manual form. */}
-        <Route path="clanovi/novi" element={<Navigate to="/clanovi/novi/rucno" replace />} />
+        <Route path="clanovi/novi" element={<ImportMember />} />
         <Route path="clanovi/novi/rucno" element={<NewMember />} />
         <Route path="clanovi/:id" element={<MemberProfileScreen />} />
         <Route path="karte" element={<Plans />} />

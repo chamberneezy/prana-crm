@@ -1,0 +1,29 @@
+{
+  "description": "A photo or a scan with no text layer: nothing is read, and every field the owner has to fill in is flagged.",
+  "lines": [],
+  "expected": {
+    "name": "",
+    "email": "",
+    "phone": "",
+    "dob": "",
+    "student": false,
+    "plan": "2x",
+    "health": false,
+    "healthText": "",
+    "consent": false,
+    "news": false,
+    "place": "",
+    "date": "",
+    "signaturePresent": false,
+    "needsReview": [
+      "name",
+      "email",
+      "phone",
+      "dob",
+      "student",
+      "plan",
+      "health",
+      "consent"
+    ]
+  }
+}
