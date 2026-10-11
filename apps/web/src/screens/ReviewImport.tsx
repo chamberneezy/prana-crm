@@ -1,4 +1,4 @@
-import { displayToIsoDate, type DocumentResponse, localDate, type MemberResponse, SCAN_FIELDS, type ScanField, STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
+import { type DocumentResponse, type MemberResponse, SCAN_FIELDS, type ScanField, STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router';
@@ -7,7 +7,7 @@ import { Button, MemberProfile, Notice, PageHeader, Toast, UpisnicaForm } from '
 import { cx } from '../components/cx';
 import { useLang } from '../i18n';
 import { isPdf } from '../import/extract';
-import { fieldErrors, planLabel, statusLabel, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
+import { fieldErrors, planLabel, type Signed, statusLabel, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
 import type { ImportedForm } from './ImportMember';
 import styles from './ReviewImport.module.css';
 
@@ -43,7 +43,6 @@ export function ReviewImport({ imported, onAnother }: Props) {
     if (flagged.includes(field) && value[field] === initial[field]) reviewErrors[field] = t(initial[field] ? 'review.fieldCheck' : 'review.fieldEmpty');
   }
 
-  const signedDate = (scan.date && displayToIsoDate(scan.date)) || localDate(new Date());
   // A form that doesn't say where it was signed is taken to be signed at the studio.
   const signedPlace = scan.place || STUDIO_PLACE;
 
@@ -56,8 +55,8 @@ export function ReviewImport({ imported, onAnother }: Props) {
     await api<DocumentResponse>('PATCH', `/documents/${document.id}`, { member_id: memberId, ocr_json: { version: 1, source: noText ? 'none' : 'pdf-text', result: { ...scan, regions: undefined }, lines: extracted.lines } });
   };
 
-  const save = async (v: UpisnicaValue) => {
-    const found = validateUpisnica(v, strings);
+  const save = async (v: UpisnicaValue, signed: Signed) => {
+    const found = validateUpisnica(v, signed, strings);
     setErrors(found);
     setFailure(null);
     if (Object.keys(found).length) return;
@@ -65,7 +64,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
     setBusy(true);
     let created: MemberResponse;
     try {
-      created = await api<MemberResponse>('POST', '/members', upisnicaToInput(v, { place: signedPlace, date: signedDate }));
+      created = await api<MemberResponse>('POST', '/members', upisnicaToInput(v, signed));
     } catch (error) {
       const rejected = error instanceof ApiClientError && error.code === 'invalid_input' ? fieldErrors(error.fields, strings) : {};
       setErrors(rejected);
@@ -203,7 +202,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
             <>
               {noText && <Notice title={t('review.noText.title')}>{t('review.noText.body')}</Notice>}
               {flagged.length > 0 && <Notice title={tn('review.count', flagged.length)}>{t('review.countBody', { fields: flagged.map(fieldName).join(', ') })}</Notice>}
-              <UpisnicaForm initial={value} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v) => void save(v)} onCancel={onAnother} />
+              <UpisnicaForm initial={value} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v, signed) => void save(v, signed)} onCancel={onAnother} />
             </>
           )}
         </section>

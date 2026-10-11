@@ -1,4 +1,4 @@
-import type { ChangeEvent, CSSProperties } from 'react';
+import { type ChangeEvent, type CSSProperties, useId } from 'react';
 import { cx } from './cx';
 import styles from './Input.module.css';
 
@@ -22,7 +22,10 @@ export interface InputProps {
 }
 
 export function Input({ label, value, defaultValue, onChange, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
+  const id = useId();
+  const noteId = `${id}-note`;
   const field = {
+    id,
     value,
     defaultValue,
     onChange,
@@ -31,14 +34,28 @@ export function Input({ label, value, defaultValue, onChange, placeholder, error
     name,
     autoComplete,
     'aria-invalid': error ? true : undefined,
+    // The message belongs to the field as a description, so the label stays just the label.
+    'aria-describedby': error || hint ? noteId : undefined,
     className: cx(styles.control, multiline && styles.multiline, readOnly && styles.readOnly, error && styles.invalid),
   };
   return (
-    <label className={styles.field} style={style}>
-      {label && <span className={styles.label}>{label}</span>}
+    <div className={styles.field} style={style}>
+      {label && (
+        <label htmlFor={id} className={styles.label}>
+          {label}
+        </label>
+      )}
       {multiline ? <textarea rows={rows} {...field} /> : <input type={type} {...field} />}
-      {error && <span className={styles.error}>{error}</span>}
-      {!error && hint && <span className={styles.hint}>{hint}</span>}
-    </label>
+      {error && (
+        <span id={noteId} className={styles.error}>
+          {error}
+        </span>
+      )}
+      {!error && hint && (
+        <span id={noteId} className={styles.hint}>
+          {hint}
+        </span>
+      )}
+    </div>
   );
 }

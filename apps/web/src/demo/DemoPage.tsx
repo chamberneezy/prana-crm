@@ -116,7 +116,7 @@ export function DemoPage() {
                 <Input label="Datum rođenja" placeholder="dd.mm.gggg." />
                 <Input label="E-mail" defaultValue="ana.horvat@" error="Unesite ispravnu e-mail adresu." />
                 <Input label="Broj mobitela" defaultValue="091 234 5678" hint="Koristi se samo za obavijesti o satu." />
-                <Input label="Mjesto i datum" readOnly value="Varaždin, 11.10.2026." />
+                <Input label="Mjesto" readOnly value="Varaždin" />
                 <Input label="Molimo navedite" multiline rows={3} defaultValue="Hernija L5, izbjegavati duboke pretklone." />
               </div>
             </Card>

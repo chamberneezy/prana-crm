@@ -7,7 +7,7 @@ import { useFreezeMembership, useMember, useUpdateMember } from '../api/queries'
 import { useToast } from '../app/ToastProvider';
 import { Button, Card, EmptyState, MemberProfile, MembershipCard, Notice, SidePanel, UpisnicaForm } from '../components';
 import { useLang } from '../i18n';
-import { fieldErrors, memberToUpisnica, planLabel, statusLabel, type UpisnicaErrors, upisnicaToPatch, validateUpisnica } from '../lib/member';
+import { fieldErrors, memberToUpisnica, planLabel, type Signed, statusLabel, type UpisnicaErrors, upisnicaToPatch, validateUpisnica } from '../lib/member';
 import styles from './MemberProfileScreen.module.css';
 import { AddMembershipForm, FreezeMembershipForm, RenewMembershipForm } from './MembershipForm';
 import { PaymentForm } from './PaymentForm';
@@ -58,12 +58,12 @@ export function MemberProfileScreen() {
   const value = memberToUpisnica(member, summary);
   const since = isoToDisplayDate(member.member_since);
 
-  const save = (v: UpisnicaValue) => {
-    const found = validateUpisnica(v, strings);
+  const save = (v: UpisnicaValue, signed: Signed) => {
+    const found = validateUpisnica(v, signed, strings);
     setErrors(found);
     setFailure(null);
     if (Object.keys(found).length) return;
-    update.mutate(upisnicaToPatch(v), {
+    update.mutate(upisnicaToPatch(v, signed), {
       onSuccess: () => {
         setEditing(false);
         toast({ message: t('profileScreen.saved') });

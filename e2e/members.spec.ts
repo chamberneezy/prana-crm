@@ -52,8 +52,11 @@ test('add a member manually', async ({ page }) => {
   await page.getByRole('radio', { name: 'Da, molimo navedite' }).click();
   await page.getByLabel('Molimo navedite').fill('Osjetljivo rame');
 
-  // The form is signed at the studio, today.
-  await expect(page.getByLabel('Mjesto i datum')).toHaveValue(/^Varaždin, \d{2}\.\d{2}\.\d{4}\.$/);
+  // The form is signed at the studio, today: the city and the date are separate fields.
+  await expect(page.getByLabel('Mjesto', { exact: true })).toHaveValue('Varaždin');
+  await expect(page.getByLabel('Datum', { exact: true })).toHaveValue(/^\d{2}\.\d{2}\.\d{4}\.$/);
+  await page.getByLabel('Datum', { exact: true }).fill('31.02.2026.');
+  await page.getByLabel('Mjesto', { exact: true }).fill('Čakovec');
 
   // Nothing is saved without the accuracy consent.
   const save = page.getByRole('button', { name: 'Spremi člana' });
@@ -63,14 +66,21 @@ test('add a member manually', async ({ page }) => {
 
   // A date that doesn't exist is caught before saving.
   await save.click();
-  await expect(page.getByText('Unesite datum u obliku dd.mm.gggg.')).toBeVisible();
+  await expect(page.getByText('Unesite datum u obliku dd.mm.gggg.')).toHaveCount(2);
   await page.getByLabel('Datum rođenja').fill('28.02.1990.');
+  await page.getByLabel('Datum', { exact: true }).fill('3.10.2026');
   await save.click();
 
   await expect(page).toHaveURL(/\/clanovi\/[0-9a-f-]{36}$/);
   await expect(page.getByRole('status')).toContainText(`${name} je spremljen/a kao novi član.`);
   await expect(page.getByText('Osjetljivo rame')).toBeVisible();
   await expect(page.getByText('3× tjedno').first()).toBeVisible();
+  // The corrected place and date were saved with the member.
+  await expect(page.getByText('potpisano', { exact: false }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Uredi' }).click();
+  await expect(page.getByLabel('Mjesto', { exact: true })).toHaveValue('Čakovec');
+  await expect(page.getByLabel('Datum', { exact: true })).toHaveValue('03.10.2026.');
+  await page.getByRole('button', { name: 'Odustani' }).click();
 
   await page.getByRole('link', { name: /Članovi/ }).click();
   await page.getByRole('searchbox').fill(name);

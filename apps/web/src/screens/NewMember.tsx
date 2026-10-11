@@ -1,4 +1,4 @@
-import { localDate, STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
+import { STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ApiClientError, errorMessage } from '../api/client';
@@ -6,7 +6,7 @@ import { useCreateMember, useDeleteMember } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
 import { Notice, PageHeader, UpisnicaForm } from '../components';
 import { useLang } from '../i18n';
-import { fieldErrors, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
+import { fieldErrors, type Signed, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
 import styles from './NewMember.module.css';
 
 /** Manual entry: an empty upisnica on screen. */
@@ -20,13 +20,13 @@ export function NewMember() {
   const [errors, setErrors] = useState<UpisnicaErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
 
-  const save = (v: UpisnicaValue) => {
-    const found = validateUpisnica(v, strings);
+  const save = (v: UpisnicaValue, signed: Signed) => {
+    const found = validateUpisnica(v, signed, strings);
     setErrors(found);
     setFailure(null);
     if (Object.keys(found).length) return;
 
-    create.mutate(upisnicaToInput(v, { place: STUDIO_PLACE, date: localDate(new Date()) }), {
+    create.mutate(upisnicaToInput(v, signed), {
       onSuccess: ({ member }) => {
         navigate(`/clanovi/${member.id}`);
         toast({

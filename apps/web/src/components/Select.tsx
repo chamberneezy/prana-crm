@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { cx } from './cx';
 import inputStyles from './Input.module.css';
 import styles from './Select.module.css';
@@ -19,10 +20,22 @@ export interface SelectProps {
 }
 
 export function Select({ label, value, onChange, options, placeholder, error }: SelectProps) {
+  const id = useId();
   return (
-    <label className={inputStyles.field}>
-      {label && <span className={inputStyles.label}>{label}</span>}
-      <select value={value} onChange={(e) => onChange(e.target.value)} aria-invalid={error ? true : undefined} className={cx(inputStyles.control, styles.select, error && inputStyles.invalid)}>
+    <div className={inputStyles.field}>
+      {label && (
+        <label htmlFor={id} className={inputStyles.label}>
+          {label}
+        </label>
+      )}
+      <select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-note` : undefined}
+        className={cx(inputStyles.control, styles.select, error && inputStyles.invalid)}
+      >
         {placeholder !== undefined && <option value="">{placeholder}</option>}
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -30,7 +43,11 @@ export function Select({ label, value, onChange, options, placeholder, error }: 
           </option>
         ))}
       </select>
-      {error && <span className={inputStyles.error}>{error}</span>}
-    </label>
+      {error && (
+        <span id={`${id}-note`} className={inputStyles.error}>
+          {error}
+        </span>
+      )}
+    </div>
   );
 }

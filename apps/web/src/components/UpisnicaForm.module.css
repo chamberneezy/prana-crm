@@ -47,7 +47,7 @@
 }
 
 .footer {
-  align-items: end;
+  align-items: start;
 }
 
 .labelled {
@@ -103,4 +103,13 @@
   margin-left: auto;
   font-size: 12px;
   color: var(--text-attention);
+}
+
+/* Place and date sit side by side; the signature takes the full width below them. */
+.signatureField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  grid-column: 1 / -1;
 }

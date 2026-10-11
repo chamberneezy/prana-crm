@@ -11,20 +11,27 @@ const PLANS: UpisnicaPlan[] = ['1x', '2x', '3x', 'unl'];
 
 const EMPTY: UpisnicaValue = { name: '', email: '', phone: '', dob: '', student: false, plan: '2x', health: false, healthText: '', consent: false, news: false };
 
+/** Where and when the form was signed, as typed: a place and a dd.mm.yyyy. date. */
+export interface UpisnicaSigned {
+  place: string;
+  date: string;
+}
+
 /** The studio's paper enrolment form (upisnica): details, student flag, plan, health note, two consents, place/date, signature. */
 export interface UpisnicaFormProps {
   initial?: Partial<UpisnicaValue>;
+  /** Where the form was signed. Shown in its own field, which the owner can correct. */
   place?: string;
   /** dd.mm.yyyy.; today when left out. */
   date?: string;
   onChange?: (v: UpisnicaValue) => void;
   /** Only fires when the accuracy consent is ticked and a name is given. */
-  onSave?: (v: UpisnicaValue) => void;
+  onSave?: (v: UpisnicaValue, signed: UpisnicaSigned) => void;
   onCancel?: () => void;
   /** `edit` changes an existing member: no plan picker, and the button says "Spremi promjene". */
   mode?: 'new' | 'edit';
   /** Messages for fields that need attention; shown in the error state. */
-  errors?: Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText', string>>;
+  errors?: Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
   /** A save is in progress. */
   busy?: boolean;
 }
@@ -45,6 +52,7 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
   const { t } = useLang();
   const [v, setV] = useState<UpisnicaValue>({ ...EMPTY, ...initial });
   const [tried, setTried] = useState(false);
+  const [signed, setSigned] = useState<UpisnicaSigned>({ place: place ?? '', date: date ?? formatDate(new Date()) });
 
   const set = (patch: Partial<UpisnicaValue>) => {
     const next = { ...v, ...patch };
@@ -53,7 +61,7 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
   };
   const save = () => {
     setTried(true);
-    if (v.consent && v.name.trim()) onSave?.(v);
+    if (v.consent && v.name.trim()) onSave?.(v, { place: signed.place.trim(), date: signed.date.trim() });
   };
 
   return (
@@ -125,8 +133,9 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
       </Section>
 
       <div className={styles.footer}>
-        <Input label={t('upisnica.placeDate')} readOnly value={[place, date ?? formatDate(new Date())].filter(Boolean).join(', ')} />
-        <div className={styles.labelled}>
+        <Input label={t('upisnica.place')} value={signed.place} onChange={(e) => setSigned({ ...signed, place: e.target.value })} />
+        <Input label={t('upisnica.signedDate')} placeholder={t('upisnica.dobPlaceholder')} value={signed.date} onChange={(e) => setSigned({ ...signed, date: e.target.value })} error={errors.date} />
+        <div className={styles.signatureField}>
           <span className={styles.label}>{t('upisnica.signature')}</span>
           <div className={styles.signatureBox}>
             <span className={styles.signature}>{v.name}</span>

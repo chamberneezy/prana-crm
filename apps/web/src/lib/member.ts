@@ -58,11 +58,18 @@ export function memberToUpisnica(member: Member, summary: MemberSummary): Upisni
   };
 }
 
-export type UpisnicaErrors = Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText', string>>;
+export type UpisnicaErrors = Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
 
-/** Checks what can be checked before sending: the date and the e-mail. */
-export function validateUpisnica(v: UpisnicaValue, { t }: Strings): UpisnicaErrors {
+/** Where and when a form was signed, as typed in the form. */
+export interface Signed {
+  place: string;
+  date: string;
+}
+
+/** Checks what can be checked before sending: the dates and the e-mail. */
+export function validateUpisnica(v: UpisnicaValue, signed: Signed, { t }: Strings): UpisnicaErrors {
   const errors: UpisnicaErrors = {};
+  if (signed.date.trim() && !displayToIsoDate(signed.date)) errors.date = t('upisnica.dobInvalid');
   if (v.dob.trim() && !displayToIsoDate(v.dob)) errors.dob = t('upisnica.dobInvalid');
   if (v.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) errors.email = t('upisnica.emailInvalid');
   return errors;
@@ -75,12 +82,15 @@ export function fieldErrors(fields: string[], { t }: Strings): UpisnicaErrors {
   if (fields.includes('dob')) errors.dob = t('upisnica.dobInvalid');
   if (fields.includes('phone')) errors.phone = t('upisnica.phoneInvalid');
   if (fields.includes('full_name')) errors.name = t('upisnica.nameRequired');
+  if (fields.includes('signed_date')) errors.date = t('upisnica.dobInvalid');
   return errors;
 }
 
 /** The member fields of the form, as the API takes them. */
-export function upisnicaToPatch(v: UpisnicaValue): MemberPatch & { full_name: string } {
+export function upisnicaToPatch(v: UpisnicaValue, signed: Signed): MemberPatch & { full_name: string } {
   return {
+    signed_place: signed.place.trim() || null,
+    signed_date: signed.date.trim() ? displayToIsoDate(signed.date) : null,
     full_name: v.name.trim(),
     email: v.email.trim() || null,
     phone: v.phone.trim() || null,
@@ -94,12 +104,6 @@ export function upisnicaToPatch(v: UpisnicaValue): MemberPatch & { full_name: st
 }
 
 /** A new member from the form, with the chosen plan as the first membership. */
-export function upisnicaToInput(v: UpisnicaValue, signed: { place?: string; date: string }): MemberInput {
-  return {
-    ...upisnicaToPatch(v),
-    consent_accuracy: v.consent,
-    signed_place: signed.place?.trim() || null,
-    signed_date: signed.date,
-    plan_code: v.plan,
-  };
+export function upisnicaToInput(v: UpisnicaValue, signed: Signed): MemberInput {
+  return { ...upisnicaToPatch(v, signed), consent_accuracy: v.consent, plan_code: v.plan };
 }

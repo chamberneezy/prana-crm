@@ -60,7 +60,8 @@ test('import a PDF, review the flagged fields and save with the document', async
   await expect(form.getByRole('radio', { name: 'DA', exact: true })).toHaveAttribute('aria-checked', 'true');
   await expect(form.getByRole('radio', { name: /3× tjedno/ })).toHaveAttribute('aria-checked', 'true');
   await expect(form.getByLabel('Molimo navedite')).toHaveValue('Osjetljiv donji dio leđa');
-  await expect(form.getByLabel('Mjesto i datum')).toHaveValue('Zagreb, 09.10.2026.');
+  await expect(form.getByLabel('Mjesto', { exact: true })).toHaveValue('Zagreb');
+  await expect(form.getByLabel('Datum', { exact: true })).toHaveValue('09.10.2026.');
 
   // The unreadable phone and the unticked consent are flagged, in the notice, the form and on the page image.
   await expect(form.getByText('2 polja za provjeru')).toBeVisible();
