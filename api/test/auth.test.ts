@@ -101,6 +101,10 @@ describe('emulator mode (local development only)', () => {
     expect((await t.call('GET', '/me', { token: unsigned('stranger@example.com'), env: emulator })).status).toBe(403);
     expect((await t.call('GET', '/me', { token: unsigned('teacher@example.com', 'uid-teacher'), env: emulator })).status).toBe(200);
   });
+  it('binds again after the emulator restarts with new account ids', async () => {
+    expect((await t.call('GET', '/me', { token: unsigned('teacher@example.com', 'uid-after-restart'), env: emulator })).status).toBe(200);
+    // Outside emulator mode a bound row is never taken over (see "cannot be taken over" above).
+  });
   it('still checks the project and expiry', async () => {
     const otherProject = new UnsecuredJWT({ email: DEV_OWNER_EMAIL }).setSubject('uid-owner').setAudience('another-project').setIssuer(ISSUER).setExpirationTime('1h').encode();
     const expired = new UnsecuredJWT({ email: DEV_OWNER_EMAIL }).setSubject('uid-owner').setAudience(PROJECT).setIssuer(ISSUER).setExpirationTime('-1m').encode();

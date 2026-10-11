@@ -73,12 +73,14 @@ export function requireStaff(keys?: JWTVerifyGetKey) {
       .limit(1);
 
     // First login: bind the account to the allowlisted row with the same verified e-mail.
-    if (!row && identity.email && (identity.emailVerified || emulatorMode(c.env))) {
+    // The emulator forgets its accounts on every restart, so there the row is bound again to the new uid.
+    const emulator = emulatorMode(c.env);
+    if (!row && identity.email && (identity.emailVerified || emulator)) {
       const now = new Date().toISOString();
       [row] = await db
         .update(staff)
         .set({ firebase_uid: identity.uid, updated_at: now, changed_at: now })
-        .where(and(sql`lower(${staff.email}) = ${identity.email}`, isNull(staff.firebase_uid), isNull(staff.deleted_at)))
+        .where(and(sql`lower(${staff.email}) = ${identity.email}`, emulator ? undefined : isNull(staff.firebase_uid), isNull(staff.deleted_at)))
         .returning();
     }
     if (!row) throw new ApiError('no_access');

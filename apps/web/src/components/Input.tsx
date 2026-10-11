@@ -16,16 +16,20 @@ export interface InputProps {
   multiline?: boolean;
   rows?: number;
   type?: string;
+  name?: string;
+  autoComplete?: string;
   style?: CSSProperties;
 }
 
-export function Input({ label, value, defaultValue, onChange, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', style }: InputProps) {
+export function Input({ label, value, defaultValue, onChange, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
   const field = {
     value,
     defaultValue,
     onChange,
     placeholder,
     readOnly,
+    name,
+    autoComplete,
     'aria-invalid': error ? true : undefined,
     className: cx(styles.control, multiline && styles.multiline, readOnly && styles.readOnly, error && styles.invalid),
   };

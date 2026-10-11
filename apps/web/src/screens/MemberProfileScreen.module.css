@@ -1,0 +1,164 @@
+.back {
+  align-self: flex-start;
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.overline {
+  margin: 0;
+  color: var(--text-3);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.membership {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Sits on linen, where tertiary text is too faint: use the secondary colour. */
+.membership .overline {
+  color: var(--text-2);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.file:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-md);
+}
+
+.fileIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--mist);
+  color: var(--sage-ink);
+}
+
+.fileText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileMeta {
+  color: var(--text-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fileOpen {
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.listCard {
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.listCard .overline {
+  padding: 14px 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-divider);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pill {
+  flex: none;
+  width: 10px;
+  height: 22px;
+  border-radius: var(--radius-full);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowDate {
+  color: var(--text-3);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.amount {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.none {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-divider);
+  color: var(--text-2);
+  font-size: 13px;
+}

@@ -1,4 +1,4 @@
-import type { MemberStatus } from '@prana/shared';
+import type { ApiMemberStatus } from '@prana/shared';
 import { Avatar } from './Avatar';
 import { cx } from './cx';
 import styles from './MemberRow.module.css';
@@ -10,7 +10,7 @@ export interface MemberRowProps {
   name: string;
   sub?: string;
   note?: string;
-  status?: MemberStatus;
+  status?: ApiMemberStatus;
   statusLabel?: string;
   compact?: boolean;
   onClick?: () => void;
@@ -25,7 +25,11 @@ export function MemberRow({ name, sub, note, status = 'active', statusLabel, com
         {sub && <span className={styles.sub}>{sub}</span>}
       </span>
       <span className={styles.chips}>
-        {note && <Tag kind="health">{note}</Tag>}
+        {note && (
+          <span className={styles.note} title={note}>
+            <Tag kind="health">{note}</Tag>
+          </span>
+        )}
         <StatusChip status={status}>{statusLabel}</StatusChip>
       </span>
     </>

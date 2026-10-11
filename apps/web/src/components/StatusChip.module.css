@@ -43,12 +43,14 @@
   background: var(--status-unpaid-dot);
 }
 
-.frozen {
+.frozen,
+.none {
   background: var(--status-frozen-bg);
   color: var(--status-frozen-fg);
 }
 
-.frozen .dot {
+.frozen .dot,
+.none .dot {
   background: var(--status-frozen-dot);
 }
 

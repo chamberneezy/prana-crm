@@ -56,6 +56,13 @@
   text-overflow: ellipsis;
 }
 
+/* A long health note is cut short in the list; the profile shows it in full. */
+.note {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 240px;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;

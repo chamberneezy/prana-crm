@@ -9,9 +9,13 @@ dist/
 .env
 .env.*
 !.env.example
+# emulator-only settings, no real keys
+!apps/web/.env.development
 .dev.vars
 
 # test output
+*-debug.log
+.firebase/
 playwright-report/
 test-results/
 

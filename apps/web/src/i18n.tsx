@@ -1,12 +1,15 @@
-import { type Lang, type MessageKey, translate } from '@prana/shared';
+import { type Lang, type MessageKey, translate, translatePlural } from '@prana/shared';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type Translate = (key: MessageKey, vars?: Record<string, string | number>) => string;
+type TranslatePlural = (base: Parameters<typeof translatePlural>[1], n: number, vars?: Record<string, string | number>) => string;
 
 interface LangContextValue {
   lang: Lang;
   setLang: (lang: Lang) => void;
   t: Translate;
+  /** Plural-aware: picks the .one / .few / .other form for the count. */
+  tn: TranslatePlural;
 }
 
 const STORAGE_KEY = 'prana.lang';
@@ -16,6 +19,7 @@ const LangContext = createContext<LangContextValue>({
   lang: 'hr',
   setLang: () => {},
   t: (key, vars) => translate('hr', key, vars),
+  tn: (base, n, vars) => translatePlural('hr', base, n, vars),
 });
 
 function storedLang(): Lang {
@@ -43,7 +47,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<LangContextValue>(
-    () => ({ lang, setLang, t: (key, vars) => translate(lang, key, vars) }),
+    () => ({ lang, setLang, t: (key, vars) => translate(lang, key, vars), tn: (base, n, vars) => translatePlural(lang, base, n, vars) }),
     [lang, setLang],
   );
 

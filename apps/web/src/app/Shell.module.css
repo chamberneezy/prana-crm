@@ -1,0 +1,147 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex: none;
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 48px 48px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1160px;
+}
+
+.account {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding-left: 2px;
+}
+
+.staffName {
+  font-size: 12px;
+  color: var(--field);
+}
+
+.signOut {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--text-on-dark);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.signOut:hover {
+  color: var(--white);
+}
+
+.signOut:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 3px;
+}
+
+.topBar,
+.menu {
+  display: none;
+}
+
+/* Below 768 px the sidebar becomes a top bar with a menu button. */
+@media (max-width: 767px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .topBar {
+    position: sticky;
+    z-index: 10;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg-sidebar);
+    color: var(--text-on-dark);
+  }
+
+  .topLogo {
+    width: 32px;
+    filter: brightness(0) invert(0.9);
+  }
+
+  .menuButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--ink-muted);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-on-dark);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .menu {
+    position: sticky;
+    z-index: 10;
+    top: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 16px 16px;
+    background: var(--bg-sidebar);
+  }
+
+  .menuItem {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-on-dark);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menuItemActive {
+    background: var(--sage-deep);
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .menuFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 12px 0;
+  }
+
+  .main {
+    padding: 24px 16px 32px;
+  }
+}

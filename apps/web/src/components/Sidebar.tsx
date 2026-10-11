@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { cx } from './cx';
 import { LangSwitch } from './LangSwitch';
 import styles from './Sidebar.module.css';
@@ -15,9 +16,11 @@ export interface SidebarProps {
   logoSrc?: string;
   lang?: string;
   onLang?: (lang: string) => void;
+  /** Shown at the foot, above the language switch (e.g. sign out). */
+  children?: ReactNode;
 }
 
-export function Sidebar({ items, active, onSelect, logoSrc, lang = 'HR', onLang }: SidebarProps) {
+export function Sidebar({ items, active, onSelect, logoSrc, lang = 'HR', onLang, children }: SidebarProps) {
   return (
     <nav className={styles.sidebar}>
       {logoSrc && <img src={logoSrc} alt="Prana" className={styles.logo} />}
@@ -33,6 +36,7 @@ export function Sidebar({ items, active, onSelect, logoSrc, lang = 'HR', onLang 
         </button>
       ))}
       <div className={styles.foot}>
+        {children}
         <LangSwitch dark value={lang} onChange={onLang} />
       </div>
     </nav>

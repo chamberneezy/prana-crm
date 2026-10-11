@@ -1,4 +1,4 @@
-import type { MemberStatus } from '@prana/shared';
+import type { ApiMemberStatus } from '@prana/shared';
 import type { ReactNode } from 'react';
 import { useLang } from '../i18n';
 import { cx } from './cx';
@@ -6,7 +6,8 @@ import styles from './StatusChip.module.css';
 
 /** Membership / payment status chip: always a dot plus a word (trial is a dashed outline). */
 export interface StatusChipProps {
-  status?: MemberStatus;
+  /** `none` (no current membership) is shown in stone, like frozen. */
+  status?: ApiMemberStatus;
   /** Override the default label, e.g. "Ističe za 3 dana". */
   children?: ReactNode;
 }

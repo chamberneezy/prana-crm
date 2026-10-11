@@ -9,7 +9,8 @@
     "db:migrate": "wrangler d1 migrations apply prana --local",
     "db:seed": "mkdir -p .wrangler && tsx scripts/seed.ts --dev > .wrangler/seed.sql && wrangler d1 execute prana --local --file=.wrangler/seed.sql",
     "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed",
-    "openapi": "tsx scripts/openapi.ts"
+    "openapi": "tsx scripts/openapi.ts",
+    "e2e:serve": "rm -rf .wrangler/e2e && mkdir -p .wrangler && wrangler d1 migrations apply prana --local --persist-to .wrangler/e2e && tsx scripts/seed.ts --dev > .wrangler/e2e-seed.sql && wrangler d1 execute prana --local --persist-to .wrangler/e2e --file=.wrangler/e2e-seed.sql && wrangler dev --port 8788 --persist-to .wrangler/e2e --var FIREBASE_AUTH_EMULATOR:true"
   },
   "dependencies": {
     "@prana/shared": "*",

@@ -21,6 +21,12 @@ export interface UpisnicaFormProps {
   /** Only fires when the accuracy consent is ticked and a name is given. */
   onSave?: (v: UpisnicaValue) => void;
   onCancel?: () => void;
+  /** `edit` changes an existing member: no plan picker, and the button says "Spremi promjene". */
+  mode?: 'new' | 'edit';
+  /** Messages for fields that need attention; shown in the error state. */
+  errors?: Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText', string>>;
+  /** A save is in progress. */
+  busy?: boolean;
 }
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
@@ -34,7 +40,8 @@ function Section({ n, title, children }: { n: string; title: string; children: R
   );
 }
 
-export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel }: UpisnicaFormProps) {
+export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false }: UpisnicaFormProps) {
+  const edit = mode === 'edit';
   const { t } = useLang();
   const [v, setV] = useState<UpisnicaValue>({ ...EMPTY, ...initial });
   const [tried, setTried] = useState(false);
@@ -52,8 +59,8 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel 
   return (
     <div className={styles.form}>
       <div className={styles.intro}>
-        <div className={styles.title}>{t('upisnica.title')}</div>
-        <p className={styles.text}>{t('upisnica.intro')}</p>
+        <div className={styles.title}>{t(edit ? 'upisnica.editTitle' : 'upisnica.title')}</div>
+        {!edit && <p className={styles.text}>{t('upisnica.intro')}</p>}
       </div>
 
       <Section n="01" title={t('upisnica.section.details')}>
@@ -62,12 +69,12 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel 
             label={t('upisnica.name')}
             value={v.name}
             onChange={(e) => set({ name: e.target.value })}
-            error={tried && !v.name.trim() ? t('upisnica.nameRequired') : undefined}
+            error={tried && !v.name.trim() ? t('upisnica.nameRequired') : errors.name}
             style={{ gridColumn: '1 / -1' }}
           />
-          <Input label={t('upisnica.email')} type="email" value={v.email} onChange={(e) => set({ email: e.target.value })} />
-          <Input label={t('upisnica.phone')} type="tel" value={v.phone} onChange={(e) => set({ phone: e.target.value })} />
-          <Input label={t('upisnica.dob')} placeholder={t('upisnica.dobPlaceholder')} value={v.dob} onChange={(e) => set({ dob: e.target.value })} />
+          <Input label={t('upisnica.email')} type="email" value={v.email} onChange={(e) => set({ email: e.target.value })} error={errors.email} />
+          <Input label={t('upisnica.phone')} type="tel" value={v.phone} onChange={(e) => set({ phone: e.target.value })} error={errors.phone} />
+          <Input label={t('upisnica.dob')} placeholder={t('upisnica.dobPlaceholder')} value={v.dob} onChange={(e) => set({ dob: e.target.value })} error={errors.dob} />
           <div className={styles.labelled}>
             <span className={styles.label}>{t('upisnica.student')}</span>
             <Choice
@@ -82,15 +89,17 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel 
         </div>
       </Section>
 
-      <Section n="02" title={t('upisnica.section.plan')}>
-        <Choice
-          layout="grid"
-          columns={2}
-          value={v.plan}
-          onChange={(plan) => set({ plan })}
-          options={PLANS.map((plan) => ({ value: plan, label: t(`plan.${plan}`), sub: t(`plan.${plan}.sub`) }))}
-        />
-      </Section>
+      {!edit && (
+        <Section n="02" title={t('upisnica.section.plan')}>
+          <Choice
+            layout="grid"
+            columns={2}
+            value={v.plan}
+            onChange={(plan) => set({ plan })}
+            options={PLANS.map((plan) => ({ value: plan, label: t(`plan.${plan}`), sub: t(`plan.${plan}.sub`) }))}
+          />
+        </Section>
+      )}
 
       <Section n="03" title={t('upisnica.section.health')}>
         <p className={styles.text}>{t('upisnica.healthQuestion')}</p>
@@ -102,7 +111,7 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel 
             { value: true, label: t('upisnica.healthYes') },
           ]}
         />
-        {v.health && <Input label={t('upisnica.healthDetail')} multiline value={v.healthText} onChange={(e) => set({ healthText: e.target.value })} />}
+        {v.health && <Input label={t('upisnica.healthDetail')} multiline value={v.healthText} onChange={(e) => set({ healthText: e.target.value })} error={errors.healthText} />}
         <span className={styles.hint}>{t('upisnica.healthHint')}</span>
       </Section>
 
@@ -127,8 +136,8 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel 
       </div>
 
       <div className={styles.actions}>
-        <Button onClick={save} disabled={!v.consent}>
-          {t('upisnica.save')}
+        <Button onClick={save} disabled={!v.consent || busy}>
+          {t(edit ? 'upisnica.saveChanges' : 'upisnica.save')}
         </Button>
         <Button variant="ghost" onClick={onCancel}>
           {t('upisnica.cancel')}

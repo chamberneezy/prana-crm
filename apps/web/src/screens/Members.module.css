@@ -1,0 +1,124 @@
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 280px;
+  max-width: 100%;
+  height: var(--control-height);
+  padding: 0 12px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-3);
+  transition: var(--transition-color);
+}
+
+.search:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-1);
+  font-size: 14px;
+}
+
+.search input::placeholder {
+  color: var(--text-3);
+}
+
+.srOnly {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0 0 0 0);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.filter:hover {
+  border-color: var(--sage);
+}
+
+.filter:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.filterSelected,
+.filterSelected:hover {
+  border-color: var(--sage-deep);
+  background: var(--mist);
+}
+
+.list {
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.listHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 16px;
+  background: var(--header-row);
+  color: var(--text-2);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-table-head);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.noResults {
+  padding: 24px 16px;
+  border-top: 1px solid var(--border-divider);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-attention);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .search {
+    width: 100%;
+    height: 44px;
+  }
+
+  .filter {
+    height: 44px;
+  }
+}

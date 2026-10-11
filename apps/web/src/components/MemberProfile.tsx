@@ -1,4 +1,4 @@
-import { ageFromDob, type MemberStatus, type UpisnicaValue } from '@prana/shared';
+import { ageFromDob, type ApiMemberStatus, type UpisnicaValue } from '@prana/shared';
 import type { ReactNode } from 'react';
 import { useLang } from '../i18n';
 import { Avatar } from './Avatar';
@@ -10,7 +10,11 @@ import { Tag } from './Tag';
 /** Member profile built from the upisnica: plan, student flag, contacts with age, highlighted health note, consents. */
 export interface MemberProfileProps {
   member: Partial<UpisnicaValue>;
-  status?: MemberStatus;
+  status?: ApiMemberStatus;
+  /** Overrides the plan tag, e.g. for a trial. */
+  planLabel?: string;
+  /** Overrides the chip label, e.g. "Ističe za 3 dana". */
+  statusLabel?: string;
   /** dd.mm.yyyy. */
   since?: string;
   onEdit?: () => void;
@@ -25,7 +29,7 @@ function Field({ label, children }: { label: string; children?: ReactNode }) {
   );
 }
 
-export function MemberProfile({ member: m, status = 'active', since = '', onEdit }: MemberProfileProps) {
+export function MemberProfile({ member: m, status = 'active', statusLabel, planLabel, since = '', onEdit }: MemberProfileProps) {
   const { t } = useLang();
   const age = m.dob ? ageFromDob(m.dob) : null;
   return (
@@ -47,8 +51,8 @@ export function MemberProfile({ member: m, status = 'active', since = '', onEdit
       </div>
 
       <div className={styles.chips}>
-        <StatusChip status={status} />
-        {m.plan && <Tag kind="plan">{t(`plan.${m.plan}`)}</Tag>}
+        <StatusChip status={status}>{statusLabel}</StatusChip>
+        {m.plan && status !== 'none' && <Tag kind="plan">{planLabel ?? t(`plan.${m.plan}`)}</Tag>}
         {m.student && <Tag kind="flag">{t('profile.student')}</Tag>}
         {m.news && <Tag kind="neutral">{t('profile.newsletter')}</Tag>}
       </div>
