@@ -18,3 +18,5 @@ export * from './StatusChip';
 export * from './Tag';
 export * from './Toast';
 export * from './UpisnicaForm';
+export * from './Select';
+export * from './SidePanel';

@@ -1,0 +1,213 @@
+.weekNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.weekLabel {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Below 980 px the week scrolls sideways rather than squeezing seven columns. */
+.scroll {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  min-width: 980px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--border-card);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+  background: var(--surface-card);
+}
+
+.dayHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--header-row);
+}
+
+.dayName {
+  color: var(--text-2);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-table-head);
+  text-transform: uppercase;
+}
+
+.dayDate {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.today {
+  color: var(--sage-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.dayBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.session {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border-divider);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.session:hover {
+  border-color: var(--sage);
+  background: var(--surface-hover);
+}
+
+.session:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sessionOpen,
+.sessionOpen:hover {
+  border-color: var(--border-focus);
+  background: var(--surface-selected);
+}
+
+.sessionTime {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pill {
+  flex: none;
+  width: 8px;
+  height: 18px;
+  border-radius: var(--radius-full);
+}
+
+.sessionName {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sessionMeta {
+  color: var(--text-3);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.addFrom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.addHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.addHead h2 {
+  margin: 0;
+  color: var(--text-3);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+
+.addHead a {
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.addHead a:hover {
+  color: var(--ink);
+}
+
+.templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.template {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-height);
+  padding: 0 14px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.template:hover {
+  border-color: var(--sage);
+}
+
+.template:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.none {
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+@media (max-width: 767px) {
+  .template {
+    height: 44px;
+  }
+}

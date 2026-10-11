@@ -22,6 +22,7 @@ export interface RouteSpec {
 /** Every endpoint the Worker serves. The API test checks this list against the real routes. */
 export const routes: RouteSpec[] = [
   { method: 'get', path: '/me', summary: 'The signed-in staff member and their business', response: s.meResponseSchema },
+  { method: 'get', path: '/staff', summary: 'Staff of the business, for the teacher picker', response: s.staffListResponseSchema },
   { method: 'get', path: '/dashboard', summary: "Today's and tomorrow's sessions, the attention list and counts", query: s.dashboardQuerySchema, response: s.dashboardResponseSchema },
 
   { method: 'get', path: '/members', summary: 'Members with their derived status', query: s.membersQuerySchema, response: s.membersResponseSchema },

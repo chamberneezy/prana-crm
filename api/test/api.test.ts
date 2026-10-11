@@ -102,6 +102,15 @@ describe('members', () => {
   });
 });
 
+describe('staff', () => {
+  it('lists the business\u2019s staff without sign-in details', async () => {
+    const { status, body } = await t.call('GET', '/staff');
+    expect(status).toBe(200);
+    expect(body.staff).toEqual([expect.objectContaining({ id: SEED.owner, name: 'Mario', role: 'owner' })]);
+    expect(body.staff[0]).not.toHaveProperty('firebase_uid');
+  });
+});
+
 describe('class types', () => {
   it('lists the seeded group and the five classes as templates', async () => {
     const groups = await t.call('GET', '/offering-groups');

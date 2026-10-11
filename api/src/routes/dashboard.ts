@@ -1,19 +1,31 @@
-import { addDays, addMonths, type DashboardResponse, type MeResponse, dashboardQuerySchema, dayStartUtc, EXPIRING_WITHIN_DAYS, startOfMonth } from '@prana/shared';
+import { addDays, addMonths, type DashboardResponse, type MeResponse, type StaffListResponse, dashboardQuerySchema, dayStartUtc, EXPIRING_WITHIN_DAYS, startOfMonth } from '@prana/shared';
 import { and, eq, gte, isNull, lt, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { member, payment } from '../db/schema';
+import { member, payment, staff as staffTable } from '../db/schema';
 import type { AppEnv } from '../env';
 import { ctx, parseQuery, publicRow } from '../lib/http';
 import { loadMemberFacts, toSummary } from '../lib/members';
 import { loadSessionViews, startsBetween } from '../lib/sessions';
 
 export const me = new Hono<AppEnv>();
+export const staffList = new Hono<AppEnv>();
 export const dashboard = new Hono<AppEnv>();
 
 me.get('/', (c) => {
   const { staff, business: biz } = ctx(c);
   const { id, name, locale, timezone } = biz;
   const body: MeResponse = { staff: publicRow(staff), business: { id, name, locale, timezone } };
+  return c.json(body);
+});
+
+staffList.get('/', async (c) => {
+  const { db, businessId } = ctx(c);
+  const rows = await db
+    .select()
+    .from(staffTable)
+    .where(and(eq(staffTable.business_id, businessId), isNull(staffTable.deleted_at)))
+    .orderBy(staffTable.name);
+  const body: StaffListResponse = { staff: rows.map(publicRow) };
   return c.json(body);
 });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, addMonths, dayStartUtc, diffDays, localDate, monthPeriodEnd, startOfMonth, startOfWeek, zonedTimeToUtc } from './dates';
+import { addDays, addMonths, dayStartUtc, diffDays, formatWeekRange, localDate, weekdayIndex, monthPeriodEnd, startOfMonth, startOfWeek, zonedTimeToUtc } from './dates';
 
 describe('localDate', () => {
   it('gives the calendar date in Zagreb', () => {
@@ -47,6 +47,13 @@ describe('date arithmetic', () => {
     expect(startOfWeek('2026-10-11')).toBe('2026-10-05'); // Sunday
     expect(startOfWeek('2026-10-12')).toBe('2026-10-12'); // Monday
     expect(startOfMonth('2026-10-11')).toBe('2026-10-01');
+  });
+  it('numbers weekdays from Monday and labels a week', () => {
+    expect(weekdayIndex('2026-10-12')).toBe(1);
+    expect(weekdayIndex('2026-10-11')).toBe(7);
+    expect(formatWeekRange('2026-10-12')).toBe('12.–18.10.2026.');
+    expect(formatWeekRange('2026-09-28')).toBe('28.09.–04.10.2026.');
+    expect(formatWeekRange('2026-12-28')).toBe('28.12.–03.01.2027.');
   });
   it('gives a one-month membership period', () => {
     expect(monthPeriodEnd('2026-10-11')).toBe('2026-11-10');

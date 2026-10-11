@@ -420,6 +420,7 @@ export type DocumentPatch = z.infer<typeof documentPatchSchema>;
 // ── Responses ─────────────────────────────────────────────────────────────────
 
 export const meResponseSchema = z.object({ staff: staffSchema, business: businessSchema });
+export const staffListResponseSchema = z.object({ staff: z.array(staffSchema) });
 
 export const dashboardResponseSchema = z.object({
   date: isoDate,
@@ -487,11 +488,15 @@ export const paymentResponseSchema = z.object({ payment: paymentSchema, summary:
 export const documentResponseSchema = z.object({ document: documentSchema });
 
 export type MeResponse = z.infer<typeof meResponseSchema>;
+export type StaffListResponse = z.infer<typeof staffListResponseSchema>;
 export type DashboardResponse = z.infer<typeof dashboardResponseSchema>;
 export type MembersResponse = z.infer<typeof membersResponseSchema>;
 export type MemberResponse = z.infer<typeof memberResponseSchema>;
 export type MemberDetailResponse = z.infer<typeof memberDetailResponseSchema>;
 export type OfferingGroupsResponse = z.infer<typeof offeringGroupsResponseSchema>;
+export type OfferingGroupResponse = z.infer<typeof offeringGroupResponseSchema>;
+export type OfferingResponse = z.infer<typeof offeringResponseSchema>;
+export type SessionResponse = z.infer<typeof sessionResponseSchema>;
 export type OfferingsResponse = z.infer<typeof offeringsResponseSchema>;
 export type SessionsResponse = z.infer<typeof sessionsResponseSchema>;
 export type SessionDetailResponse = z.infer<typeof sessionDetailResponseSchema>;

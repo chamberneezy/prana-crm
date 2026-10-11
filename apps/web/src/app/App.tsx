@@ -9,6 +9,8 @@ import { Login } from '../screens/Login';
 import { MemberProfileScreen } from '../screens/MemberProfileScreen';
 import { Members } from '../screens/Members';
 import { NewMember } from '../screens/NewMember';
+import { Offerings } from '../screens/Offerings';
+import { Schedule } from '../screens/Schedule';
 import { SECTIONS, Shell } from './Shell';
 import { ToastProvider } from './ToastProvider';
 
@@ -40,11 +42,13 @@ function ComingSoon({ title }: { title: string }) {
 
 function SignedIn() {
   const { t } = useLang();
-  const built = new Set(['members']);
+  const built = new Set(['members', 'schedule', 'offerings']);
   return (
     <Routes>
       <Route element={<Shell />}>
         <Route index element={<Navigate to="/clanovi" replace />} />
+        <Route path="raspored" element={<Schedule />} />
+        <Route path="vrste-satova" element={<Offerings />} />
         <Route path="clanovi" element={<Members />} />
         {/* Importing a scanned form arrives with M5; until then "Novi član" is the manual form. */}
         <Route path="clanovi/novi" element={<Navigate to="/clanovi/novi/rucno" replace />} />

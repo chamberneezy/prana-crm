@@ -105,3 +105,17 @@ export function startOfMonth(date: string): string {
 export function monthPeriodEnd(start: string): string {
   return addDays(addMonths(start, 1), -1);
 }
+
+/** 1 = Monday … 7 = Sunday. */
+export function weekdayIndex(date: string): number {
+  const [y, m, d] = split(date);
+  return ((new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7) + 1;
+}
+
+/** "12.–18.10.2026." for the week starting on `monday`; both months are shown when it spans two. */
+export function formatWeekRange(monday: string): string {
+  const [, m1, d1] = split(monday);
+  const [y2, m2, d2] = split(addDays(monday, 6));
+  const first = m1 === m2 ? `${pad(d1)}.` : `${pad(d1)}.${pad(m1)}.`;
+  return `${first}–${pad(d2)}.${pad(m2)}.${y2}.`;
+}

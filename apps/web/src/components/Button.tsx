@@ -10,15 +10,18 @@ export interface ButtonProps {
   type?: 'button' | 'submit';
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   style?: CSSProperties;
+  /** For buttons whose visible text is a symbol or needs more context for screen readers. */
+  'aria-label'?: string;
   children?: ReactNode;
 }
 
-export function Button({ variant = 'primary', size = 'md', disabled = false, type = 'button', onClick, style, children }: ButtonProps) {
+export function Button({ variant = 'primary', size = 'md', disabled = false, type = 'button', onClick, style, 'aria-label': ariaLabel, children }: ButtonProps) {
   return (
     <button
       type={type}
       disabled={disabled}
       onClick={onClick}
+      aria-label={ariaLabel}
       className={cx(styles.button, styles[variant], size === 'sm' && styles.sm)}
       style={style}
     >

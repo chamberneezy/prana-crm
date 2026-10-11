@@ -1,0 +1,72 @@
+/* Shared by the forms that open in a side panel. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.labelled {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font: var(--text-label);
+  color: var(--text-2);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.swatch:hover {
+  border-color: var(--sage);
+}
+
+.swatch:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.swatchSelected,
+.swatchSelected:hover {
+  border-color: var(--border-focus);
+  background: var(--surface-selected);
+}
+
+.pill {
+  width: 10px;
+  height: 22px;
+  border-radius: var(--radius-full);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 4px;
+}

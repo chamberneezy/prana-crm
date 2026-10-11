@@ -91,7 +91,6 @@ export function MemberProfileScreen() {
         <div className={styles.column}>
           {editing ? (
             <UpisnicaForm
-              key={member.updated_at}
               mode="edit"
               initial={value}
               place={member.signed_place ?? undefined}
