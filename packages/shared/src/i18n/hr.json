@@ -426,5 +426,10 @@
   "demo.note.title": "Ovo je demo",
   "demo.note.body": "Podaci su izmišljeni i spremaju se samo u ovom pregledniku. Prijava nije stvarna: uđite bilo kojim gumbom.",
   "demo.reset": "Vrati početne podatke",
-  "demo.sample": "Preuzmite primjer upisnice (PDF) i uvezite ga."
+  "demo.sample": "Preuzmite primjer upisnice (PDF) i uvezite ga.",
+  "preview.note.title": "Probna verzija",
+  "preview.note.body": "Prijava je stvarna. Podaci su izmišljeni i spremaju se samo u ovom pregledniku, dok se ne postavi baza.",
+  "auth.forgot": "Zaboravili ste lozinku?",
+  "auth.forgotNeedsEmail": "Upišite e-mail, pa ponovno odaberite „Zaboravili ste lozinku?”.",
+  "auth.resetSent": "Ako ta adresa ima račun, poslali smo joj e-mail za postavljanje lozinke."
 }

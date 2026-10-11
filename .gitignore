@@ -12,6 +12,7 @@ dist/
 # emulator-only settings, no real keys
 !apps/web/.env.development
 !apps/web/.env.demo
+!apps/web/.env.preview
 .dev.vars
 
 # test output

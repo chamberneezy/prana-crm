@@ -55,7 +55,7 @@
 }
 
 .providers button,
-.form button {
+.form button[type='submit'] {
   min-height: 44px;
 }
 
@@ -93,4 +93,26 @@
   color: var(--sage-ink);
   font-size: 12px;
   font-weight: 600;
+}
+
+.forgot {
+  align-self: center;
+  min-height: 0;
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.forgot:hover {
+  color: var(--ink);
+}
+
+.forgot:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }

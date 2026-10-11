@@ -15,5 +15,9 @@ export interface AuthSession {
   getToken(forceRefresh?: boolean): Promise<string | null>;
   signInWithEmail(email: string, password: string): Promise<void>;
   signInWithProvider(provider: 'apple' | 'google'): Promise<void>;
+  /** Sends the e-mail for setting a new password. Resolves whether or not the address has an account. */
+  sendPasswordReset(email: string): Promise<void>;
+  /** The signed-in person's e-mail, lower-cased, or null. */
+  email(): string | null;
   signOut(): Promise<void>;
 }

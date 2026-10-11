@@ -1,7 +1,7 @@
 name: Demo on GitHub Pages
 
-# Publishes the demo build: the web app with the API running inside the browser on sample data.
-# No server, no accounts and no secrets are involved.
+# Publishes the preview build: real sign-in (Firebase project "Prana"), with the API still running
+# inside the browser on sample data. No server and no secrets are involved.
 on:
   push:
     branches: [main]
@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       # Pages serves a project site from /<repository>/.
-      - run: npm run build:demo
+      - run: npm run build:preview
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v3

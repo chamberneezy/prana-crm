@@ -3,7 +3,7 @@ import wasmUrl from 'sql.js/dist/sql-wasm-browser.wasm?url';
 import migration from '../../migrations/0001_init.sql?raw';
 import { createApp } from '../app';
 import type { Env } from '../env';
-import { DEV_OWNER_EMAIL, devSeed, toSql } from '../seed';
+import { DEV_OWNER_EMAIL, devSeed, SEED, toSql } from '../seed';
 import { createD1 } from './d1';
 import { createR2 } from './r2';
 
@@ -26,7 +26,14 @@ export const DEMO_OWNER = { uid: 'demo-owner', email: DEV_OWNER_EMAIL };
 
 const DATABASE_KEY = 'sqlite';
 
-export async function startDemoBackend(storage: DemoStorage) {
+export interface DemoOptions {
+  /** The Firebase project the sign-in tokens come from. Left out: the demo's own unsigned tokens. */
+  projectId?: string;
+  /** The e-mail to put on the studio's one staff row, i.e. who is let in. Left out: the demo owner. */
+  ownerEmail?: string;
+}
+
+export async function startDemoBackend(storage: DemoStorage, options: DemoOptions = {}) {
   const SQL = await initSqlJs({ locateFile: () => wasmUrl });
 
   const saved = await storage.get(DATABASE_KEY);
@@ -38,9 +45,12 @@ export async function startDemoBackend(storage: DemoStorage) {
     for (const statement of toSql(devSeed({ now: new Date().toISOString() }), 'keep')) db.run(statement);
   }
 
+  // The staff allowlist has one row. Put the allowed person's e-mail on it; anyone else gets "no access".
+  db.run('UPDATE staff SET email = ?, firebase_uid = NULL WHERE id = ?', [(options.ownerEmail ?? DEV_OWNER_EMAIL).toLowerCase(), SEED.owner]);
+
   // Every change is written to the browser's storage before its response goes back,
   // so nothing is lost if the tab is closed or reloaded straight afterwards.
-  let dirty = !saved;
+  let dirty = true;
   const save = async () => {
     if (!dirty) return;
     dirty = false;
@@ -56,9 +66,11 @@ export async function startDemoBackend(storage: DemoStorage) {
       dirty = true;
     }),
     BUCKET: createR2(storage),
-    FIREBASE_PROJECT_ID: DEMO_PROJECT,
+    FIREBASE_PROJECT_ID: options.projectId ?? DEMO_PROJECT,
     ENVIRONMENT: 'demo',
-    // Demo tokens are unsigned, like the local emulator's. The Worker ignores this flag in production.
+    // Tokens are read without checking their signature, as with the local emulator: this copy of the API
+    // runs in the visitor's own browser on their own data, so there is nothing for a signature to protect.
+    // The deployed Worker ignores this flag in production and always verifies.
     FIREBASE_AUTH_EMULATOR: 'true',
   };
   const app = createApp();

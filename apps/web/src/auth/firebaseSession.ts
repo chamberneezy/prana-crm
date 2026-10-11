@@ -1,5 +1,5 @@
 import { FirebaseError, initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth, GoogleAuthProvider, OAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { connectAuthEmulator, getAuth, GoogleAuthProvider, OAuthProvider, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
 import { type AuthSession, SignInFailure } from './types';
 
 // Only the Auth module of the Firebase SDK is used. All data goes through the API.
@@ -32,5 +32,13 @@ export const firebaseSession: AuthSession = {
   getToken: async (forceRefresh) => (await auth.currentUser?.getIdToken(forceRefresh)) ?? null,
   signInWithEmail: (email, password) => attempt(() => signInWithEmailAndPassword(auth, email, password)),
   signInWithProvider: (provider) => attempt(() => signInWithPopup(auth, provider === 'apple' ? new OAuthProvider('apple.com') : new GoogleAuthProvider())),
+  sendPasswordReset: async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch {
+      // Say nothing either way: whether an address has an account is not for the login screen to reveal.
+    }
+  },
+  email: () => auth.currentUser?.email?.toLowerCase() ?? null,
   signOut: () => signOut(auth),
 };

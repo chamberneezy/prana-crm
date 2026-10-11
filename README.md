@@ -7,11 +7,24 @@ Management app for Prana Yoga Studio: members, enrolment from the paper form (up
 
 ## Try it
 
-**https://chamberneezy.github.io/prana-crm/** is a demo of the web app. The data is made up and is kept only in your
-own browser; sign-in is not real (any button lets you in). "Vrati početne podatke" on the login screen starts over.
+**https://chamberneezy.github.io/prana-crm/** is a preview of the web app.
 
-The demo runs the same API code as the real app, but inside the browser on SQLite (`api/src/demo`), so it needs no
-server. It is rebuilt from `main` by `.github/workflows/pages.yml`. To build it yourself: `npm run build:demo`.
+- **Sign-in is real**, through the Firebase project "Prana" (`prana-studio-crm`): Google, or e-mail and password.
+  Only listed addresses get in; anyone else is told the account has no access.
+- **The data is made up and is kept only in your own browser.** There is no server or shared database yet, so
+  another browser or device starts from the sample data. "Vrati početne podatke" on the login screen starts over.
+
+The preview runs the same API code as the real app, but inside the browser on SQLite (`api/src/demo`). It is rebuilt
+from `main` by `.github/workflows/pages.yml`.
+
+| Build | Sign-in | Data |
+|---|---|---|
+| `npm run build` | Firebase | The Cloudflare Worker (not deployed yet) |
+| `npm run build:preview` | Firebase project "Prana" | In the browser, sample data |
+| `npm run build:demo` | None: any button lets you in | In the browser, sample data |
+
+To let another address into the preview, add the SHA-256 of its lower-cased e-mail to `VITE_OWNER_HASHES` in
+`apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`).
 
 ## Layout
 

@@ -41,5 +41,7 @@ export const demoSession: AuthSession = {
   getToken: async () => (signedIn() ? demoToken() : null),
   signInWithEmail: async () => set(true),
   signInWithProvider: async () => set(true),
+  sendPasswordReset: async () => {},
+  email: () => (signedIn() ? DEMO_OWNER.email : null),
   signOut: async () => set(false),
 };

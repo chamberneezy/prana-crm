@@ -16,7 +16,8 @@
     "dev:all": "node scripts/dev.mjs",
     "e2e": "playwright test",
     "build:demo": "npm run build:demo -w @prana/web",
-    "e2e:demo": "playwright test -c playwright.demo.config.ts"
+    "e2e:demo": "playwright test -c playwright.demo.config.ts",
+    "build:preview": "npm run build:preview -w @prana/web"
   },
   "engines": {
     "node": ">=22"

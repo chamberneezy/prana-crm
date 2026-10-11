@@ -426,5 +426,10 @@
   "demo.note.title": "This is a demo",
   "demo.note.body": "The data is made up and is kept only in this browser. Sign-in is not real: any button lets you in.",
   "demo.reset": "Restore the sample data",
-  "demo.sample": "Download a sample form (PDF) and import it."
+  "demo.sample": "Download a sample form (PDF) and import it.",
+  "preview.note.title": "Preview",
+  "preview.note.body": "Sign-in is real. The data is made up and is kept only in this browser until the database is set up.",
+  "auth.forgot": "Forgot your password?",
+  "auth.forgotNeedsEmail": "Enter your e-mail, then choose “Forgot your password?” again.",
+  "auth.resetSent": "If that address has an account, we have sent it an e-mail for setting a password."
 }
