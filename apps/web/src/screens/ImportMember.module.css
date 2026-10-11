@@ -161,3 +161,14 @@ a.option:focus-visible {
   font-size: 12px;
   line-height: 1.6;
 }
+
+.sample {
+  align-self: flex-start;
+  color: var(--sage-deep);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sample:hover {
+  color: var(--ink);
+}

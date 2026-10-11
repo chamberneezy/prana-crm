@@ -1,21 +1,16 @@
-import { FirebaseError } from 'firebase/app';
-import { GoogleAuthProvider, OAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { type FormEvent, useState } from 'react';
 import logo from '../assets/prana-mark.png';
 import type { AuthNotice } from '../auth/AuthProvider';
-import { auth } from '../auth/firebase';
+import { DEMO, session, SignInFailure } from '../auth/session';
 import { Button, Input, LangSwitch } from '../components';
 import { useLang } from '../i18n';
 import styles from './Login.module.css';
 
-const WRONG_CREDENTIALS = ['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-email', 'auth/missing-password'];
-// The owner closed the pop-up: not an error worth a message.
-const CANCELLED = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled'];
-
 export function Login({ notice }: { notice: AuthNotice | null }) {
   const { t, lang, setLang } = useLang();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // The demo has no accounts, so the fields come filled in and any button lets the visitor in.
+  const [email, setEmail] = useState(DEMO ? 'mario@prana.test' : '');
+  const [password, setPassword] = useState(DEMO ? 'demo' : '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<'wrong' | 'failed' | null>(null);
 
@@ -25,8 +20,8 @@ export function Login({ notice }: { notice: AuthNotice | null }) {
     try {
       await signIn();
     } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      if (!CANCELLED.includes(code)) setError(WRONG_CREDENTIALS.includes(code) ? 'wrong' : 'failed');
+      const problem = err instanceof SignInFailure ? err.problem : 'failed';
+      if (problem !== 'cancelled') setError(problem);
     } finally {
       setBusy(false);
     }
@@ -34,7 +29,7 @@ export function Login({ notice }: { notice: AuthNotice | null }) {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    void attempt(() => signInWithEmailAndPassword(auth, email.trim(), password));
+    void attempt(() => session.signInWithEmail(email.trim(), password));
   };
 
   const message = error === 'wrong' ? t('auth.wrong') : error === 'failed' ? t('auth.failed') : notice === 'noAccess' ? t('auth.noAccess') : notice === 'offline' ? t('error.offline') : notice === 'failed' ? t('auth.failed') : null;
@@ -50,12 +45,18 @@ export function Login({ notice }: { notice: AuthNotice | null }) {
             {message}
           </p>
         )}
+        {DEMO && (
+          <p className={styles.demo}>
+            <strong>{t('demo.note.title')}</strong>
+            {t('demo.note.body')}
+          </p>
+        )}
 
         <div className={styles.providers}>
-          <Button variant="secondary" disabled={busy} onClick={() => void attempt(() => signInWithPopup(auth, new OAuthProvider('apple.com')))}>
+          <Button variant="secondary" disabled={busy} onClick={() => void attempt(() => session.signInWithProvider('apple'))}>
             {t('auth.apple')}
           </Button>
-          <Button variant="secondary" disabled={busy} onClick={() => void attempt(() => signInWithPopup(auth, new GoogleAuthProvider()))}>
+          <Button variant="secondary" disabled={busy} onClick={() => void attempt(() => session.signInWithProvider('google'))}>
             {t('auth.google')}
           </Button>
         </div>
@@ -73,6 +74,11 @@ export function Login({ notice }: { notice: AuthNotice | null }) {
         </form>
       </div>
       <LangSwitch value={lang.toUpperCase()} onChange={(code) => setLang(code === 'EN' ? 'en' : 'hr')} />
+      {DEMO && (
+        <Button variant="ghost" size="sm" onClick={() => void import('../demo-backend').then((m) => m.resetDemo())}>
+          {t('demo.reset')}
+        </Button>
+      )}
     </main>
   );
 }

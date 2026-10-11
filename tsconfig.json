@@ -12,8 +12,10 @@
   },
   "include": [
     "e2e",
+    "e2e-demo",
     "fixtures",
     "playwright.config.ts",
+    "playwright.demo.config.ts",
     "vitest.config.ts",
     "scripts"
   ]

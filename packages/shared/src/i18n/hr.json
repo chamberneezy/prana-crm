@@ -421,5 +421,10 @@
   "review.openProfile": "Otvori profil",
   "review.uploadFailed.title": "Član je spremljen, ali upisnica nije",
   "review.uploadFailed.body": "Datoteka se nije spremila uz profil.",
-  "review.uploadRetry": "Pokušaj ponovno spremiti datoteku"
+  "review.uploadRetry": "Pokušaj ponovno spremiti datoteku",
+  "demo.tag": "Demo",
+  "demo.note.title": "Ovo je demo",
+  "demo.note.body": "Podaci su izmišljeni i spremaju se samo u ovom pregledniku. Prijava nije stvarna: uđite bilo kojim gumbom.",
+  "demo.reset": "Vrati početne podatke",
+  "demo.sample": "Preuzmite primjer upisnice (PDF) i uvezite ga."
 }

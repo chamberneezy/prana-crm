@@ -4,6 +4,7 @@ import { type DragEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { Button, Notice, PageHeader } from '../components';
 import { cx } from '../components/cx';
+import { DEMO } from '../auth/session';
 import { useLang } from '../i18n';
 import { checkFile, type Extracted, extractFile, type ImportStep } from '../import/extract';
 import styles from './ImportMember.module.css';
@@ -138,6 +139,11 @@ export function ImportMember() {
       </div>
 
       <p className={styles.footer}>{t('import.footer')}</p>
+      {DEMO && (
+        <a className={styles.sample} href={`${import.meta.env.BASE_URL}primjer-upisnice.pdf`} download>
+          {t('demo.sample')}
+        </a>
+      )}
     </div>
   );
 }

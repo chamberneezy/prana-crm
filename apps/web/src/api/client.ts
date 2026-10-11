@@ -1,6 +1,5 @@
 import type { ErrorCode, ErrorResponse, Lang } from '@prana/shared';
-import { signOut } from 'firebase/auth';
-import { auth } from '../auth/firebase';
+import { DEMO, session } from '../auth/session';
 
 /** An error from the API, with the server's plain-language message in both languages. */
 export class ApiClientError extends Error {
@@ -15,7 +14,7 @@ export class ApiClientError extends Error {
 }
 
 async function send(method: string, path: string, body: unknown, forceRefresh: boolean): Promise<Response> {
-  const token = await auth.currentUser?.getIdToken(forceRefresh);
+  const token = await session.getToken(forceRefresh);
   if (!token) throw new ApiClientError('unauthenticated', 401, null);
 
   const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
@@ -27,7 +26,10 @@ async function send(method: string, path: string, body: unknown, forceRefresh: b
   }
 
   try {
-    return await fetch(`/api${path}`, { method, headers, body: payload });
+    const init = { method, headers, body: payload };
+    // In the demo build the API runs inside the browser; otherwise it is the Worker behind /api.
+    if (DEMO) return await (await import('../demo-backend')).demoFetch(path, init);
+    return await fetch(`/api${path}`, init);
   } catch {
     throw new ApiClientError('network', 0, null);
   }
@@ -45,7 +47,7 @@ async function request(method: string, path: string, body?: unknown): Promise<Re
   } catch {
     // not our error format (e.g. the API is not running behind the proxy)
   }
-  if (res.status === 401) await signOut(auth);
+  if (res.status === 401) await session.signOut();
   if (!error) throw new ApiClientError(res.status >= 500 ? 'network' : 'internal', res.status, null);
   throw new ApiClientError(error.code, res.status, { hr: error.message_hr, en: error.message_en }, error.fields);
 }

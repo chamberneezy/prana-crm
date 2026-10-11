@@ -1,9 +1,8 @@
 import type { MeResponse } from '@prana/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { api, ApiClientError } from '../api/client';
-import { auth } from './firebase';
+import { session } from './session';
 
 /** Why the login screen is showing a message. */
 export type AuthNotice = 'noAccess' | 'failed' | 'offline';
@@ -28,8 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(
     () =>
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+      session.onChange(async (signedIn) => {
+        if (!signedIn) {
           queryClient.clear();
           setState({ status: 'signedOut', notice: notice.current });
           return;
@@ -41,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
           const code = error instanceof ApiClientError ? error.code : null;
           notice.current = code === 'no_access' ? 'noAccess' : code === 'network' ? 'offline' : 'failed';
-          await firebaseSignOut(auth);
+          await session.signOut();
         }
       }),
     [queryClient],
@@ -49,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     notice.current = null;
-    await firebaseSignOut(auth);
+    await session.signOut();
   }, []);
 
   const value = useMemo(() => ({ state, signOut }), [state, signOut]);

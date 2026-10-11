@@ -5,6 +5,14 @@ Management app for Prana Yoga Studio: members, enrolment from the paper form (up
 - `docs/handoff-web.md` and `docs/handoff-ios.md` are the source of truth for behaviour, data and architecture.
 - `docs/design/` is the source of truth for how screens look.
 
+## Try it
+
+**https://chamberneezy.github.io/prana-crm/** is a demo of the web app. The data is made up and is kept only in your
+own browser; sign-in is not real (any button lets you in). "Vrati početne podatke" on the login screen starts over.
+
+The demo runs the same API code as the real app, but inside the browser on SQLite (`api/src/demo`), so it needs no
+server. It is rebuilt from `main` by `.github/workflows/pages.yml`. To build it yourself: `npm run build:demo`.
+
 ## Layout
 
 ```
@@ -37,6 +45,7 @@ The sample members, sessions and prices are made up, and the emulator account is
 | `npm run db:reset -w @prana/api` | Wipes the local database and seeds it again |
 | `npm run typecheck` / `npm run lint` / `npm test` | Checks and unit tests |
 | `npm run e2e` | Playwright smoke flows, on their own ports and their own database |
+| `npm run e2e:demo` | The same kind of check against the demo build, served as GitHub Pages serves it |
 | `npm run openapi -w @prana/api` | Regenerates `docs/openapi.json`; a test fails if it is stale |
 
 - Local data lives in `api/.wrangler/` (git-ignored).

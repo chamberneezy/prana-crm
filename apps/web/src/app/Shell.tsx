@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import logo from '../assets/prana-mark.png';
 import { useAuth, useMe } from '../auth/AuthProvider';
+import { DEMO } from '../auth/session';
 import { LangSwitch, Sidebar } from '../components';
 import { cx } from '../components/cx';
 import { useLang } from '../i18n';
@@ -38,7 +39,10 @@ export function Shell() {
 
   const account = (
     <div className={styles.account}>
-      <span className={styles.staffName}>{staff.name}</span>
+      <span className={styles.staffName}>
+        {staff.name}
+        {DEMO && ` · ${t('demo.tag')}`}
+      </span>
       <button type="button" className={styles.signOut} onClick={() => void signOut()}>
         {t('auth.logout')}
       </button>

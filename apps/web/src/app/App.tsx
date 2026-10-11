@@ -62,7 +62,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LangProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <Routes>
             <Route
               path="/demo"

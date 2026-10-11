@@ -14,7 +14,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "dev:all": "node scripts/dev.mjs",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "build:demo": "npm run build:demo -w @prana/web",
+    "e2e:demo": "playwright test -c playwright.demo.config.ts"
   },
   "engines": {
     "node": ">=22"
