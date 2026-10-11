@@ -52,6 +52,9 @@ test('add a member manually', async ({ page }) => {
   await page.getByRole('radio', { name: 'Da, molimo navedite' }).click();
   await page.getByLabel('Molimo navedite').fill('Osjetljivo rame');
 
+  // The form is signed at the studio, today.
+  await expect(page.getByLabel('Mjesto i datum')).toHaveValue(/^Varaždin, \d{2}\.\d{2}\.\d{4}\.$/);
+
   // Nothing is saved without the accuracy consent.
   const save = page.getByRole('button', { name: 'Spremi člana' });
   await expect(save).toBeDisabled();

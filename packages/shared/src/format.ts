@@ -1,5 +1,12 @@
 export const TIME_ZONE = 'Europe/Zagreb';
 
+/**
+ * Where the studio is: the place written beside the date on an upisnica ("Mjesto i datum").
+ * It is only the default for new forms; each member keeps the place their own form was signed in.
+ * With more than one location this moves onto the location record.
+ */
+export const STUDIO_PLACE = 'Varaždin';
+
 type DateInput = Date | string;
 
 const partsFormat = new Intl.DateTimeFormat('en-GB', {

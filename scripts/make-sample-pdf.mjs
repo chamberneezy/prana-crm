@@ -28,7 +28,7 @@ const html = `<!doctype html><html lang="hr"><head><meta charset="utf-8"><style>
   <p>Bol u lijevom koljenu</p>
   <p class="gap">Potvrđujem da su navedeni podaci točni.</p>
   <p>Mjesto i datum</p>
-  <p>Zagreb, 11.10.2026.</p>
+  <p>Varaždin, 11.10.2026.</p>
 </body></html>`;
 
 const browser = await chromium.launch();

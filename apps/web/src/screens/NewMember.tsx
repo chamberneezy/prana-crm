@@ -1,4 +1,4 @@
-import { localDate, type UpisnicaValue } from '@prana/shared';
+import { localDate, STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ApiClientError, errorMessage } from '../api/client';
@@ -26,7 +26,7 @@ export function NewMember() {
     setFailure(null);
     if (Object.keys(found).length) return;
 
-    create.mutate(upisnicaToInput(v, { date: localDate(new Date()) }), {
+    create.mutate(upisnicaToInput(v, { place: STUDIO_PLACE, date: localDate(new Date()) }), {
       onSuccess: ({ member }) => {
         navigate(`/clanovi/${member.id}`);
         toast({
@@ -53,7 +53,7 @@ export function NewMember() {
         <p>{t('newMember.manualIntro')}</p>
       </div>
       {failure && <Notice>{failure}</Notice>}
-      <UpisnicaForm errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi/novi')} />
+      <UpisnicaForm place={STUDIO_PLACE} errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi/novi')} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { addDays, addMonths, type ColorToken, localDate, type PaymentMethod, type PlanCode, startOfWeek, TIME_ZONE, zonedTimeToUtc } from '@prana/shared';
+import { STUDIO_PLACE, addDays, addMonths, type ColorToken, localDate, type PaymentMethod, type PlanCode, startOfWeek, TIME_ZONE, zonedTimeToUtc } from '@prana/shared';
 
 /** Seed data as plain rows, turned into SQL by toSql(). Used by scripts/seed.ts and by the tests. */
 
@@ -191,7 +191,7 @@ export function devSeed({ now }: { now: string }): SeedRow[] {
         health_text: m.health ?? null,
         consent_accuracy: true,
         consent_news: m.news ?? false,
-        signed_place: 'Zagreb',
+        signed_place: STUDIO_PLACE,
         signed_date: since,
         member_since: since,
         notes: null,

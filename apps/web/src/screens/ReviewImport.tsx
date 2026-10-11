@@ -1,4 +1,4 @@
-import { displayToIsoDate, type DocumentResponse, localDate, type MemberResponse, SCAN_FIELDS, type ScanField, type UpisnicaValue } from '@prana/shared';
+import { displayToIsoDate, type DocumentResponse, localDate, type MemberResponse, SCAN_FIELDS, type ScanField, STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router';
@@ -44,6 +44,8 @@ export function ReviewImport({ imported, onAnother }: Props) {
   }
 
   const signedDate = (scan.date && displayToIsoDate(scan.date)) || localDate(new Date());
+  // A form that doesn't say where it was signed is taken to be signed at the studio.
+  const signedPlace = scan.place || STUDIO_PLACE;
 
   /** Stores the original with the member, along with what was read from it (for audit and later tuning). */
   const storeFile = async (memberId: string) => {
@@ -63,7 +65,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
     setBusy(true);
     let created: MemberResponse;
     try {
-      created = await api<MemberResponse>('POST', '/members', upisnicaToInput(v, { place: scan.place, date: signedDate }));
+      created = await api<MemberResponse>('POST', '/members', upisnicaToInput(v, { place: signedPlace, date: signedDate }));
     } catch (error) {
       const rejected = error instanceof ApiClientError && error.code === 'invalid_input' ? fieldErrors(error.fields, strings) : {};
       setErrors(rejected);
@@ -201,7 +203,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
             <>
               {noText && <Notice title={t('review.noText.title')}>{t('review.noText.body')}</Notice>}
               {flagged.length > 0 && <Notice title={tn('review.count', flagged.length)}>{t('review.countBody', { fields: flagged.map(fieldName).join(', ') })}</Notice>}
-              <UpisnicaForm initial={value} place={scan.place || undefined} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v) => void save(v)} onCancel={onAnother} />
+              <UpisnicaForm initial={value} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v) => void save(v)} onCancel={onAnother} />
             </>
           )}
         </section>
