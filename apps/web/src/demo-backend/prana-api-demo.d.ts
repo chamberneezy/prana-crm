@@ -8,5 +8,5 @@ declare module 'prana-api-demo' {
   }
   export const DEMO_PROJECT: string;
   export const DEMO_OWNER: { uid: string; email: string };
-  export function startDemoBackend(storage: DemoStorage, options?: { projectId?: string; ownerEmail?: string }): Promise<{ fetch(request: Request): Promise<Response> }>;
+  export function startDemoBackend(storage: DemoStorage, options?: { projectId?: string; ownerEmail?: string; ownerName?: string }): Promise<{ fetch(request: Request): Promise<Response> }>;
 }

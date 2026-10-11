@@ -50,7 +50,7 @@ export async function setup(seed: 'dev' | 'prod' | 'none' = 'dev') {
 
   const now = new Date().toISOString();
   if (seed === 'dev') await run(toSql(devSeed({ now }), 'keep'));
-  if (seed === 'prod') await run(toSql(prodSeed({ now, ownerEmail: DEV_OWNER_EMAIL }), 'keep'));
+  if (seed === 'prod') await run(toSql(prodSeed({ now, owners: [{ email: DEV_OWNER_EMAIL, name: 'Mario' }] }), 'keep'));
 
   const { publicKey, privateKey } = await generateKeyPair('RS256');
   const keys = createLocalJWKSet({ keys: [{ ...(await exportJWK(publicKey)), kid: 'test-key', alg: 'RS256' }] });

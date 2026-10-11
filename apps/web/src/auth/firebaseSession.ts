@@ -40,5 +40,6 @@ export const firebaseSession: AuthSession = {
     }
   },
   email: () => auth.currentUser?.email?.toLowerCase() ?? null,
+  displayName: () => auth.currentUser?.displayName?.trim() || null,
   signOut: () => signOut(auth),
 };

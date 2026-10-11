@@ -66,7 +66,7 @@ The sample members, sessions and prices are made up, and the emulator account is
 - First `npm run e2e` on a machine: run `npx playwright install chromium` once.
 
 The production seed (M6) has no sample data and takes the owner's sign-in address:
-`tsx api/scripts/seed.ts --prod --owner-email <address>`.
+`tsx api/scripts/seed.ts --prod --owner "Name <address>"` (repeat `--owner` for each owner).
 
 ## Secrets
 

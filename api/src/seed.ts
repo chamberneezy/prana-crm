@@ -42,24 +42,30 @@ const PLANS: Array<{ code: PlanCode; name: string; visits_per_month: number | nu
 
 const stamps = (now: string) => ({ created_at: now, updated_at: now, deleted_at: null, changed_at: now });
 
+export interface SeedOwner {
+  email: string;
+  name: string;
+}
+
 export interface ProdSeedOptions {
   now: string;
-  /** The owner's sign-in e-mail. Left out: no staff row, so nobody can sign in yet. */
-  ownerEmail?: string;
-  ownerName?: string;
+  /** Who may sign in as owner. Left out: no staff rows, so nobody can sign in yet. */
+  owners?: SeedOwner[];
 }
 
 /** Production seed: the business, one location, the Joga group, the five classes and the five plans. No members. */
-export function prodSeed({ now, ownerEmail, ownerName = 'Mario' }: ProdSeedOptions): SeedRow[] {
+export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
   const b = SEED.business;
   const rows: SeedRow[] = [
     { table: 'business', row: { id: b, name: 'Prana Yoga Studio', locale: 'hr', timezone: TIME_ZONE, created_at: now, updated_at: now } },
     { table: 'location', row: { id: SEED.location, business_id: b, name: 'Prana Yoga Studio', ...stamps(now) } },
     { table: 'offering_group', row: { id: SEED.group, business_id: b, name: 'Joga', sort: 0, ...stamps(now) } },
   ];
-  if (ownerEmail) {
-    rows.push({ table: 'staff', row: { id: SEED.owner, business_id: b, firebase_uid: null, email: ownerEmail.toLowerCase(), name: ownerName, role: 'owner', ...stamps(now) } });
-  }
+  owners.forEach((owner, i) => {
+    // The first owner keeps the fixed id the sample data points at; further ones follow it.
+    const id = i === 0 ? SEED.owner : fixedId(0x40 + i);
+    rows.push({ table: 'staff', row: { id, business_id: b, firebase_uid: null, email: owner.email.toLowerCase(), name: owner.name, role: 'owner', ...stamps(now) } });
+  });
   for (const o of OFFERINGS) {
     rows.push({
       table: 'offering',
@@ -138,7 +144,7 @@ const DEV_MEMBERS: DevMember[] = [
 export function devSeed({ now }: { now: string }): SeedRow[] {
   const b = SEED.business;
   const today = localDate(now);
-  const rows = prodSeed({ now, ownerEmail: DEV_OWNER_EMAIL });
+  const rows = prodSeed({ now, owners: [{ email: DEV_OWNER_EMAIL, name: 'Mario' }] });
   for (const r of rows) {
     if (r.table === 'plan') r.row.price_cents = DEV_PRICES[r.row.code as PlanCode];
   }

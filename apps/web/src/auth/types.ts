@@ -19,5 +19,7 @@ export interface AuthSession {
   sendPasswordReset(email: string): Promise<void>;
   /** The signed-in person's e-mail, lower-cased, or null. */
   email(): string | null;
+  /** Their name as the sign-in provider gives it, if it gives one. */
+  displayName(): string | null;
   signOut(): Promise<void>;
 }

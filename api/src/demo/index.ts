@@ -31,6 +31,8 @@ export interface DemoOptions {
   projectId?: string;
   /** The e-mail to put on the studio's one staff row, i.e. who is let in. Left out: the demo owner. */
   ownerEmail?: string;
+  /** Their name, shown in the app. */
+  ownerName?: string;
 }
 
 export async function startDemoBackend(storage: DemoStorage, options: DemoOptions = {}) {
@@ -46,7 +48,7 @@ export async function startDemoBackend(storage: DemoStorage, options: DemoOption
   }
 
   // The staff allowlist has one row. Put the allowed person's e-mail on it; anyone else gets "no access".
-  db.run('UPDATE staff SET email = ?, firebase_uid = NULL WHERE id = ?', [(options.ownerEmail ?? DEV_OWNER_EMAIL).toLowerCase(), SEED.owner]);
+  db.run('UPDATE staff SET email = ?, name = ?, firebase_uid = NULL WHERE id = ?', [(options.ownerEmail ?? DEV_OWNER_EMAIL).toLowerCase(), options.ownerName || 'Mario', SEED.owner]);
 
   // Every change is written to the browser's storage before its response goes back,
   // so nothing is lost if the tab is closed or reloaded straight afterwards.

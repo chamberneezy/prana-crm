@@ -45,9 +45,12 @@ async function sha256(text: string): Promise<string> {
  * everyone else is answered "no access", as the deployed API would. This runs in the browser,
  * so it keeps the preview tidy rather than secret: the data here is sample data.
  */
-async function ownerFor(email: string | null): Promise<string | undefined> {
+async function ownerFor(email: string | null): Promise<{ ownerEmail: string; ownerName: string } | undefined> {
   if (!REAL_SIGN_IN || !email) return undefined;
-  return allowedHashes.includes(await sha256(email)) ? email : undefined;
+  if (!allowedHashes.includes(await sha256(email))) return undefined;
+  // The name shown in the app: the one on their account, or else the first part of the address ("matija.z…" → "Matija").
+  const fromAddress = (email.split('@')[0] ?? '').split(/[._-]/)[0] ?? '';
+  return { ownerEmail: email, ownerName: session.displayName() ?? fromAddress.charAt(0).toUpperCase() + fromAddress.slice(1) };
 }
 
 let started: { email: string | null; backend: ReturnType<typeof startDemoBackend> } | undefined;
@@ -58,7 +61,7 @@ export async function demoFetch(path: string, init: RequestInit): Promise<Respon
   if (!started || started.email !== email) {
     started = {
       email,
-      backend: ownerFor(email).then((ownerEmail) => startDemoBackend(storage, { projectId: REAL_SIGN_IN ? import.meta.env.VITE_FIREBASE_PROJECT_ID : undefined, ownerEmail })),
+      backend: ownerFor(email).then((owner) => startDemoBackend(storage, { projectId: REAL_SIGN_IN ? import.meta.env.VITE_FIREBASE_PROJECT_ID : undefined, ...owner })),
     };
   }
   // The host is never contacted; the app only looks at the path.
