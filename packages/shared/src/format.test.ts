@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageFromDob, formatDate, formatDayMonth, formatMoney, formatTime, formatTimeRange } from './format';
+import { ageFromDob, displayToIsoDate, formatDate, formatDayMonth, formatMoney, formatTime, formatTimeRange, isoToDisplayDate } from './format';
 
 describe('formatMoney', () => {
   it('uses comma decimals and the euro sign after the amount', () => {
@@ -49,5 +49,18 @@ describe('ageFromDob', () => {
     expect(ageFromDob('', today)).toBeNull();
     expect(ageFromDob('22.13.1991.', today)).toBeNull();
     expect(ageFromDob('22.07.19?1.', today)).toBeNull();
+  });
+});
+
+describe('display and ISO dates', () => {
+  it('converts both ways', () => {
+    expect(isoToDisplayDate('1988-03-14')).toBe('14.03.1988.');
+    expect(displayToIsoDate('14.03.1988.')).toBe('1988-03-14');
+    expect(displayToIsoDate('1.2.2000')).toBe('2000-02-01');
+  });
+  it('rejects dates that do not exist', () => {
+    expect(displayToIsoDate('31.02.2000.')).toBeNull();
+    expect(displayToIsoDate('22.13.1991.')).toBeNull();
+    expect(displayToIsoDate('')).toBeNull();
   });
 });

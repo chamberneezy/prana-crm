@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local development. .dev.vars is never committed.
+# Accepts tokens from the Firebase Auth emulator (they are not signed).
+# Ignored when ENVIRONMENT is "production".
+FIREBASE_AUTH_EMULATOR=true

@@ -1,0 +1,20 @@
+name = "prana-crm-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+
+# Local development only needs the binding names; `wrangler dev` runs D1 and R2 on this machine.
+# Before the first deploy (M6), create both in the EU and put the real D1 database_id here.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prana"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "prana-documents"
+
+[vars]
+FIREBASE_PROJECT_ID = "prana-crm"
+ENVIRONMENT = "development"

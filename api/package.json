@@ -1,0 +1,26 @@
+{
+  "name": "@prana/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc -p tsconfig.json",
+    "db:migrate": "wrangler d1 migrations apply prana --local",
+    "db:seed": "mkdir -p .wrangler && tsx scripts/seed.ts --dev > .wrangler/seed.sql && wrangler d1 execute prana --local --file=.wrangler/seed.sql",
+    "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed",
+    "openapi": "tsx scripts/openapi.ts"
+  },
+  "dependencies": {
+    "@prana/shared": "*",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.13",
+    "jose": "^6.2.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261011.1",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "wrangler": "^4.149.0"
+  }
+}

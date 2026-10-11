@@ -63,3 +63,21 @@ export function ageFromDob(dob: string, today: Date = new Date()): number | null
   if (Number(now.month) < month || (Number(now.month) === month && Number(now.day) < day)) age--;
   return age >= 0 ? age : null;
 }
+
+/** "1988-03-14" → "14.03.1988."; anything else comes back unchanged. */
+export function isoToDisplayDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return m ? `${m[3]}.${m[2]}.${m[1]}.` : iso;
+}
+
+/** "14.03.1988." or "14.3.1988" → "1988-03-14"; null if it isn't a real date. */
+export function displayToIsoDate(display: string): string | null {
+  const m = /^\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\.?\s*$/.exec(display);
+  if (!m) return null;
+  const day = Number(m[1]);
+  const month = Number(m[2]);
+  const year = Number(m[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  return date.toISOString().slice(0, 10);
+}
