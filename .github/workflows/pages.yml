@@ -30,6 +30,8 @@ jobs:
       - run: npm run build:preview
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
+          # Recorded with each piece of feedback, so it can be matched to the code it was about.
+          VITE_BUILD: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: apps/web/dist

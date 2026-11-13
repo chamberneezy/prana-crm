@@ -24,7 +24,29 @@ from `main` by `.github/workflows/pages.yml`.
 | `npm run build:demo` | None: any button lets you in | In the browser, sample data |
 
 To let another address into the preview, add the SHA-256 of its lower-cased e-mail to `VITE_OWNER_HASHES` in
-`apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`).
+`apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`), and to the list in `firestore.rules`
+so they can send feedback too (a test checks the two agree), then `npm run deploy:rules`.
+
+## Feedback
+
+In the signed-in app, **right-click on anything** (a button, a row, a card, the page) to send feedback about it.
+The form offers the element, each named section around it and the whole page, highlights the chosen one, and takes
+a type (something's wrong / suggestion / question) and a comment. Shift + right-click keeps the browser's own menu.
+
+Entries go to Firestore (collection `feedback`) in the same Firebase project as sign-in. `firestore.rules` lets only
+verified owners add entries, and nobody read them from the app. Each entry records the page's address (without the
+query), the chosen target and its path, a CSS path to the element, the language, the window size and the build's commit.
+
+| Command | What it does |
+|---|---|
+| `npm run feedback` | Prints new entries as Markdown (uses your `gcloud auth login`) |
+| `npm run feedback -- --mark-seen` | The same, then marks them `seen` |
+| `npm run feedback -- --all` | Every entry, with its status |
+| `npm run feedback -- --set <id> <status>` | e.g. `planned`, `done`, `wontfix` |
+| `npm run feedback -- --emulator` | Reads the local Firestore emulator instead |
+| `npm run deploy:rules` | Publishes `firestore.rules` to the Firebase project "Prana" |
+
+Feedback is on where `VITE_FEEDBACK=firestore` (the preview and local development) and off in the plain demo.
 
 ## Layout
 
@@ -39,14 +61,14 @@ docs/              handoffs, the design export, openapi.json (generated)
 
 ## Running locally
 
-Needs Node 22 or newer. Nothing here needs a Cloudflare or Firebase account: the database, file storage and
+Needs Node 22 or newer, and Java 21 or newer for the Firestore emulator. Nothing here needs a Cloudflare or Firebase account: the database, file storage and
 sign-in all run on this machine.
 
 ```
 npm install
 cp api/.dev.vars.example api/.dev.vars   # once: lets the local API accept emulator sign-ins
 npm run db:reset -w @prana/api           # once: create the local database with sample data
-npm run dev:all                          # Auth emulator + API + web app
+npm run dev:all                          # Auth and Firestore emulators + API + web app
 ```
 
 Then open http://localhost:5173 and sign in with **mario@prana.test** / **prana-dev**.
@@ -54,7 +76,7 @@ The sample members, sessions and prices are made up, and the emulator account is
 
 | Command | What it does |
 |---|---|
-| `npm run dev:all` | Auth emulator (9099), API (8787) and web app (5173) together |
+| `npm run dev:all` | Auth (9099) and Firestore (8080) emulators, API (8787) and web app (5173) together |
 | `npm run db:reset -w @prana/api` | Wipes the local database and seeds it again |
 | `npm run typecheck` / `npm run lint` / `npm test` | Checks and unit tests |
 | `npm run e2e` | Playwright smoke flows, on their own ports and their own database |

@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// Firestore holds one thing: feedback that staff send from the app (right-click on anything).
+// Owners may add an entry; nobody can read or change entries from the app. They are read with
+// `npm run feedback`, which signs in as the project's administrator and is not bound by these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // SHA-256 of the lower-cased e-mail of each owner, so no address is published.
+    // Keep in step with VITE_OWNER_HASHES in apps/web/.env.preview (a test checks it).
+    // 83c87347… is mario@prana.test, the local emulator's owner: it can never be verified in the real project.
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && hashing.sha256(request.auth.token.email.lower()).toHexString().lower() in [
+          'c3e1f241479cc7a5ed51c21c2391f0b4aafdd94bd45886265ff3f84f3d0577ad',
+          'a0110f14d6aba9b41d5aed1f17b54c0abfc013f6d7a519bb4f13a0a9f2e8c2a7',
+          '83c87347ef45a8b6902a85751d9961eee9b99c070d8fc0d09ae39504576b9a82'
+        ];
+    }
+
+    function shortText(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    function validFeedback(d) {
+      return d.keys().hasOnly(['status', 'kind', 'comment', 'target', 'page', 'context', 'author', 'created_at'])
+        && d.keys().hasAll(['status', 'kind', 'comment', 'target', 'page', 'context', 'author', 'created_at'])
+        && d.status == 'new'
+        && d.kind in ['bug', 'idea', 'question']
+        && shortText(d.comment, 4000) && d.comment.size() > 0
+        && d.target is map && d.target.keys().hasOnly(['label', 'path', 'selector'])
+        && shortText(d.target.label, 400) && shortText(d.target.selector, 400)
+        && d.target.path is list && d.target.path.size() <= 12
+        && d.page is map && d.page.keys().hasOnly(['path', 'title'])
+        && shortText(d.page.path, 300) && shortText(d.page.title, 200)
+        && d.context is map && d.context.keys().hasOnly(['lang', 'viewport', 'user_agent', 'build'])
+        && shortText(d.context.user_agent, 400) && shortText(d.context.build, 80)
+        && d.author is map && d.author.keys().hasOnly(['uid', 'email', 'name'])
+        && d.author.uid == request.auth.uid
+        && d.author.email == request.auth.token.email.lower()
+        && shortText(d.author.name, 120)
+        && d.created_at == request.time;
+    }
+
+    match /feedback/{id} {
+      allow create: if isOwner() && validFeedback(request.resource.data);
+    }
+  }
+}

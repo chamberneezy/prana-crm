@@ -1,4 +1,4 @@
-// Starts everything for local development: the Auth emulator, the API and the web app.
+// Starts everything for local development: the Auth and Firestore emulators, the API and the web app.
 // Sign in at http://localhost:5173 with the account below.
 import { spawn } from 'node:child_process';
 import { ensureUser, waitForEmulator } from './emulator-user.mjs';
@@ -6,13 +6,14 @@ import { ensureUser, waitForEmulator } from './emulator-user.mjs';
 const DEV_USER = { email: 'mario@prana.test', password: 'prana-dev' };
 
 const children = [
-  spawn('npx', ['firebase', 'emulators:start', '--only', 'auth', '--project', 'prana-crm'], { stdio: 'inherit' }),
+  spawn('npx', ['firebase', 'emulators:start', '--only', 'auth,firestore', '--project', 'prana-crm'], { stdio: 'inherit' }),
   spawn('npm', ['run', 'dev', '-w', '@prana/api'], { stdio: 'inherit' }),
   spawn('npm', ['run', 'dev', '-w', '@prana/web'], { stdio: 'inherit' }),
 ];
 
+// SIGINT (as Ctrl-C) lets the Firebase CLI stop the Firestore emulator (Java) too; SIGTERM would leave it running.
 const stop = () => {
-  for (const child of children) child.kill('SIGTERM');
+  for (const child of children) child.kill('SIGINT');
 };
 process.on('SIGINT', stop);
 process.on('SIGTERM', stop);

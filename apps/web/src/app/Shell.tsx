@@ -7,6 +7,7 @@ import { useAuth, useMe } from '../auth/AuthProvider';
 import { DEMO, REAL_SIGN_IN } from '../auth/session';
 import { LangSwitch, Sidebar } from '../components';
 import { cx } from '../components/cx';
+import { FeedbackHint } from '../feedback/FeedbackProvider';
 import { useLang } from '../i18n';
 import styles from './Shell.module.css';
 
@@ -46,6 +47,7 @@ export function Shell() {
       <button type="button" className={styles.signOut} onClick={() => void signOut()}>
         {t('auth.logout')}
       </button>
+      <FeedbackHint className={styles.feedbackHint} />
     </div>
   );
 

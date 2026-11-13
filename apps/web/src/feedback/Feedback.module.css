@@ -1,0 +1,158 @@
+.backdrop {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  background: rgba(42, 50, 46, 0.18);
+}
+
+/* Above the shade, so the chosen target stands out. Clicks pass through to the backdrop. */
+.highlight {
+  position: fixed;
+  z-index: 41;
+  border: 2px solid var(--accent-attention);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 4px rgba(200, 109, 81, 0.18);
+  pointer-events: none;
+  transition: top 120ms ease, left 120ms ease, width 120ms ease, height 120ms ease;
+}
+
+.dialog {
+  position: fixed;
+  z-index: 42;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-float);
+  font-family: var(--font-ui);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 12px 12px 24px;
+  border-bottom: 1px solid var(--border-divider);
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  font: var(--text-card-title);
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--mist);
+  color: var(--text-1);
+}
+
+.close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 16px 24px 20px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: 8px;
+  padding: 0;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.targets {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.target {
+  overflow: hidden;
+  padding: 8px 12px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.target:hover {
+  background: var(--surface-hover);
+}
+
+.target:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.targetChosen {
+  border-color: var(--accent-attention);
+  background: var(--bg-attention);
+}
+
+.targetChosen:hover {
+  background: var(--bg-attention);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hint {
+  flex: 1 1 100%;
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+@media (max-width: 767px) {
+  .dialog {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    width: auto;
+  }
+}

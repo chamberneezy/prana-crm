@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // The smoke flows run against their own servers and database, so they never touch dev data:
-// the Auth emulator, the API on 8788 with a freshly seeded database, and the web app on 5174.
+// the Auth and Firestore emulators, the API on 8788 with a freshly seeded database, and the web app on 5174.
 export default defineConfig({
   testDir: 'e2e',
   globalSetup: './e2e/global-setup.ts',
@@ -19,9 +19,12 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'npx firebase emulators:start --only auth --project prana-crm',
-      url: 'http://127.0.0.1:9099',
+      command: 'npx firebase emulators:start --only auth,firestore --project prana-crm',
+      // Firestore (Java) comes up last, so its port being open means both are ready.
+      url: 'http://127.0.0.1:8080',
       reuseExistingServer: !process.env.CI,
+      // Ctrl-C lets the Firebase CLI stop the Firestore emulator (Java) too; a kill would leave it running.
+      gracefulShutdown: { signal: 'SIGINT', timeout: 10_000 },
       timeout: 120_000,
     },
     {

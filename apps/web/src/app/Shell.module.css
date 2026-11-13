@@ -37,6 +37,13 @@
   color: var(--field);
 }
 
+.feedbackHint {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--stone-dot);
+}
+
 .signOut {
   padding: 4px 0;
   border: 0;

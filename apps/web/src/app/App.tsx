@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { ApiClientError } from '../api/client';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
+import { FeedbackProvider } from '../feedback/FeedbackProvider';
 import { LangProvider, useLang } from '../i18n';
 import { ImportMember } from '../screens/ImportMember';
 import { Login } from '../screens/Login';
@@ -32,21 +33,23 @@ const queryClient = new QueryClient({
 
 function SignedIn() {
   return (
-    <Routes>
-      <Route element={<Shell />}>
-        <Route index element={<Navigate to="/pregled" replace />} />
-        <Route path="pregled" element={<Overview />} />
-        <Route path="raspored" element={<Schedule />} />
-        <Route path="vrste-satova" element={<Offerings />} />
-        <Route path="clanovi" element={<Members />} />
-        <Route path="clanovi/novi" element={<ImportMember />} />
-        <Route path="clanovi/novi/rucno" element={<NewMember />} />
-        <Route path="clanovi/:id" element={<MemberProfileScreen />} />
-        <Route path="karte" element={<Plans />} />
-        <Route path="uplate" element={<Payments />} />
-        <Route path="*" element={<Navigate to="/pregled" replace />} />
-      </Route>
-    </Routes>
+    <FeedbackProvider>
+      <Routes>
+        <Route element={<Shell />}>
+          <Route index element={<Navigate to="/pregled" replace />} />
+          <Route path="pregled" element={<Overview />} />
+          <Route path="raspored" element={<Schedule />} />
+          <Route path="vrste-satova" element={<Offerings />} />
+          <Route path="clanovi" element={<Members />} />
+          <Route path="clanovi/novi" element={<ImportMember />} />
+          <Route path="clanovi/novi/rucno" element={<NewMember />} />
+          <Route path="clanovi/:id" element={<MemberProfileScreen />} />
+          <Route path="karte" element={<Plans />} />
+          <Route path="uplate" element={<Payments />} />
+          <Route path="*" element={<Navigate to="/pregled" replace />} />
+        </Route>
+      </Routes>
+    </FeedbackProvider>
   );
 }
 

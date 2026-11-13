@@ -15,6 +15,12 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID: string;
   /** Set only for local development, e.g. http://127.0.0.1:9099. */
   readonly VITE_FIREBASE_AUTH_EMULATOR_URL?: string;
+  /** "firestore": right-click on anything opens the feedback form, which saves to Firestore. */
+  readonly VITE_FEEDBACK?: string;
+  /** Set only for local development, e.g. 127.0.0.1:8080. */
+  readonly VITE_FIRESTORE_EMULATOR_HOST?: string;
+  /** The commit the build was made from, recorded with feedback. */
+  readonly VITE_BUILD?: string;
 }
 
 interface ImportMeta {
