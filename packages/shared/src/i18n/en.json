@@ -468,5 +468,9 @@
   "upisnica.paidAmount": "Paid? ({amount})",
   "upisnica.paid.later": "Not yet",
   "upisnica.paidRequired": "Choose whether the membership is paid.",
-  "upisnica.paidHint": "A payment is recorded straight away. “Not yet” leaves the membership unpaid."
+  "upisnica.paidHint": "A payment is recorded straight away. “Not yet” leaves the membership unpaid.",
+  "upisnica.firstName": "First name",
+  "upisnica.lastName": "Last name",
+  "upisnica.firstNameRequired": "Enter the first name.",
+  "upisnica.lastNameRequired": "Enter the last name."
 }

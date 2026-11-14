@@ -561,6 +561,12 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
           "full_name": {
             "type": "string"
           },
@@ -661,6 +667,8 @@
         "required": [
           "id",
           "business_id",
+          "first_name",
+          "last_name",
           "full_name",
           "email",
           "phone",
@@ -2033,9 +2041,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "first_name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
                   "full_name": {
                     "type": "string",
-                    "minLength": 1,
                     "maxLength": 200
                   },
                   "email": {
@@ -2163,7 +2178,6 @@
                   }
                 },
                 "required": [
-                  "full_name",
                   "consent_accuracy"
                 ]
               }
@@ -2296,9 +2310,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "first_name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
                   "full_name": {
                     "type": "string",
-                    "minLength": 1,
                     "maxLength": 200
                   },
                   "email": {

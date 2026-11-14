@@ -6,7 +6,11 @@ export type UpisnicaPlan = '1x' | '2x' | '3x' | 'unl';
 
 /** The studio's paper enrolment form, field for field. */
 export interface UpisnicaValue {
+  /** As on the paper form: first and last name on one line. Kept as firstName + lastName once those are set. */
   name: string;
+  /** Not on the paper form: the screen asks for them apart. Left out: split from `name` at the first space. */
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   /** dd.mm.yyyy. */

@@ -51,7 +51,7 @@ Feedback is on where `VITE_FEEDBACK=firestore` (the preview and local developmen
 ## Layout
 
 ```
-api/               Cloudflare Worker (Hono): D1 schema and migration, seed, auth, all endpoints
+api/               Cloudflare Worker (Hono): D1 schema and migrations, seed, auth, all endpoints
 apps/web/          React + Vite + TypeScript web app
 packages/shared/   zod schemas (the API contract), member-status rules, date and money helpers, i18n strings (hr/en)
 docs/              handoffs, the design export, openapi.json (generated)
@@ -84,6 +84,8 @@ The sample members, sessions and prices are made up, and the emulator account is
 | `npm run openapi -w @prana/api` | Regenerates `docs/openapi.json`; a test fails if it is stale |
 
 - Local data lives in `api/.wrangler/` (git-ignored).
+- A new file in `api/migrations/` also goes in the list in `api/src/demo/migrations.ts` (a test checks): the preview
+  applies it in each visitor's browser and keeps their data. Locally, `npm run db:migrate -w @prana/api` applies it.
 - The component demo page is at http://localhost:5173/demo.
 - First `npm run e2e` on a machine: run `npx playwright install chromium` once.
 

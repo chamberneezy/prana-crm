@@ -27,8 +27,10 @@ test('the demo runs with no server: sample data, and changes that survive a relo
   // Add a member by hand.
   await page.getByRole('button', { name: 'Novi član' }).click();
   await page.getByRole('link', { name: /Upiši ručno/ }).click();
-  await page.getByLabel('Ime i prezime').fill('Demo Posjetitelj');
+  await page.getByLabel('Ime', { exact: true }).fill('Demo');
+  await page.getByLabel('Prezime').fill('Posjetitelj');
   await page.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
+  await page.getByRole('radio', { name: 'Ne još' }).click();
   await page.getByRole('button', { name: 'Spremi člana' }).click();
   await expect(page).toHaveURL(/\/prana-crm\/clanovi\/[0-9a-f-]{36}$/);
   await expect(page.getByRole('status')).toContainText('Demo Posjetitelj je spremljen/a kao novi član.');
@@ -75,10 +77,12 @@ test('schedule, check-in, payment and PDF import all work in the demo', async ({
   await page.getByLabel('Odaberite datoteku').setInputFiles({ name: 'primjer-upisnice.pdf', mimeType: 'application/pdf', buffer: readFileSync('apps/web/public/primjer-upisnice.pdf') });
   await expect(page.getByRole('heading', { name: 'Provjerite podatke' })).toBeVisible();
   const review = page.getByRole('region', { name: 'Prepoznati podaci' });
-  await expect(review.getByLabel('Ime i prezime')).toHaveValue('Lucija Perić');
+  await expect(review.getByLabel('Ime', { exact: true })).toHaveValue('Lucija');
+  await expect(review.getByLabel('Prezime')).toHaveValue('Perić');
   await expect(review.getByLabel('Broj mobitela')).toHaveAttribute('aria-invalid', 'true');
   await review.getByLabel('Broj mobitela').fill('098 765 4321');
   await review.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
+  await review.getByRole('radio', { name: 'Gotovina' }).click();
   await review.getByRole('button', { name: 'Spremi člana' }).click();
   await page.getByRole('link', { name: /Otvori profil/ }).click();
   await expect(page.getByRole('button', { name: /primjer-upisnice\.pdf/ })).toContainText('Uvezeno');
@@ -115,8 +119,10 @@ test('"Vrati početne podatke" starts again from the sample data', async ({ page
   await openSection(page, 'Članovi');
   await page.getByRole('button', { name: 'Novi član' }).click();
   await page.getByRole('link', { name: /Upiši ručno/ }).click();
-  await page.getByLabel('Ime i prezime').fill('Privremeni Član');
+  await page.getByLabel('Ime', { exact: true }).fill('Privremeni');
+  await page.getByLabel('Prezime').fill('Član');
   await page.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
+  await page.getByRole('radio', { name: 'Ne još' }).click();
   await page.getByRole('button', { name: 'Spremi člana' }).click();
   await expect(page.getByRole('status')).toContainText('Privremeni Član');
 

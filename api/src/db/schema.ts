@@ -1,7 +1,7 @@
 import type { ColorToken, DocumentSource, PaymentMethod, PlanCode, StaffRole } from '@prana/shared';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-// Mirrors migrations/0001_init.sql. Property names are the column names, so rows
+// Mirrors migrations/ (0001_init.sql and the ones after it). Property names are the column names, so rows
 // come back in the same snake_case shape the API contract uses.
 
 /** updated_at = last edit (sync resolves conflicts by it); changed_at = last server write (the sync cursor). */
@@ -75,6 +75,8 @@ export const session = sqliteTable('session', {
 export const member = sqliteTable('member', {
   id: text().primaryKey(),
   business_id: text().notNull(),
+  first_name: text().notNull(),
+  last_name: text().notNull(),
   full_name: text().notNull(),
   email: text(),
   phone: text(),

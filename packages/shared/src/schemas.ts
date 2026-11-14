@@ -125,6 +125,9 @@ export const sessionSchema = z.object({
 export const memberSchema = z.object({
   id,
   business_id: id,
+  first_name: z.string(),
+  last_name: z.string(),
+  /** Always "first_name last_name"; kept for lists, search and sorting. */
   full_name: z.string(),
   email: z.string().nullable(),
   phone: z.string().nullable(),
@@ -292,7 +295,10 @@ const shortText = z.string().trim().max(200);
 const longText = z.string().trim().max(2000);
 
 export const memberInputSchema = z.object({
-  full_name: shortText.min(1),
+  first_name: shortText.optional(),
+  last_name: shortText.optional(),
+  /** Instead of first_name and last_name: split at the first space. One of the two is required. */
+  full_name: shortText.optional(),
   email: z.email().max(200).nullable().optional(),
   phone: z.string().trim().max(40).nullable().optional(),
   dob: isoDate.nullable().optional(),

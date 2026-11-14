@@ -1,4 +1,4 @@
-import { formatDate, formatMoney, tidyDisplayDate, typingDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
+import { formatDate, formatMoney, joinName, splitFullName, tidyDisplayDate, typingDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
 import { type ReactNode, useState } from 'react';
 import { useLang } from '../i18n';
 import { Button } from './Button';
@@ -25,13 +25,13 @@ export interface UpisnicaFormProps {
   /** dd.mm.yyyy.; today when left out. */
   date?: string;
   onChange?: (v: UpisnicaValue) => void;
-  /** Only fires when the accuracy consent is ticked and a name is given. */
+  /** Only fires when the accuracy consent is ticked and a first and last name are given. */
   onSave?: (v: UpisnicaValue, signed: UpisnicaSigned) => void;
   onCancel?: () => void;
   /** `edit` changes an existing member: no plan picker, and the button says "Spremi promjene". */
   mode?: 'new' | 'edit';
-  /** Messages for fields that need attention; shown in the error state. */
-  errors?: Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
+  /** Messages for fields that need attention; shown in the error state. `name` marks both name fields. */
+  errors?: Partial<Record<'name' | 'firstName' | 'lastName' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
   /** A save is in progress. */
   busy?: boolean;
   /** Each plan's price in cents (null: none set). Shown with the plans; a plan without a price skips "Plaćeno?". */
@@ -52,12 +52,24 @@ function Section({ n, title, children }: { n: string; title: string; children: R
 export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false, prices }: UpisnicaFormProps) {
   const edit = mode === 'edit';
   const { t } = useLang();
-  const [v, setV] = useState<UpisnicaValue>({ ...EMPTY, ...initial });
+  const [v, setV] = useState<UpisnicaValue>(() => {
+    const start = { ...EMPTY, ...initial };
+    // A name read off the paper form is one line: split it at the first space.
+    if (start.firstName === undefined && start.lastName === undefined) {
+      const split = splitFullName(start.name);
+      return { ...start, firstName: split.first_name, lastName: split.last_name };
+    }
+    return start;
+  });
+  const first = v.firstName ?? '';
+  const last = v.lastName ?? '';
   const [tried, setTried] = useState(false);
   const [signed, setSigned] = useState<UpisnicaSigned>({ place: place ?? '', date: date ?? formatDate(new Date()) });
 
   const set = (patch: Partial<UpisnicaValue>) => {
-    const next = { ...v, ...patch };
+    const merged = { ...v, ...patch };
+    // `name` follows the two parts, so the signature and anything reading `name` stay right.
+    const next = 'firstName' in patch || 'lastName' in patch ? { ...merged, name: joinName(merged.firstName ?? '', merged.lastName ?? '') } : merged;
     setV(next);
     onChange?.(next);
   };
@@ -67,7 +79,7 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
   const save = () => {
     setTried(true);
     if (askPaid && !v.paid) return;
-    if (v.consent && v.name.trim()) onSave?.(askPaid ? v : { ...v, paid: undefined }, { place: signed.place.trim(), date: signed.date.trim() });
+    if (v.consent && first.trim() && last.trim()) onSave?.(askPaid ? v : { ...v, paid: undefined }, { place: signed.place.trim(), date: signed.date.trim() });
   };
 
   return (
@@ -80,11 +92,18 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
       <Section n="01" title={t('upisnica.section.details')}>
         <div className={styles.fields}>
           <Input
-            label={t('upisnica.name')}
-            value={v.name}
-            onChange={(e) => set({ name: e.target.value })}
-            error={tried && !v.name.trim() ? t('upisnica.nameRequired') : errors.name}
-            style={{ gridColumn: '1 / -1' }}
+            label={t('upisnica.firstName')}
+            value={first}
+            autoComplete="given-name"
+            onChange={(e) => set({ firstName: e.target.value })}
+            error={tried && !first.trim() ? t('upisnica.firstNameRequired') : (errors.firstName ?? errors.name)}
+          />
+          <Input
+            label={t('upisnica.lastName')}
+            value={last}
+            autoComplete="family-name"
+            onChange={(e) => set({ lastName: e.target.value })}
+            error={tried && !last.trim() ? t('upisnica.lastNameRequired') : (errors.lastName ?? errors.name)}
           />
           <Input label={t('upisnica.email')} type="email" value={v.email} onChange={(e) => set({ email: e.target.value })} error={errors.email} />
           <Input label={t('upisnica.phone')} type="tel" value={v.phone} onChange={(e) => set({ phone: e.target.value })} error={errors.phone} />

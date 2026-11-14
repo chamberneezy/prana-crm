@@ -1,10 +1,10 @@
 import initSqlJs from 'sql.js';
 import wasmUrl from 'sql.js/dist/sql-wasm-browser.wasm?url';
-import migration from '../../migrations/0001_init.sql?raw';
 import { createApp } from '../app';
 import type { Env } from '../env';
 import { DEV_OWNER_EMAIL, devSeed, SEED, toSql } from '../seed';
 import { createD1 } from './d1';
+import { migrate } from './migrations';
 import { createR2 } from './r2';
 
 /**
@@ -41,8 +41,9 @@ export async function startDemoBackend(storage: DemoStorage, options: DemoOption
   const saved = await storage.get(DATABASE_KEY);
   const db = saved ? new SQL.Database(saved) : new SQL.Database();
   db.run('PRAGMA foreign_keys = ON');
+  // A database saved by an earlier version of the app is brought up to date, keeping its data.
+  migrate(db);
   if (!saved) {
-    db.exec(migration);
     // Sample dates are relative to the day the demo is first opened.
     for (const statement of toSql(devSeed({ now: new Date().toISOString() }), 'keep')) db.run(statement);
   }

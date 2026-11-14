@@ -468,5 +468,9 @@
   "upisnica.paidAmount": "Plaćeno? ({amount})",
   "upisnica.paid.later": "Ne još",
   "upisnica.paidRequired": "Odaberite je li članarina plaćena.",
-  "upisnica.paidHint": "Plaćeno se odmah bilježi kao uplata. „Ne još” ostavlja članarinu neplaćenom."
+  "upisnica.paidHint": "Plaćeno se odmah bilježi kao uplata. „Ne još” ostavlja članarinu neplaćenom.",
+  "upisnica.firstName": "Ime",
+  "upisnica.lastName": "Prezime",
+  "upisnica.firstNameRequired": "Upišite ime.",
+  "upisnica.lastNameRequired": "Upišite prezime."
 }

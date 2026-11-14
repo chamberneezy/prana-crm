@@ -1,4 +1,4 @@
-import { addDays, addMonths, localDate, type MemberSummary, monthPeriodEnd, monthPeriodStart, routes, uuidv7 } from '@prana/shared';
+import { addDays, addMonths, localDate, type MemberSummary, monthPeriodEnd, monthPeriodStart, routes, splitFullName, uuidv7 } from '@prana/shared';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildOpenApi } from '@prana/shared';
@@ -67,7 +67,7 @@ describe('members', () => {
     expect(noConsent.body.error).toMatchObject({ code: 'consent_required', message_hr: 'Potrebna je potvrda točnosti podataka.' });
 
     const noName = await t.call('POST', '/members', { body: { full_name: '  ', consent_accuracy: true } });
-    expect(noName.body.error).toMatchObject({ code: 'invalid_input', fields: ['full_name'] });
+    expect(noName.body.error).toMatchObject({ code: 'invalid_input', fields: ['first_name'] });
 
     const badEmail = await t.call('POST', '/members', { body: { full_name: 'Test', email: 'not-an-email', dob: '14.03.1988.', consent_accuracy: true } });
     expect(badEmail.body.error.fields.sort()).toEqual(['dob', 'email']);
@@ -106,6 +106,17 @@ describe('members', () => {
     // Not paid yet: no payment, and the price is owed.
     const later = await t.call('POST', '/members', { body: { full_name: 'Platit Ce Kasnije', consent_accuracy: true, plan_code: '2x', paid_with: null } });
     expect(later.body.summary).toMatchObject({ status: 'unpaid', debt_cents: 8500 });
+  });
+
+  it('keeps first and last name apart, and full_name as the two together', async () => {
+    const made = await t.call('POST', '/members', { body: { first_name: ' Ana Marija ', last_name: 'Horvat Kovač', consent_accuracy: true } });
+    expect(made.status).toBe(201);
+    expect(made.body.member).toMatchObject({ first_name: 'Ana Marija', last_name: 'Horvat Kovač', full_name: 'Ana Marija Horvat Kovač' });
+    const renamed = await t.call('PATCH', `/members/${made.body.member.id}`, { body: { last_name: 'Babić' } });
+    expect(renamed.body.member).toMatchObject({ first_name: 'Ana Marija', last_name: 'Babić', full_name: 'Ana Marija Babić' });
+    // A full name alone is split at the first space.
+    const whole = await t.call('POST', '/members', { body: { full_name: 'Ivo Ivić Perić', consent_accuracy: true } });
+    expect(whole.body.member).toMatchObject({ first_name: 'Ivo', last_name: 'Ivić Perić', full_name: 'Ivo Ivić Perić' });
   });
 
   it('edits a member; the consent cannot be withdrawn by an edit', async () => {
@@ -427,8 +438,10 @@ describe('sync (iOS)', () => {
   let cursor: string;
   const id = uuidv7();
   const stamp = (offsetMs = 0) => new Date(Date.now() + offsetMs).toISOString();
+  // Synced rows carry first and last name; full_name is built from them on the server.
   const memberRow = (overrides: Record<string, unknown> = {}) => ({
     id,
+    ...splitFullName(String(overrides.full_name ?? 'Offline Član')),
     full_name: 'Offline Član',
     email: null,
     phone: null,

@@ -54,7 +54,9 @@ test('import a PDF, review the flagged fields and save with the document', async
 
   // The fields are filled in and tidied: name in title case, e-mail lower-cased, date with leading zeros.
   const form = page.getByRole('region', { name: 'Prepoznati podaci' });
-  await expect(form.getByLabel('Ime i prezime')).toHaveValue('Dora Vuković');
+  // The one name line on paper is split into first and last name.
+  await expect(form.getByLabel('Ime', { exact: true })).toHaveValue('Dora');
+  await expect(form.getByLabel('Prezime')).toHaveValue('Vuković');
   await expect(form.getByLabel('E-mail')).toHaveValue('dora.vukovic@example.com');
   await expect(form.getByLabel('Datum rođenja')).toHaveValue('05.04.1993.');
   await expect(form.getByRole('radio', { name: 'DA', exact: true })).toHaveAttribute('aria-checked', 'true');
@@ -102,7 +104,8 @@ test('undo after saving removes the member again', async ({ page }) => {
   const pdf = await makeUpisnicaPdf(page);
   await page.getByLabel('Odaberite datoteku').setInputFiles({ name: 'upisnica-dora.pdf', mimeType: 'application/pdf', buffer: pdf });
   const form = page.getByRole('region', { name: 'Prepoznati podaci' });
-  await form.getByLabel('Ime i prezime').fill('Poništena Osoba');
+  await form.getByLabel('Ime', { exact: true }).fill('Poništena');
+  await form.getByLabel('Prezime').fill('Osoba');
   await form.getByLabel('Broj mobitela').fill('098 765 4321');
   await form.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
   await form.getByRole('radio', { name: 'Ne još' }).click();
@@ -111,7 +114,8 @@ test('undo after saving removes the member again', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Poništi' }).click();
   // The form is back, with what was typed.
-  await expect(form.getByLabel('Ime i prezime')).toHaveValue('Poništena Osoba');
+  await expect(form.getByLabel('Ime', { exact: true })).toHaveValue('Poništena');
+  await expect(form.getByLabel('Prezime')).toHaveValue('Osoba');
   await openSection(page, 'Članovi');
   await page.getByRole('searchbox').fill('Poništena');
   await expect(page.getByText('Nema članova za ovaj prikaz')).toBeVisible();
@@ -122,7 +126,7 @@ test('a photo opens the review with the original and an empty form', async ({ pa
   await expect(page.getByRole('heading', { name: 'Provjerite podatke' })).toBeVisible();
   await expect(page.getByText('Tekst nije pročitan')).toBeVisible();
   const form = page.getByRole('region', { name: 'Prepoznati podaci' });
-  await expect(form.getByLabel('Ime i prezime')).toHaveValue('');
+  await expect(form.getByLabel('Ime', { exact: true })).toHaveValue('');
   await expect(form.getByRole('button', { name: 'Spremi člana' })).toBeDisabled();
 
   await page.getByRole('button', { name: 'Druga datoteka' }).click();

@@ -8,6 +8,7 @@ import {
   type MemberPatch,
   type MemberSummary,
   type PlanCode,
+  splitFullName,
   type UpisnicaPlan,
   type UpisnicaValue,
 } from '@prana/shared';
@@ -47,6 +48,8 @@ export function memberToUpisnica(member: Member, summary: MemberSummary): Upisni
   const code = summary.membership?.plan_code;
   return {
     name: member.full_name,
+    firstName: member.first_name,
+    lastName: member.last_name,
     email: member.email ?? '',
     phone: member.phone ?? '',
     dob: member.dob ? isoToDisplayDate(member.dob) : '',
@@ -59,7 +62,7 @@ export function memberToUpisnica(member: Member, summary: MemberSummary): Upisni
   };
 }
 
-export type UpisnicaErrors = Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
+export type UpisnicaErrors = Partial<Record<'name' | 'firstName' | 'lastName' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
 
 /** Where and when a form was signed, as typed in the form. */
 export interface Signed {
@@ -83,16 +86,20 @@ export function fieldErrors(fields: string[], { t }: Strings): UpisnicaErrors {
   if (fields.includes('dob')) errors.dob = t('upisnica.dobInvalid');
   if (fields.includes('phone')) errors.phone = t('upisnica.phoneInvalid');
   if (fields.includes('full_name')) errors.name = t('upisnica.nameRequired');
+  if (fields.includes('first_name')) errors.firstName = t('upisnica.firstNameRequired');
+  if (fields.includes('last_name')) errors.lastName = t('upisnica.lastNameRequired');
   if (fields.includes('signed_date')) errors.date = t('upisnica.dobInvalid');
   return errors;
 }
 
 /** The member fields of the form, as the API takes them. */
-export function upisnicaToPatch(v: UpisnicaValue, signed: Signed): MemberPatch & { full_name: string } {
+export function upisnicaToPatch(v: UpisnicaValue, signed: Signed): MemberPatch {
+  const split = splitFullName(v.name);
   return {
     signed_place: signed.place.trim() || null,
     signed_date: signed.date.trim() ? displayToIsoDate(signed.date) : null,
-    full_name: v.name.trim(),
+    first_name: (v.firstName ?? split.first_name).trim(),
+    last_name: (v.lastName ?? split.last_name).trim(),
     email: v.email.trim() || null,
     phone: v.phone.trim() || null,
     dob: v.dob.trim() ? displayToIsoDate(v.dob) : null,

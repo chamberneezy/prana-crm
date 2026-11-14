@@ -1,4 +1,4 @@
-import { type SyncPullResponse, type SyncPushResponse, syncPushRowSchemas, syncPushSchema, type SyncPushTable, syncQuerySchema } from '@prana/shared';
+import { joinName, type SyncPullResponse, type SyncPushResponse, syncPushRowSchemas, syncPushSchema, type SyncPushTable, syncQuerySchema } from '@prana/shared';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { document, location, member, membership, offering, offeringGroup, payment, plan, session, staff, visit } from '../db/schema';
@@ -105,7 +105,9 @@ sync.post('/', async (c) => {
       continue;
     }
 
-    const values = { ...row, business_id: businessId, created_at: existing?.created_at ?? row.created_at ?? now, changed_at: now };
+    // A member's full_name is always built from first and last name, whatever the client sent.
+    const named = name === 'member' ? { full_name: joinName(String(row.first_name ?? ''), String(row.last_name ?? '')) } : {};
+    const values = { ...row, ...named, business_id: businessId, created_at: existing?.created_at ?? row.created_at ?? now, changed_at: now };
     try {
       await db
         .insert(t)

@@ -38,13 +38,16 @@ test('filter, search and open a profile', async ({ page }) => {
 });
 
 test('add a member manually', async ({ page }) => {
-  const name = `Proba Testić ${Date.now().toString().slice(-6)}`;
+  const surname = `Testić${Date.now().toString().slice(-6)}`;
+  const name = `Proba ${surname}`;
   await page.getByRole('button', { name: 'Novi član' }).click();
   await page.getByRole('link', { name: /Upiši ručno/ }).click();
   await expect(page.getByRole('heading', { name: 'Novi član' })).toBeVisible();
   await expect(page.getByText('Prijava za članstvo')).toBeVisible();
 
-  await page.getByLabel('Ime i prezime').fill(name);
+  // First and last name are separate fields.
+  await page.getByLabel('Ime', { exact: true }).fill('Proba');
+  await page.getByLabel('Prezime').fill(surname);
   await page.getByLabel('E-mail').fill('proba.testic@example.com');
   await page.getByLabel('Broj mobitela').fill('091 111 2222');
   await page.getByLabel('Datum rođenja').fill('31.02.1990.');

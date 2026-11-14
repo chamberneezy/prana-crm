@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { getPlatformProxy } from 'wrangler';
@@ -27,7 +27,7 @@ interface CallOptions {
 }
 
 /**
- * A fresh local D1 and R2 (through Miniflare, nothing persisted) with the migration applied,
+ * A fresh local D1 and R2 (through Miniflare, nothing persisted) with the migrations applied,
  * and the real app wired to test signing keys in place of Google's.
  */
 export async function setup(seed: 'dev' | 'prod' | 'none' = 'dev') {
@@ -39,14 +39,18 @@ export async function setup(seed: 'dev' | 'prod' | 'none' = 'dev') {
     await env.DB.batch(statements.map((s) => env.DB.prepare(s)));
   };
 
-  const migration = readFileSync(resolve(import.meta.dirname, '../migrations/0001_init.sql'), 'utf8')
-    .split('\n')
-    .filter((line) => !line.trimStart().startsWith('--'))
-    .join('\n')
-    .split(';')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  await run(migration);
+  // Every migration, in order, as `wrangler d1 migrations apply` would.
+  const dir = resolve(import.meta.dirname, '../migrations');
+  for (const file of readdirSync(dir).filter((f) => f.endsWith('.sql')).sort()) {
+    const statements = readFileSync(resolve(dir, file), 'utf8')
+      .split('\n')
+      .filter((line) => !line.trimStart().startsWith('--'))
+      .join('\n')
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    await run(statements);
+  }
 
   const now = new Date().toISOString();
   if (seed === 'dev') await run(toSql(devSeed({ now }), 'keep'));

@@ -83,7 +83,7 @@ prana-crm/
 | `offering_group` | id, business_id, name, sort. v1: `Joga`. |
 | `offering` (class type) | id, business_id, group_id, name, color_token, default_duration_min, entry_rule (null), default_capacity (null), active |
 | `session` | id, business_id, location_id, offering_id, starts_at, ends_at, teacher_staff_id (null), capacity (null), note |
-| `member` | id, business_id, full_name, email, phone, dob, is_student_or_retired, health_flag, health_text, consent_accuracy, consent_news, signed_place, signed_date, member_since, notes |
+| `member` | id, business_id, first_name, last_name, full_name (always "first last", for lists and search), email, phone, dob, is_student_or_retired, health_flag, health_text, consent_accuracy, consent_news, signed_place, signed_date, member_since, notes |
 | `plan` | id, business_id, code (`1x` \| `2x` \| `3x` \| `unl` \| `trial`), name, visits_per_month (null = unlimited), price_cents (null) |
 | `membership` | id, business_id, member_id, plan_id, period_start, period_end, frozen_until (null). **Periods are calendar months** (1st to last day), at the full price even when someone joins mid-month; a trial runs one month from its first day. A renewal starts the day after the old period ends, or on the 1st of this month if that has passed. |
 | `visit` | id, business_id, member_id, session_id, membership_id (null), checked_in_at |
@@ -403,7 +403,7 @@ Implement these as local React components with exactly these props, so screens m
 
 Sections are numbered as on the paper form:
 
-- **01 Vaši podaci**: name (full width), e-mail, mobile, date of birth (dots added while typing; also takes 14.3.88, 14031988), "Student / umirovljenik / nezaposlen?" NE/DA (one discount flag; the paper form still says "Student / umirovljenik?").
+- **01 Vaši podaci**: first name and last name (two fields; a name read off the paper form is split at the first space), e-mail, mobile, date of birth (dots added while typing; also takes 14.3.88, 14031988), "Student / umirovljenik / nezaposlen?" NE/DA (one discount flag; the paper form still says "Student / umirovljenik?").
 - **02 Odaberite članstvo**: Choice grid with 2 columns. Plan subtitles: "≈ 4 / 8 / 12 dolazaka mjesečno".
 - **03 Važno za vašu praksu**: Ne / "Da, molimo navedite", then a multiline field. Helper text: "Vidi ga samo učitelj na popisu sata."
 - **04 Suglasnosti**: accuracy consent (required) and newsletter opt-in.

@@ -1,6 +1,8 @@
 import {
   digitsOnly,
   foldText,
+  joinName,
+  splitFullName,
   type MemberDetailResponse,
   memberInputSchema,
   memberPatchSchema,
@@ -19,6 +21,23 @@ import { blankToNull, created, ctx, owned, parseBody, parseQuery, publicRow, rem
 import { loadMemberFacts, summaryFor, toSummary } from '../lib/members';
 
 export const members = new Hono<AppEnv>();
+
+/**
+ * The three name columns from what was sent: first and last name, or a full name split at the first space.
+ * Returns null when nothing about the name was sent.
+ */
+function names(input: { first_name?: string; last_name?: string; full_name?: string }, current?: { first_name: string; last_name: string }) {
+  if (input.first_name !== undefined || input.last_name !== undefined) {
+    const first_name = (input.first_name ?? current?.first_name ?? '').trim();
+    const last_name = (input.last_name ?? current?.last_name ?? '').trim();
+    return { first_name, last_name, full_name: joinName(first_name, last_name) };
+  }
+  if (input.full_name !== undefined) {
+    const split = splitFullName(input.full_name);
+    return { ...split, full_name: joinName(split.first_name, split.last_name) };
+  }
+  return null;
+}
 
 members.get('/', async (c) => {
   const { db, businessId, today } = ctx(c);
@@ -59,10 +78,12 @@ members.post('/', async (c) => {
   const { db, businessId, now, today } = ctx(c);
   const input = await parseBody(c, memberInputSchema);
   if (!input.consent_accuracy) throw new ApiError('consent_required');
+  const name = names(input);
+  if (!name?.first_name) throw new ApiError('invalid_input', ['first_name']);
 
   const row = {
     ...created(businessId, now),
-    full_name: input.full_name,
+    ...name,
     email: blankToNull(input.email)?.toLowerCase() ?? null,
     phone: blankToNull(input.phone),
     dob: input.dob ?? null,
@@ -160,8 +181,11 @@ members.patch('/:id', async (c) => {
   // The consent can't be withdrawn by an edit; a member without it is deleted instead.
   if (input.consent_accuracy === false) throw new ApiError('consent_required');
 
+  const name = names(input, existing);
+  if (name && !name.first_name) throw new ApiError('invalid_input', ['first_name']);
   const patch = {
     ...input,
+    ...(name ?? {}),
     ...('email' in input ? { email: blankToNull(input.email)?.toLowerCase() ?? null } : {}),
     ...('phone' in input ? { phone: blankToNull(input.phone) } : {}),
     ...('health_text' in input ? { health_text: blankToNull(input.health_text) } : {}),
