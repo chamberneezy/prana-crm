@@ -2145,6 +2145,21 @@
                       "unl",
                       "trial"
                     ]
+                  },
+                  "paid_with": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "cash",
+                          "card",
+                          "transfer"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "required": [

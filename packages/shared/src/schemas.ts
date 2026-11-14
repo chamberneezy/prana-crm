@@ -307,10 +307,12 @@ export const memberInputSchema = z.object({
   /** Defaults to today. */
   member_since: isoDate.optional(),
   notes: longText.nullable().optional(),
-  /** When given, a one-month membership on this plan starts on member_since. */
+  /** When given, a membership on this plan for the month of member_since. */
   plan_code: planCodeSchema.optional(),
+  /** With a plan: how its price was paid at sign-up, recorded as a payment. Left out or null: not paid yet. */
+  paid_with: paymentMethodSchema.nullable().optional(),
 });
-export const memberPatchSchema = memberInputSchema.omit({ plan_code: true }).partial();
+export const memberPatchSchema = memberInputSchema.omit({ plan_code: true, paid_with: true }).partial();
 
 export const membersQuerySchema = z.object({
   q: z.string().trim().max(200).optional(),
@@ -358,9 +360,9 @@ export const visitInputSchema = z.object({ member_id: id });
 export const membershipInputSchema = z.object({
   member_id: id,
   plan_id: id,
-  /** Defaults to today. */
+  /** Defaults to the 1st of this month. */
   period_start: isoDate.optional(),
-  /** Defaults to one month after period_start, minus a day. */
+  /** Defaults to the last day of period_start's month. */
   period_end: isoDate.optional(),
 });
 

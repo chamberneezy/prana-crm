@@ -1,4 +1,4 @@
-import { formatDate, tidyDisplayDate, typingDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
+import { formatDate, formatMoney, tidyDisplayDate, typingDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
 import { type ReactNode, useState } from 'react';
 import { useLang } from '../i18n';
 import { Button } from './Button';
@@ -34,6 +34,8 @@ export interface UpisnicaFormProps {
   errors?: Partial<Record<'name' | 'email' | 'phone' | 'dob' | 'healthText' | 'date', string>>;
   /** A save is in progress. */
   busy?: boolean;
+  /** Each plan's price in cents (null: none set). Shown with the plans; a plan without a price skips "Plaćeno?". */
+  prices?: Partial<Record<UpisnicaPlan, number | null>>;
 }
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
@@ -47,7 +49,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
   );
 }
 
-export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false }: UpisnicaFormProps) {
+export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false, prices }: UpisnicaFormProps) {
   const edit = mode === 'edit';
   const { t } = useLang();
   const [v, setV] = useState<UpisnicaValue>({ ...EMPTY, ...initial });
@@ -59,9 +61,13 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
     setV(next);
     onChange?.(next);
   };
+  const price = prices?.[v.plan];
+  // Asked only on a new member, and only when the chosen plan has something to pay.
+  const askPaid = !edit && price !== null && price !== 0;
   const save = () => {
     setTried(true);
-    if (v.consent && v.name.trim()) onSave?.(v, { place: signed.place.trim(), date: signed.date.trim() });
+    if (askPaid && !v.paid) return;
+    if (v.consent && v.name.trim()) onSave?.(askPaid ? v : { ...v, paid: undefined }, { place: signed.place.trim(), date: signed.date.trim() });
   };
 
   return (
@@ -112,8 +118,27 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
             columns={2}
             value={v.plan}
             onChange={(plan) => set({ plan })}
-            options={PLANS.map((plan) => ({ value: plan, label: t(`plan.${plan}`), sub: t(`plan.${plan}.sub`) }))}
+            options={PLANS.map((plan) => {
+              const cost = prices?.[plan];
+              return { value: plan, label: t(`plan.${plan}`), sub: cost ? `${t(`plan.${plan}.sub`)} · ${formatMoney(cost)}` : t(`plan.${plan}.sub`) };
+            })}
           />
+          {askPaid && (
+            <div className={styles.labelled}>
+              <span className={styles.label}>{price ? t('upisnica.paidAmount', { amount: formatMoney(price) }) : t('upisnica.paid')}</span>
+              <Choice<NonNullable<UpisnicaValue['paid']>>
+                value={v.paid}
+                onChange={(paid) => set({ paid })}
+                options={[
+                  { value: 'cash', label: t('method.cash.label') },
+                  { value: 'card', label: t('method.card.label') },
+                  { value: 'transfer', label: t('method.transfer.label') },
+                  { value: 'later', label: t('upisnica.paid.later') },
+                ]}
+              />
+              {tried && !v.paid ? <span className={styles.error}>{t('upisnica.paidRequired')}</span> : <span className={styles.hint}>{t('upisnica.paidHint')}</span>}
+            </div>
+          )}
         </Section>
       )}
 

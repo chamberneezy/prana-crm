@@ -101,9 +101,40 @@ export function startOfMonth(date: string): string {
   return `${date.slice(0, 8)}01`;
 }
 
-/** A one-month period starting on `start`: 11.10. → 10.11. */
+/** The last day of the month a date falls in: 11.10. → 31.10. */
+export function endOfMonth(date: string): string {
+  return addDays(addMonths(startOfMonth(date), 1), -1);
+}
+
+/**
+ * Memberships run by calendar month: a period ends on the last day of the month it starts in.
+ * (Someone joining on the 20th gets the current month, 1.–31., at the full price.)
+ */
 export function monthPeriodEnd(start: string): string {
-  return addDays(addMonths(start, 1), -1);
+  return endOfMonth(start);
+}
+
+/** A new membership's first day: the 1st of the month `date` falls in. */
+export function monthPeriodStart(date: string): string {
+  return startOfMonth(date);
+}
+
+/**
+ * The period of a new membership that starts around `date`: the calendar month for a regular plan,
+ * and one month from that day for a trial, so a trial on the 28th doesn't run out three days later.
+ */
+export function membershipPeriod(planCode: string, date: string): { start: string; end: string } {
+  if (planCode === 'trial') return { start: date, end: addDays(addMonths(date, 1), -1) };
+  return { start: monthPeriodStart(date), end: monthPeriodEnd(date) };
+}
+
+/**
+ * The first day of a renewal: the day after the old period ends, or, if that has already passed,
+ * the 1st of the current month (as for a new member).
+ */
+export function renewalStart(previousEnd: string, today: string): string {
+  const dayAfter = addDays(previousEnd, 1);
+  return dayAfter > today ? dayAfter : monthPeriodStart(today);
 }
 
 /** 1 = Monday … 7 = Sunday. */

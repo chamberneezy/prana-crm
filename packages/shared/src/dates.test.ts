@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, addMonths, dayStartUtc, diffDays, formatWeekRange, localDate, weekdayIndex, monthPeriodEnd, startOfMonth, startOfWeek, zonedTimeToUtc } from './dates';
+import { addDays, addMonths, dayStartUtc, diffDays, formatWeekRange, localDate, weekdayIndex, endOfMonth, membershipPeriod, monthPeriodEnd, monthPeriodStart, renewalStart, startOfMonth, startOfWeek, zonedTimeToUtc } from './dates';
 
 describe('localDate', () => {
   it('gives the calendar date in Zagreb', () => {
@@ -55,8 +55,18 @@ describe('date arithmetic', () => {
     expect(formatWeekRange('2026-09-28')).toBe('28.09.–04.10.2026.');
     expect(formatWeekRange('2026-12-28')).toBe('28.12.–03.01.2027.');
   });
-  it('gives a one-month membership period', () => {
-    expect(monthPeriodEnd('2026-10-11')).toBe('2026-11-10');
+  it('runs memberships by calendar month', () => {
+    expect(monthPeriodStart('2026-10-20')).toBe('2026-10-01');
     expect(monthPeriodEnd('2026-10-01')).toBe('2026-10-31');
+    expect(monthPeriodEnd('2026-10-11')).toBe('2026-10-31');
+    expect(endOfMonth('2028-02-03')).toBe('2028-02-29');
+  });
+  it('gives a trial a month from its first day', () => {
+    expect(membershipPeriod('trial', '2026-10-28')).toEqual({ start: '2026-10-28', end: '2026-11-27' });
+    expect(membershipPeriod('2x', '2026-10-28')).toEqual({ start: '2026-10-01', end: '2026-10-31' });
+  });
+  it('renews from the day after, or from the 1st of this month once that has passed', () => {
+    expect(renewalStart('2026-11-30', '2026-11-20')).toBe('2026-12-01');
+    expect(renewalStart('2026-10-31', '2026-11-14')).toBe('2026-11-01');
   });
 });

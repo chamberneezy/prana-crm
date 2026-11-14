@@ -1,10 +1,11 @@
 import {
-  addDays,
   membershipFreezeSchema,
   membershipInputSchema,
   membershipRenewSchema,
   type MembershipResponse,
+  membershipPeriod,
   monthPeriodEnd,
+  renewalStart,
   planPatchSchema,
   type PlansResponse,
 } from '@prana/shared';
@@ -50,10 +51,12 @@ memberships.post('/', async (c) => {
   const { db, businessId, now, today } = ctx(c);
   const input = await parseBody(c, membershipInputSchema);
   await owned(db, member, input.member_id, businessId);
-  await owned(db, plan, input.plan_id, businessId);
+  const chosen = await owned(db, plan, input.plan_id, businessId);
 
-  const period_start = input.period_start ?? today;
-  const period_end = input.period_end ?? monthPeriodEnd(period_start);
+  const period = membershipPeriod(chosen.code, input.period_start ?? today);
+  // A start that was asked for is kept; the end follows the plan's rule from there.
+  const period_start = input.period_start ?? period.start;
+  const period_end = input.period_end ?? (chosen.code === 'trial' ? period.end : monthPeriodEnd(period_start));
   if (period_end < period_start) throw new ApiError('invalid_input', ['period_end']);
 
   const row = { ...created(businessId, now), member_id: input.member_id, plan_id: input.plan_id, period_start, period_end, frozen_until: null };
@@ -61,15 +64,14 @@ memberships.post('/', async (c) => {
   return respond(c, row, 201);
 });
 
-// The following month: it starts the day after the old period ends, or today if that has already passed.
+// The following month: from the day after the old period ends, or the 1st of this month if that has passed.
 memberships.post('/:id/renew', async (c) => {
   const { db, businessId, now, today } = ctx(c);
   const input = await parseBody(c, membershipRenewSchema);
   const previous = await owned(db, membership, c.req.param('id'), businessId);
   if (input.plan_id) await owned(db, plan, input.plan_id, businessId);
 
-  const dayAfter = addDays(previous.period_end, 1);
-  const period_start = dayAfter > today ? dayAfter : today;
+  const period_start = renewalStart(previous.period_end, today);
   const row = {
     ...created(businessId, now),
     member_id: previous.member_id,

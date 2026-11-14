@@ -297,7 +297,7 @@
   "overview.allGood.body": "Sve su članarine plaćene i nijedna ne ističe ovaj tjedan.",
   "overview.loadFailed": "Pregled se nije učitao.",
   "plans.title": "Članarine",
-  "plans.intro": "Cijena vrijedi za jedno razdoblje od mjesec dana. Bez upisane cijene članarina se ne vodi kao neplaćena.",
+  "plans.intro": "Cijena vrijedi za jedan kalendarski mjesec (od 1. do zadnjeg dana), i kad se netko upiše usred mjeseca. Bez upisane cijene članarina se ne vodi kao neplaćena.",
   "plans.col.plan": "Članarina",
   "plans.col.visits": "Dolasci",
   "plans.col.price": "Cijena",
@@ -463,5 +463,10 @@
   "feedback.target.menu": "Izbornik",
   "feedback.target.table": "Tablica",
   "feedback.target.form": "Obrazac",
-  "feedback.target.page": "Cijela stranica"
+  "feedback.target.page": "Cijela stranica",
+  "upisnica.paid": "Plaćeno?",
+  "upisnica.paidAmount": "Plaćeno? ({amount})",
+  "upisnica.paid.later": "Ne još",
+  "upisnica.paidRequired": "Odaberite je li članarina plaćena.",
+  "upisnica.paidHint": "Plaćeno se odmah bilježi kao uplata. „Ne još” ostavlja članarinu neplaćenom."
 }

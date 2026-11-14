@@ -1,4 +1,4 @@
-import { addDays, isoToDisplayDate, localDate, type MembershipView, monthPeriodEnd } from '@prana/shared';
+import { addDays, isoToDisplayDate, localDate, type MembershipView, monthPeriodEnd, monthPeriodStart, renewalStart } from '@prana/shared';
 import { type FormEvent, useState } from 'react';
 import { errorMessage } from '../api/client';
 import { useAddMembership, useFreezeMembership, usePlans, useRenewMembership } from '../api/queries';
@@ -10,7 +10,7 @@ import styles from './forms.module.css';
 
 const period = (start: string) => `${isoToDisplayDate(start)}–${isoToDisplayDate(monthPeriodEnd(start))}`;
 
-/** Start a membership for a member who has none: plan and first day; the period is one month. */
+/** Start a membership for a member who has none: plan and first day; the period runs to the end of that month. */
 export function AddMembershipForm({ memberId, onDone }: { memberId: string; onDone: () => void }) {
   const { t, lang } = useLang();
   const toast = useToast();
@@ -18,7 +18,7 @@ export function AddMembershipForm({ memberId, onDone }: { memberId: string; onDo
   const plans = usePlans();
   const add = useAddMembership();
   const [planId, setPlanId] = useState('');
-  const [start, setStart] = useState(localDate(new Date(), business.timezone));
+  const [start, setStart] = useState(monthPeriodStart(localDate(new Date(), business.timezone)));
   const [tried, setTried] = useState(false);
   const validStart = /^\d{4}-\d{2}-\d{2}$/.test(start);
 
@@ -61,7 +61,7 @@ export function AddMembershipForm({ memberId, onDone }: { memberId: string; onDo
   );
 }
 
-/** Renew: the next month, starting the day after the current period ends (or today, if that has passed). */
+/** Renew: the next calendar month (or this one, if the old period has already ended). */
 export function RenewMembershipForm({ membership, onDone }: { membership: MembershipView; onDone: () => void }) {
   const { t, lang } = useLang();
   const toast = useToast();
@@ -71,8 +71,7 @@ export function RenewMembershipForm({ membership, onDone }: { membership: Member
   const [planId, setPlanId] = useState(membership.plan_id);
 
   const today = localDate(new Date(), business.timezone);
-  const dayAfter = addDays(membership.period_end, 1);
-  const start = dayAfter > today ? dayAfter : today;
+  const start = renewalStart(membership.period_end, today);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();

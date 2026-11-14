@@ -1,4 +1,4 @@
-import { addDays, localDate, type MemberSummary, monthPeriodEnd, routes, uuidv7 } from '@prana/shared';
+import { addDays, addMonths, localDate, type MemberSummary, monthPeriodEnd, monthPeriodStart, routes, uuidv7 } from '@prana/shared';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildOpenApi } from '@prana/shared';
@@ -82,14 +82,30 @@ describe('members', () => {
     expect(status).toBe(201);
     expect(body.member).toMatchObject({ full_name: 'Lucija Perić', email: 'lucija.peric@example.com', phone: '098 761 4321', member_since: today, consent_news: true });
     expect(body.member.id).toMatch(/^[0-9a-f-]{36}$/);
-    // Dev plans have a price, so a new membership starts out unpaid.
+    // Dev plans have a price, so a new membership that wasn't paid at sign-up starts out unpaid.
     expect(body.summary).toMatchObject({ status: 'unpaid', debt_cents: 8500 });
-    expect(body.summary.membership).toMatchObject({ plan_code: '2x', period_start: today, period_end: monthPeriodEnd(today), visits_used: 0 });
+    // Memberships run by calendar month, from the 1st.
+    expect(body.summary.membership).toMatchObject({ plan_code: '2x', period_start: monthPeriodStart(today), period_end: monthPeriodEnd(today), visits_used: 0 });
 
     const plain = await t.call('POST', '/members', { body: { full_name: 'Bez Članarine', consent_accuracy: true } });
     expect(plain.status).toBe(201);
     expect(plain.body.summary).toMatchObject({ status: 'none', membership: null });
     expect(plain.body.member).toMatchObject({ email: null, health_flag: false, is_student_or_retired: false });
+  });
+
+  it('records the payment when the plan was paid at sign-up', async () => {
+    const { status, body } = await t.call('POST', '/members', { body: { full_name: 'Platila Odmah', consent_accuracy: true, plan_code: '2x', paid_with: 'card' } });
+    expect(status).toBe(201);
+    expect(body.summary).toMatchObject({ debt_cents: 0 });
+    expect(body.summary.status).not.toBe('unpaid');
+    expect(body.summary.membership).toMatchObject({ price_cents: 8500, paid_cents: 8500 });
+    const detail = await t.call('GET', `/members/${body.member.id}`);
+    expect(detail.body.payments).toHaveLength(1);
+    expect(detail.body.payments[0]).toMatchObject({ amount_cents: 8500, method: 'card', membership_id: body.summary.membership.id });
+
+    // Not paid yet: no payment, and the price is owed.
+    const later = await t.call('POST', '/members', { body: { full_name: 'Platit Ce Kasnije', consent_accuracy: true, plan_code: '2x', paid_with: null } });
+    expect(later.body.summary).toMatchObject({ status: 'unpaid', debt_cents: 8500 });
   });
 
   it('edits a member; the consent cannot be withdrawn by an edit', async () => {
@@ -286,8 +302,11 @@ describe('plans, memberships and payments', () => {
   it('starts a membership for a member who has none', async () => {
     const { status, body } = await t.call('POST', '/memberships', { body: { member_id: SEED.member(7), plan_id: SEED.plans.trial } });
     expect(status).toBe(201);
-    expect(body.membership).toMatchObject({ period_start: today, period_end: monthPeriodEnd(today) });
+    // A trial runs a month from its first day; regular plans run by calendar month.
+    expect(body.membership).toMatchObject({ period_start: today, period_end: addDays(addMonths(today, 1), -1) });
     expect(body.summary.status).toBe('trial');
+    const regular = await t.call('POST', '/memberships', { body: { member_id: SEED.member(7), plan_id: SEED.plans['1x'] } });
+    expect(regular.body.membership).toMatchObject({ period_start: monthPeriodStart(today), period_end: monthPeriodEnd(today) });
     expect((await t.call('POST', '/memberships', { body: { member_id: SEED.member(7), plan_id: SEED.plans['1x'], period_start: today, period_end: addDays(today, -1) } })).status).toBe(400);
   });
 });

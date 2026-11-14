@@ -85,9 +85,9 @@ prana-crm/
 | `session` | id, business_id, location_id, offering_id, starts_at, ends_at, teacher_staff_id (null), capacity (null), note |
 | `member` | id, business_id, full_name, email, phone, dob, is_student_or_retired, health_flag, health_text, consent_accuracy, consent_news, signed_place, signed_date, member_since, notes |
 | `plan` | id, business_id, code (`1x` \| `2x` \| `3x` \| `unl` \| `trial`), name, visits_per_month (null = unlimited), price_cents (null) |
-| `membership` | id, business_id, member_id, plan_id, period_start, period_end, frozen_until (null) |
+| `membership` | id, business_id, member_id, plan_id, period_start, period_end, frozen_until (null). **Periods are calendar months** (1st to last day), at the full price even when someone joins mid-month; a trial runs one month from its first day. A renewal starts the day after the old period ends, or on the 1st of this month if that has passed. |
 | `visit` | id, business_id, member_id, session_id, membership_id (null), checked_in_at |
-| `payment` | id, business_id, member_id, membership_id (null), amount_cents, currency, method (`cash` \| `card` \| `transfer`), paid_at, note |
+| `payment` | id, business_id, member_id, membership_id (null), amount_cents, currency, method (`cash` \| `card` \| `transfer`), paid_at, note. Signing up asks "Plaćeno?" (cash, card, transfer, or not yet): paid now is recorded as a payment of the plan's price (`paid_with` on `POST /members`). |
 | `document` | id, business_id, member_id (null until saved), kind (`upisnica`), r2_key, mime, source (`camera` \| `pdf` \| `image`), ocr_json, created_by |
 
 ### Member status

@@ -19,4 +19,6 @@ export interface UpisnicaValue {
   consent: boolean;
   /** E-mail opt-in, separate from the accuracy consent. */
   news: boolean;
+  /** Not on the paper form: how the chosen plan was paid at sign-up, or `later`. Unset until the owner answers. */
+  paid?: 'cash' | 'card' | 'transfer' | 'later';
 }

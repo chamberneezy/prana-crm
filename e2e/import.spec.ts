@@ -77,6 +77,7 @@ test('import a PDF, review the flagged fields and save with the document', async
   await form.getByLabel('Broj mobitela').fill('098 765 4321');
   await expect(form.getByText('Provjerite prije spremanja.')).toHaveCount(0);
   await form.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
+  await form.getByRole('radio', { name: 'Ne još' }).click();
   await save.click();
 
   await expect(page.getByRole('status')).toContainText('Dora Vuković je spremljen/a kao novi član.');
@@ -104,6 +105,7 @@ test('undo after saving removes the member again', async ({ page }) => {
   await form.getByLabel('Ime i prezime').fill('Poništena Osoba');
   await form.getByLabel('Broj mobitela').fill('098 765 4321');
   await form.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
+  await form.getByRole('radio', { name: 'Ne još' }).click();
   await form.getByRole('button', { name: 'Spremi člana' }).click();
   await expect(page.getByRole('status')).toContainText('Poništena Osoba je spremljen/a kao novi član.');
 

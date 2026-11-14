@@ -2,11 +2,11 @@ import { STUDIO_PLACE, type UpisnicaValue } from '@prana/shared';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ApiClientError, errorMessage } from '../api/client';
-import { useCreateMember, useDeleteMember } from '../api/queries';
+import { useCreateMember, useDeleteMember, usePlans } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
 import { Notice, PageHeader, UpisnicaForm } from '../components';
 import { useLang } from '../i18n';
-import { fieldErrors, type Signed, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
+import { fieldErrors, type Signed, type UpisnicaErrors, upisnicaPrices, upisnicaToInput, validateUpisnica } from '../lib/member';
 import styles from './NewMember.module.css';
 
 /** Manual entry: an empty upisnica on screen. */
@@ -17,6 +17,7 @@ export function NewMember() {
   const toast = useToast();
   const create = useCreateMember();
   const remove = useDeleteMember();
+  const plans = usePlans();
   const [errors, setErrors] = useState<UpisnicaErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
 
@@ -53,7 +54,7 @@ export function NewMember() {
         <p>{t('newMember.manualIntro')}</p>
       </div>
       {failure && <Notice>{failure}</Notice>}
-      <UpisnicaForm place={STUDIO_PLACE} errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi/novi')} />
+      <UpisnicaForm place={STUDIO_PLACE} prices={upisnicaPrices(plans.data?.plans)} errors={errors} busy={create.isPending} onSave={save} onCancel={() => navigate('/clanovi/novi')} />
     </div>
   );
 }

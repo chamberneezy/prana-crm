@@ -8,6 +8,7 @@ import {
   type MemberPatch,
   type MemberSummary,
   type PlanCode,
+  type UpisnicaPlan,
   type UpisnicaValue,
 } from '@prana/shared';
 import type { useLang } from '../i18n';
@@ -103,7 +104,15 @@ export function upisnicaToPatch(v: UpisnicaValue, signed: Signed): MemberPatch &
   };
 }
 
-/** A new member from the form, with the chosen plan as the first membership. */
+/** A new member from the form, with the chosen plan as the first membership, paid now or not yet. */
 export function upisnicaToInput(v: UpisnicaValue, signed: Signed): MemberInput {
-  return { ...upisnicaToPatch(v, signed), consent_accuracy: v.consent, plan_code: v.plan };
+  return { ...upisnicaToPatch(v, signed), consent_accuracy: v.consent, plan_code: v.plan, paid_with: v.paid && v.paid !== 'later' ? v.paid : null };
+}
+
+/** Each upisnica plan's price, from the studio's plans, for the form. */
+export function upisnicaPrices(plans: Array<{ code: string; price_cents: number | null }> | undefined): Partial<Record<UpisnicaPlan, number | null>> | undefined {
+  if (!plans) return undefined;
+  const prices: Partial<Record<UpisnicaPlan, number | null>> = {};
+  for (const p of plans) if (p.code === '1x' || p.code === '2x' || p.code === '3x' || p.code === 'unl') prices[p.code] ??= p.price_cents;
+  return prices;
 }

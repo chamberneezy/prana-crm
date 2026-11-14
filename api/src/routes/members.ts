@@ -7,7 +7,7 @@ import {
   type MemberResponse,
   type MembersResponse,
   membersQuerySchema,
-  monthPeriodEnd,
+  membershipPeriod,
 } from '@prana/shared';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -84,18 +84,22 @@ members.post('/', async (c) => {
       .where(and(eq(plan.business_id, businessId), eq(plan.code, input.plan_code), isNull(plan.deleted_at)))
       .limit(1);
     if (!chosen) throw new ApiError('invalid_input', ['plan_code']);
-    // Member and first membership are written together or not at all.
-    await db.batch([
-      db.insert(member).values(row),
-      db.insert(membership).values({
-        ...created(businessId, now),
-        member_id: row.id,
-        plan_id: chosen.id,
-        period_start: row.member_since,
-        period_end: monthPeriodEnd(row.member_since),
-        frozen_until: null,
-      }),
-    ]);
+    const period = membershipPeriod(chosen.code, row.member_since);
+    const first = {
+      ...created(businessId, now),
+      member_id: row.id,
+      plan_id: chosen.id,
+      period_start: period.start,
+      period_end: period.end,
+      frozen_until: null,
+    };
+    // Paid at sign-up: the plan's price, recorded against the first membership. A plan without a price has nothing to pay.
+    const paid =
+      input.paid_with && chosen.price_cents !== null && chosen.price_cents > 0
+        ? { ...created(businessId, now), member_id: row.id, membership_id: first.id, amount_cents: chosen.price_cents, currency: 'EUR' as const, method: input.paid_with, paid_at: now, note: null }
+        : null;
+    // Member, first membership and payment are written together or not at all.
+    await db.batch([db.insert(member).values(row), db.insert(membership).values(first), ...(paid ? [db.insert(payment).values(paid)] : [])]);
   } else {
     await db.insert(member).values(row);
   }

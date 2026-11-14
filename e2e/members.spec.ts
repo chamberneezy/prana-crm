@@ -64,6 +64,12 @@ test('add a member manually', async ({ page }) => {
   await page.getByRole('checkbox', { name: /Potvrđujem da su navedeni podaci točni/ }).click();
   await expect(save).toBeEnabled();
 
+  // Whether the plan was paid must be answered; paid now is recorded as a payment.
+  await save.click();
+  await expect(page.getByText('Odaberite je li članarina plaćena.')).toBeVisible();
+  await expect(page.getByText(/Plaćeno\? \(\d+,\d{2} €\)/)).toBeVisible();
+  await page.getByRole('radio', { name: 'Kartica' }).click();
+
   // A date that doesn't exist is caught before saving.
   await save.click();
   await expect(page.getByText('Unesite datum u obliku dd.mm.gggg.')).toHaveCount(2);
@@ -75,6 +81,9 @@ test('add a member manually', async ({ page }) => {
   await expect(page.getByRole('status')).toContainText(`${name} je spremljen/a kao novi član.`);
   await expect(page.getByText('Osjetljivo rame')).toBeVisible();
   await expect(page.getByText('3× tjedno').first()).toBeVisible();
+  // Paid at sign-up: nothing is owed, and the payment is on the profile.
+  await expect(page.getByText(/Dugovanje/)).toHaveCount(0);
+  await expect(page.getByText('kartica').first()).toBeVisible();
   // The corrected place and date were saved with the member.
   await expect(page.getByText('potpisano', { exact: false }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Uredi' }).click();

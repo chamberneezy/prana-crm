@@ -297,7 +297,7 @@
   "overview.allGood.body": "Every membership is paid and none expires this week.",
   "overview.loadFailed": "The overview did not load.",
   "plans.title": "Memberships",
-  "plans.intro": "The price covers one period of a month. Without a price, a membership is never shown as unpaid.",
+  "plans.intro": "The price is for one calendar month (the 1st to the last day), also for someone who joins mid-month. Without a price, a membership is never counted as unpaid.",
   "plans.col.plan": "Membership",
   "plans.col.visits": "Visits",
   "plans.col.price": "Price",
@@ -463,5 +463,10 @@
   "feedback.target.menu": "Menu",
   "feedback.target.table": "Table",
   "feedback.target.form": "Form",
-  "feedback.target.page": "Whole page"
+  "feedback.target.page": "Whole page",
+  "upisnica.paid": "Paid?",
+  "upisnica.paidAmount": "Paid? ({amount})",
+  "upisnica.paid.later": "Not yet",
+  "upisnica.paidRequired": "Choose whether the membership is paid.",
+  "upisnica.paidHint": "A payment is recorded straight away. “Not yet” leaves the membership unpaid."
 }

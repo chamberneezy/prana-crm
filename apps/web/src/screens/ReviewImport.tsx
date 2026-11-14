@@ -3,11 +3,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { api, ApiClientError, errorMessage } from '../api/client';
+import { usePlans } from '../api/queries';
 import { Button, MemberProfile, Notice, PageHeader, Toast, UpisnicaForm } from '../components';
 import { cx } from '../components/cx';
 import { useLang } from '../i18n';
 import { isPdf } from '../import/extract';
-import { fieldErrors, planLabel, type Signed, statusLabel, type UpisnicaErrors, upisnicaToInput, validateUpisnica } from '../lib/member';
+import { fieldErrors, planLabel, type Signed, statusLabel, type UpisnicaErrors, upisnicaPrices, upisnicaToInput, validateUpisnica } from '../lib/member';
 import type { ImportedForm } from './ImportMember';
 import styles from './ReviewImport.module.css';
 
@@ -24,6 +25,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
   const strings = useLang();
   const { t, tn, lang } = strings;
   const queryClient = useQueryClient();
+  const plans = usePlans();
   const { file, extracted, scan } = imported;
 
   const initial: UpisnicaValue = { name: scan.name, email: scan.email, phone: scan.phone, dob: scan.dob, student: scan.student, plan: scan.plan, health: scan.health, healthText: scan.healthText, consent: scan.consent, news: scan.news };
@@ -202,7 +204,7 @@ export function ReviewImport({ imported, onAnother }: Props) {
             <>
               {noText && <Notice title={t('review.noText.title')}>{t('review.noText.body')}</Notice>}
               {flagged.length > 0 && <Notice title={tn('review.count', flagged.length)}>{t('review.countBody', { fields: flagged.map(fieldName).join(', ') })}</Notice>}
-              <UpisnicaForm initial={value} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v, signed) => void save(v, signed)} onCancel={onAnother} />
+              <UpisnicaForm initial={value} prices={upisnicaPrices(plans.data?.plans)} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v, signed) => void save(v, signed)} onCancel={onAnother} />
             </>
           )}
         </section>
