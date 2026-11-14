@@ -18,6 +18,7 @@ export const SECTIONS: Array<{ id: string; path: string; label: MessageKey }> = 
   { id: 'members', path: '/clanovi', label: 'nav.members' },
   { id: 'plans', path: '/karte', label: 'nav.plans' },
   { id: 'payments', path: '/uplate', label: 'nav.payments' },
+  { id: 'analytics', path: '/analitika', label: 'nav.analytics' },
 ];
 
 /** The signed-in app: ink sidebar beside the linen workspace; a top bar with a menu below 768 px. */

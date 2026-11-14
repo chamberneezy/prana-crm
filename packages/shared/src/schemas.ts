@@ -521,6 +521,45 @@ export const paymentResponseSchema = z.object({ payment: paymentSchema, summary:
 
 export const documentResponseSchema = z.object({ document: documentSchema });
 
+export const analyticsQuerySchema = z.object({
+  /** How many calendar months, ending with this one. Defaults to 6. */
+  months: z.coerce.number().int().min(1).max(24).optional(),
+});
+
+const memberCountSchema = z.object({ id, full_name: z.string(), visits: z.number().int(), last_visit_at: isoDateTime.nullable() });
+
+/** Attendance and income over whole calendar months, in the business's time zone. */
+export const analyticsResponseSchema = z.object({
+  /** First day of the first month and last day of the last month. */
+  from: isoDate,
+  to: isoDate,
+  totals: z.object({
+    visits: z.number().int(),
+    income_cents: cents,
+    /** Sessions in the range that had at least one check-in. */
+    sessions: z.number().int(),
+    /** Check-ins per such session, one decimal. */
+    average_class_size: z.number(),
+    /** Members who came at least once. */
+    members_who_came: z.number().int(),
+  }),
+  /** One entry per month, oldest first, months without anything included. */
+  months: z.array(z.object({ month: z.string(), visits: z.number().int(), income_cents: cents, members_who_came: z.number().int() })),
+  /** Every class type with a check-in, most visited first. */
+  by_offering: z.array(z.object({ offering_id: id, name: z.string(), color_token: colorTokenSchema, visits: z.number().int(), sessions: z.number().int() })),
+  /** Check-ins by the session's weekday (1 = Monday) and starting hour, where there were any. */
+  by_slot: z.array(z.object({ weekday: z.number().int(), hour: z.number().int(), visits: z.number().int() })),
+  /** Most check-ins in the range. */
+  most_active: z.array(memberCountSchema),
+  /** Members with a current membership and the fewest check-ins in the last 30 days. */
+  least_active: z.array(memberCountSchema),
+  by_method: z.array(z.object({ method: paymentMethodSchema, cents })),
+  /** Income by the plan of the membership paid for; `plan_name` null for payments not tied to one. */
+  by_plan: z.array(z.object({ plan_code: planCodeSchema.nullable(), plan_name: z.string().nullable(), cents })),
+  currency: z.literal('EUR'),
+});
+export type AnalyticsResponse = z.infer<typeof analyticsResponseSchema>;
+
 export type MeResponse = z.infer<typeof meResponseSchema>;
 export type StaffListResponse = z.infer<typeof staffListResponseSchema>;
 export type StaffResponse = z.infer<typeof staffResponseSchema>;

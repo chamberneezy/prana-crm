@@ -4,6 +4,7 @@ import type { JWTVerifyGetKey } from 'jose';
 import { requireStaff } from './auth';
 import type { AppEnv } from './env';
 import { ApiError, errorBody, ERRORS } from './errors';
+import { analytics } from './routes/analytics';
 import { dashboard, me, staffList } from './routes/dashboard';
 import { documents } from './routes/documents';
 import { members } from './routes/members';
@@ -32,6 +33,7 @@ export function createApp(options: AppOptions = {}) {
   api.route('/me', me);
   api.route('/staff', staffList);
   api.route('/dashboard', dashboard);
+  api.route('/analytics', analytics);
   api.route('/members', members);
   api.route('/offering-groups', offeringGroups);
   api.route('/offerings', offerings);

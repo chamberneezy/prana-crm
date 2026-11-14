@@ -5,6 +5,7 @@ import { ApiClientError } from '../api/client';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
 import { FeedbackProvider } from '../feedback/FeedbackProvider';
 import { LangProvider, useLang } from '../i18n';
+import { Analytics } from '../screens/Analytics';
 import { ImportMember } from '../screens/ImportMember';
 import { Login } from '../screens/Login';
 import { MemberProfileScreen } from '../screens/MemberProfileScreen';
@@ -46,6 +47,7 @@ function SignedIn() {
           <Route path="clanovi/:id" element={<MemberProfileScreen />} />
           <Route path="karte" element={<Plans />} />
           <Route path="uplate" element={<Payments />} />
+          <Route path="analitika" element={<Analytics />} />
           <Route path="*" element={<Navigate to="/pregled" replace />} />
         </Route>
       </Routes>

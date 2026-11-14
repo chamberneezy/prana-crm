@@ -48,6 +48,11 @@ export function localDate(instant: Date | string, timeZone: string = TIME_ZONE):
   return toDate(p.year, p.month, p.day);
 }
 
+/** The hour (0–23) of an instant on the clock in the given time zone. */
+export function localHour(instant: Date | string, timeZone: string = TIME_ZONE): number {
+  return zonedParts(typeof instant === 'string' ? new Date(instant) : instant, timeZone).hour;
+}
+
 /** The UTC instant of a wall-clock time ("HH:mm") on a calendar date in the given time zone. */
 export function zonedTimeToUtc(date: string, time: string, timeZone: string = TIME_ZONE): string {
   const [y, m, d] = split(date);

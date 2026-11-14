@@ -412,7 +412,7 @@ Sections are numbered as on the paper form:
 
 ## B4. App shell
 
-- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Vrste satova, Članovi, Članarine, Uplate**, with the HR/EN switch at the foot.
+- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Vrste satova, Članovi, Članarine, Uplate, Analitika**, with the HR/EN switch at the foot.
 - **Workspace**: linen. Content max-width 1160 px, padding 32 px top and 48 px sides.
 - **Below 768 px**: the sidebar becomes a top bar with a menu button. Wide tables scroll horizontally inside their card.
 - **Feedback**: right-click on anything opens a form (`src/feedback/`) offering the element, each named section around it and the whole page, with a type (something's wrong / suggestion / question) and a comment. Shift + right-click keeps the browser's menu. A hint under the account in the sidebar says so. On where `VITE_FEEDBACK=firestore`.
@@ -461,6 +461,8 @@ These match the artboards on the canvas's Web page.
    - On save: create the member and the document link (PATCH the document with member_id and ocr_json). Show the Toast "<Ime> je spremljen/a kao novi član." with "Poništi", plus an "Otvori profil ›" link.
 
 **Članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns. Članarine has "Nova članarina" (top right) for the studio's own plans: name, visits per month (empty = unlimited) and price; they are offered on the sign-up form after the standard ones.
+
+**Analitika** (`/analitika`, `GET /api/analytics?months=`) isn't designed either; it uses the same cards and tokens. Over the last 3, 6 or 12 calendar months: totals (visits, income, average per class, members who came); visits and income per month (columns); visits per class type (bars, with the class colour as a dot); when people come (weekday × start hour, one hue, darker is more); the most active members and the least active ones with a current membership (last 30 days); income by payment method and by membership. Every mark has its value on hover and for screen readers.
 
 ## B6. Milestones and acceptance criteria
 

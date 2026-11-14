@@ -1,4 +1,5 @@
 import type {
+  AnalyticsResponse,
   ApiMemberStatus,
   DashboardResponse,
   MembershipInput,
@@ -181,6 +182,10 @@ export function useRemoveVisit() {
 }
 
 // ── Overview, plans, memberships, payments ────────────────────────────────────
+
+export function useAnalytics(months: number) {
+  return useQuery({ queryKey: ['analytics', months], queryFn: () => api<AnalyticsResponse>('GET', `/analytics?months=${months}`), staleTime: 0, refetchOnMount: 'always' });
+}
 
 export function useDashboard() {
   return useQuery({

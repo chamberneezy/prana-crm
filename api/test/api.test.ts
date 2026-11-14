@@ -490,6 +490,37 @@ describe('documents', () => {
   });
 });
 
+describe('analytics', () => {
+  it('counts attendance and income over whole months, consistently with the rest of the API', async () => {
+    const { status, body } = await t.call('GET', '/analytics?months=3');
+    expect(status).toBe(200);
+    expect(body.months).toHaveLength(3);
+    expect(body.from.endsWith('-01')).toBe(true);
+    expect(body.months.at(-1).month).toBe(today.slice(0, 7));
+    const sum = (list: Array<Record<string, number>>, key: string) => list.reduce((n, x) => n + (x[key] ?? 0), 0);
+
+    // The same check-ins, counted every way.
+    expect(body.totals.visits).toBeGreaterThan(0);
+    expect(sum(body.months, 'visits')).toBe(body.totals.visits);
+    expect(sum(body.by_offering, 'visits')).toBe(body.totals.visits);
+    expect(sum(body.by_slot, 'visits')).toBe(body.totals.visits);
+    expect(body.by_slot.every((x: { weekday: number; hour: number }) => x.weekday >= 1 && x.weekday <= 7 && x.hour >= 0 && x.hour <= 23)).toBe(true);
+    expect(body.totals.average_class_size).toBeCloseTo(body.totals.visits / body.totals.sessions, 1);
+
+    // Income matches the payments list for this month.
+    const thisMonth = await t.call('GET', '/payments');
+    expect(body.months.at(-1).income_cents).toBe(thisMonth.body.total_cents);
+    expect(sum(body.by_method, 'cents')).toBe(body.totals.income_cents);
+    expect(sum(body.by_plan, 'cents')).toBe(body.totals.income_cents);
+
+    // Most active first; least active are members with a current membership.
+    const visits = body.most_active.map((m: { visits: number }) => m.visits);
+    expect(visits).toEqual([...visits].sort((a, b) => b - a));
+    expect(body.least_active.length).toBeGreaterThan(0);
+    expect((await t.call('GET', '/analytics?months=30')).status).toBe(400);
+  });
+});
+
 describe('sync (iOS)', () => {
   let cursor: string;
   const id = uuidv7();

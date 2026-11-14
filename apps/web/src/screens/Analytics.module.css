@@ -1,0 +1,324 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--text-2);
+  font: var(--text-small);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-full);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.filter:hover {
+  border-color: var(--sage);
+}
+
+.filter:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.filterSelected,
+.filterSelected:hover {
+  border-color: var(--sage-deep);
+  background: var(--mist);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 20px 24px 24px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardHead h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.headValue {
+  color: var(--text-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Columns by month: thin bars on a shared baseline, rounded only at the data end. */
+.columns {
+  display: flex;
+  gap: 6px;
+  height: 160px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.columnTrack {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  border-bottom: 1px solid var(--border-divider);
+}
+
+.columnBar {
+  width: min(28px, 70%);
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: var(--sage-deep);
+  transition: background 120ms ease;
+}
+
+.column:hover .columnBar {
+  background: var(--ink);
+}
+
+.columnLabel {
+  color: var(--text-3);
+  font-size: 11px;
+  text-transform: lowercase;
+}
+
+/* Bars beside their names, value written at the end. */
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: minmax(90px, 34%) 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.barLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  color: var(--text-1);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px rgba(42, 50, 46, 0.15);
+}
+
+.barTrack {
+  display: flex;
+  height: 10px;
+}
+
+.bar {
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sage-deep);
+}
+
+.barRow:hover .bar {
+  background: var(--ink);
+}
+
+.barValue {
+  color: var(--text-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+.heatmap {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.heatmap th {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.heatmap tbody th {
+  padding-right: 6px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.heatmap td {
+  height: 30px;
+  min-width: 34px;
+  border-radius: var(--radius-xs);
+  color: var(--text-1);
+  text-align: center;
+}
+
+.cellEmpty {
+  background: var(--surface-hover);
+}
+
+.cellDark {
+  color: var(--white);
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.people li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-divider);
+}
+
+.people li:first-child {
+  border-top: 0;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.person:hover .personName {
+  color: var(--sage-deep);
+}
+
+.personName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.personSub {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* On a phone: the name and its value on one line, the bar across the full width below. */
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+  }
+
+  .barRow {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'label value' 'bar bar';
+    row-gap: 4px;
+  }
+
+  .barLabel {
+    grid-area: label;
+  }
+
+  .barValue {
+    grid-area: value;
+  }
+
+  .barTrack {
+    grid-area: bar;
+  }
+}
