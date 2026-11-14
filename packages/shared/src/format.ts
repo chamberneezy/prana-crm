@@ -77,16 +77,38 @@ export function isoToDisplayDate(iso: string): string {
   return m ? `${m[3]}.${m[2]}.${m[1]}.` : iso;
 }
 
-/** "14.03.1988." or "14.3.1988" → "1988-03-14"; null if it isn't a real date. */
-export function displayToIsoDate(display: string): string | null {
-  const m = /^\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\.?\s*$/.exec(display);
+/**
+ * A typed date → "YYYY-MM-DD"; null if it isn't a real date. Takes the ways people type one:
+ * "14.03.1988.", "14.3.1988", "14.3.88", "14/3/1988", "14-3-1988", "14 3 1988" and "14031988".
+ * A two-digit year is this century up to this year, and the last century after it (88 → 1988, 05 → 2005).
+ */
+export function displayToIsoDate(display: string, thisYear: number = new Date().getFullYear()): string | null {
+  const text = display.trim();
+  const m = /^(\d{1,2})\s*[./\- ]\s*(\d{1,2})\s*[./\- ]\s*(\d{2}|\d{4})\s*\.?$/.exec(text) ?? /^(\d{2})(\d{2})(\d{4}|\d{2})$/.exec(text);
   if (!m) return null;
   const day = Number(m[1]);
   const month = Number(m[2]);
-  const year = Number(m[3]);
+  let year = Number(m[3]);
+  if (m[3]!.length === 2) year += year <= thisYear % 100 ? Math.floor(thisYear / 100) * 100 : Math.floor(thisYear / 100) * 100 - 100;
   const date = new Date(Date.UTC(year, month - 1, day));
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
   return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Helps while a date is typed: after the day and the month, the dot is put in ("14" → "14.", "14.03" → "14.03.").
+ * Only when characters were added, so deleting a dot works as expected.
+ */
+export function typingDate(previous: string, next: string): string {
+  if (next.length <= previous.length) return next;
+  if (/^\d{2}$/.test(next) || /^\d{1,2}\.\d{2}$/.test(next)) return `${next}.`;
+  return next;
+}
+
+/** A typed date in the form's own spelling, "dd.mm.yyyy.", or the text unchanged if it isn't a date. */
+export function tidyDisplayDate(display: string): string {
+  const iso = displayToIsoDate(display);
+  return iso ? isoToDisplayDate(iso) : display;
 }
 
 /** "65", "65,5", "65.50" or "1.180,00" → cents; null if it isn't an amount. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageFromDob, displayToIsoDate, formatDate, formatDayMonth, formatMoney, formatTime, formatMoneyInput, formatTimeRange, isoToDisplayDate, parseMoney } from './format';
+import { ageFromDob, displayToIsoDate, tidyDisplayDate, typingDate, formatDate, formatDayMonth, formatMoney, formatTime, formatMoneyInput, formatTimeRange, isoToDisplayDate, parseMoney } from './format';
 
 describe('formatMoney', () => {
   it('uses comma decimals and the euro sign after the amount', () => {
@@ -58,10 +58,40 @@ describe('display and ISO dates', () => {
     expect(displayToIsoDate('14.03.1988.')).toBe('1988-03-14');
     expect(displayToIsoDate('1.2.2000')).toBe('2000-02-01');
   });
+  it('takes the other ways a date is typed', () => {
+    expect(displayToIsoDate('14.3.88', 2026)).toBe('1988-03-14');
+    expect(displayToIsoDate('1.2.05', 2026)).toBe('2005-02-01');
+    expect(displayToIsoDate('14/03/1988')).toBe('1988-03-14');
+    expect(displayToIsoDate('14-3-1988')).toBe('1988-03-14');
+    expect(displayToIsoDate('14 3 1988')).toBe('1988-03-14');
+    expect(displayToIsoDate('14031988')).toBe('1988-03-14');
+    expect(displayToIsoDate('140388', 2026)).toBe('1988-03-14');
+  });
   it('rejects dates that do not exist', () => {
     expect(displayToIsoDate('31.02.2000.')).toBeNull();
+    expect(displayToIsoDate('1988')).toBeNull();
     expect(displayToIsoDate('22.13.1991.')).toBeNull();
     expect(displayToIsoDate('')).toBeNull();
+  });
+});
+
+describe('typingDate', () => {
+  it('puts the dots in after the day and the month', () => {
+    expect(typingDate('1', '14')).toBe('14.');
+    expect(typingDate('14.', '14.03')).toBe('14.03.');
+    expect(typingDate('14.0', '14.3')).toBe('14.3');
+    expect(typingDate('14.03.', '14.03.1988')).toBe('14.03.1988');
+  });
+  it('leaves deleting alone', () => {
+    expect(typingDate('14.', '14')).toBe('14');
+    expect(typingDate('14.03.', '14.03')).toBe('14.03');
+  });
+});
+
+describe('tidyDisplayDate', () => {
+  it('writes a date the form\'s way, and leaves anything else', () => {
+    expect(tidyDisplayDate('1.2.1990')).toBe('01.02.1990.');
+    expect(tidyDisplayDate('31.02.')).toBe('31.02.');
   });
 });
 

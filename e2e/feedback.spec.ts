@@ -84,6 +84,24 @@ test('a member row is named by the member, inside its list', async ({ page }) =>
   await expect(dialog).toBeHidden();
 });
 
+test('a table row is named by its first cell, and the page by its title wherever the click was', async ({ page }) => {
+  await signInToOverview(page);
+  await openSection(page, 'Vrste satova');
+  await page.getByRole('row', { name: /Joga za kralježnicu/ }).first().click({ button: 'right' });
+  const dialog = page.getByRole('dialog', { name: 'Povratna informacija' });
+  await expect(dialog.getByRole('group', { name: 'Na što se odnosi?' }).getByRole('radio').first()).toHaveText('Redak „Joga za kralježnicu”');
+  await page.keyboard.press('Escape');
+
+  // From the sidebar: the entry still names the page on screen.
+  const comment = `Iz izbornika ${Date.now()}`;
+  await page.getByRole('navigation').getByRole('button', { name: 'Uplate' }).click({ button: 'right' });
+  await dialog.getByLabel('Komentar').fill(comment);
+  await dialog.getByRole('button', { name: 'Pošalji' }).click();
+  await expect(dialog).toBeHidden();
+  const saved = (await storedEntries()).find((f) => text(f, 'comment') === comment);
+  expect(text(saved, 'page', 'title')).toBe('Vrste satova');
+});
+
 test('the rules refuse entries that are not from a signed-in owner', async () => {
   // No sign-in at all: Firestore says no (403), whatever the entry says.
   const res = await fetch(FEEDBACK, {

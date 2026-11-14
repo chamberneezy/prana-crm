@@ -9,7 +9,7 @@ import { cx } from '../components/cx';
 import { useLang } from '../i18n';
 import styles from './Feedback.module.css';
 import { FEEDBACK_ENABLED, type FeedbackKind, sendFeedback } from './send';
-import { selectorOf, type Target, targetsAt } from './target';
+import { pageTitle, selectorOf, type Target, targetsAt } from './target';
 
 /**
  * Right-click on anything in the signed-in app opens a short form for feedback about it.
@@ -106,7 +106,6 @@ function FeedbackDialog({ targets, dialogRef, onClose }: DialogProps) {
 
   // There is always at least the clicked element.
   const target = targets[chosen] ?? targets[0]!;
-  const page = targets.find((x) => x.kind === 'page');
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -123,7 +122,7 @@ function FeedbackDialog({ targets, dialogRef, onClose }: DialogProps) {
           selector: selectorOf(target.el),
         },
         // The address without its query: a search there can hold a member's name.
-        page: { path: pathname.slice(0, 300), title: (page?.name ?? document.title).slice(0, 200) },
+        page: { path: pathname.slice(0, 300), title: (pageTitle() || document.title).slice(0, 200) },
         lang,
         authorName: staff.name,
       });

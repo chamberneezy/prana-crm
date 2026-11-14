@@ -54,7 +54,7 @@ function PlanForm({ plan, onDone }: { plan: Plan; onDone: () => void }) {
   );
 }
 
-/** "Karte i članarine": the plans and what each costs for a month. */
+/** "Članarine": the plans and what each costs for a month. */
 export function Plans() {
   const { t, tn, lang } = useLang();
   const { data, error } = usePlans();

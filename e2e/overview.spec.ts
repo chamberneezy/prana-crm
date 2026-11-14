@@ -126,7 +126,7 @@ test('add, freeze and renew a membership from the profile', async ({ page }) => 
 });
 
 test('set a plan price', async ({ page }) => {
-  await openSection(page, 'Karte i članarine');
+  await openSection(page, 'Članarine');
   const row = page.getByRole('row', { name: /Proba/ });
   await expect(row).toContainText('Cijena nije upisana');
 

@@ -88,6 +88,9 @@ function nameOf(el: Element): string {
     return clean(label?.textContent) || clean(el.getAttribute('placeholder')) || clean(el.name);
   }
   if (el instanceof HTMLImageElement) return clean(el.alt);
+  // A table row is named by its first cell (the class, the member…), not all its cells run together.
+  const firstCell = el.matches('tr, [role="row"]') ? el.querySelector('th, td, [role="cell"], [role="gridcell"]') : null;
+  if (firstCell) return nameOf(firstCell);
   // A row reads "AH / Ana Horvat / 2× tjedno · …": its first real line (not initials or an icon) names it.
   const lines = (el instanceof HTMLElement ? el.innerText : (el.textContent ?? '')).split('\n').map((l) => l.trim());
   return clean(lines.find((l) => l.length > 2) ?? lines.find(Boolean)) || clean(el.getAttribute('title'));
@@ -159,6 +162,12 @@ export function targetsAt(start: Element, root: Element = document.body): Target
   const page = el.closest('main') ? pageTarget(root) : null;
   if (page && !list.some((t) => t.el === page.el)) list.push(page);
   return list;
+}
+
+/** The title of the page on screen (its h1), wherever the click was. */
+export function pageTitle(root: Element = document.body): string {
+  const h1 = root.querySelector('main h1');
+  return h1 ? visibleText(h1) : '';
 }
 
 /** A short CSS path to the element, for finding it again in the code. */

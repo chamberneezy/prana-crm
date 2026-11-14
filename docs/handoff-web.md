@@ -42,12 +42,14 @@ Member self-booking, online payments, multi-location UI, staff-roles UI, sending
 | Offline | iOS keeps a local copy and syncs. The web is online-only. | The studio may have weak Wi-Fi. |
 | Language | Croatian first, English as a switch | Brand rule. |
 | Design | Kadulja design system ("Yoga CRM") | See A7. |
+| Feedback | Staff right-click anything in the web app and send a comment about it. Entries go to **Firestore** (collection `feedback`) in the same Firebase project, `eur3` (EU). `firestore.rules` lets only verified owners add entries; nobody reads them from the app. Mario reads them with `npm run feedback`. | The preview has no server, so feedback can't go through the API yet. Firestore's free quota (20,000 writes and 50,000 reads a day) covers it. **Rejected:** e-mail through a form service (another account and key); the API's own database (in the preview it stays in the tester's browser). |
 | Cost target | 0 €/month at studio scale | The Apple Developer Program (yearly fee) is needed for TestFlight, the App Store and Sign in with Apple. |
 
 ### Current status
 
 - **Mario has no Cloudflare account yet.** Develop everything locally with `wrangler dev` (local D1 and R2 through Miniflare). Deployment is the last milestone.
-- **The Firebase project is not created yet.** Use the Firebase Auth emulator locally until it exists.
+- **The Firebase project "Prana" (`prana-studio-crm`) exists** and gives the GitHub Pages preview its sign-in. Locally, use the Auth emulator.
+- **Firestore is on in that project** (since 2026-11-13, `eur3`), for feedback only. Studio data never goes there. Locally, use the Firestore emulator.
 - All secrets and IDs come from environment variables. Never commit them.
 
 ## A3. Repo layout
@@ -336,6 +338,7 @@ Health notes are sensitive personal data (GDPR special category). Mario should c
 - Documents are served only through the authenticated endpoint.
 - Deleting a member deletes their document files.
 - The newsletter consent stays separate from the accuracy consent.
+- Feedback entries record the text of the element they are about, which can be a member's name. Settle this before real member data is in the app (e.g. leave out text inside member rows).
 
 ## A9. Open items for Mario
 
@@ -364,7 +367,7 @@ Health notes are sensitive personal data (GDPR special category). Mario should c
 |---|---|
 | API | Hono on Cloudflare Workers · Drizzle ORM (D1) with SQL migrations through `wrangler d1 migrations` · zod · `jose` for verifying Firebase tokens |
 | Web | React 18 · Vite · TypeScript (strict) · React Router · TanStack Query |
-| Login (web) | Firebase JS SDK, **Auth module only** |
+| Login (web) | Firebase JS SDK, **Auth module**. Firestore Lite only to send feedback (loaded on first send). |
 | Styling | Plain CSS with the tokens in A7 (`tokens.css`) and CSS modules. **No UI kit.** |
 | PDFs and OCR | `pdfjs-dist` reads the text layer. For scanned PDFs and images, `tesseract.js` with the `hrv` language, lazy-loaded in a Web Worker. |
 | Tests | Vitest for shared, API and web logic. Playwright for 3 smoke flows: login with the emulator, add a member manually, import a PDF and save. |
@@ -400,7 +403,7 @@ Implement these as local React components with exactly these props, so screens m
 
 Sections are numbered as on the paper form:
 
-- **01 Vaši podaci**: name (full width), e-mail, mobile, date of birth, "Student / umirovljenik?" NE/DA.
+- **01 Vaši podaci**: name (full width), e-mail, mobile, date of birth (dots added while typing; also takes 14.3.88, 14031988), "Student / umirovljenik / nezaposlen?" NE/DA (one discount flag; the paper form still says "Student / umirovljenik?").
 - **02 Odaberite članstvo**: Choice grid with 2 columns. Plan subtitles: "≈ 4 / 8 / 12 dolazaka mjesečno".
 - **03 Važno za vašu praksu**: Ne / "Da, molimo navedite", then a multiline field. Helper text: "Vidi ga samo učitelj na popisu sata."
 - **04 Suglasnosti**: accuracy consent (required) and newsletter opt-in.
@@ -409,9 +412,10 @@ Sections are numbered as on the paper form:
 
 ## B4. App shell
 
-- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Vrste satova, Članovi, Karte i članarine, Uplate**, with the HR/EN switch at the foot.
+- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Vrste satova, Članovi, Članarine, Uplate**, with the HR/EN switch at the foot.
 - **Workspace**: linen. Content max-width 1160 px, padding 32 px top and 48 px sides.
 - **Below 768 px**: the sidebar becomes a top bar with a menu button. Wide tables scroll horizontally inside their card.
+- **Feedback**: right-click on anything opens a form (`src/feedback/`) offering the element, each named section around it and the whole page, with a type (something's wrong / suggestion / question) and a comment. Shift + right-click keeps the browser's menu. A hint under the account in the sidebar says so. On where `VITE_FEEDBACK=firestore`.
 - **Login screen** (not drawn; build from tokens):
   - Linen ground, centred white card with the logo and a Cinzel title "Prijava".
   - Buttons "Nastavi s Appleom" and "Nastavi s Googleom" (secondary), then e-mail and password with "Prijava" (primary).
@@ -456,7 +460,7 @@ These match the artboards on the canvas's Web page.
    - Right: a `Notice` "N polja za provjeru: …" and `UpisnicaForm` pre-filled with flagged fields in the error state.
    - On save: create the member and the document link (PATCH the document with member_id and ocr_json). Show the Toast "<Ime> je spremljen/a kao novi član." with "Poništi", plus an "Otvori profil ›" link.
 
-**Karte i članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns.
+**Članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns.
 
 ## B6. Milestones and acceptance criteria
 

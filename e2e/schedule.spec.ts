@@ -114,7 +114,7 @@ test('class types: add one, edit it and schedule from it', async ({ page }) => {
 
   const row = joga.getByRole('row', { name: /Yin joga/ });
   await expect(row).toContainText('90 min');
-  await expect(row).toContainText('Na početku sata');
+  await expect(row).toContainText('5 min prije sata');
 
   await row.getByRole('button', { name: 'Uredi' }).click();
   const edit = page.getByRole('dialog', { name: 'Uredi vrstu sata' });

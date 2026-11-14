@@ -1,4 +1,4 @@
-import { formatDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
+import { formatDate, tidyDisplayDate, typingDate, type UpisnicaPlan, type UpisnicaValue } from '@prana/shared';
 import { type ReactNode, useState } from 'react';
 import { useLang } from '../i18n';
 import { Button } from './Button';
@@ -82,7 +82,15 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
           />
           <Input label={t('upisnica.email')} type="email" value={v.email} onChange={(e) => set({ email: e.target.value })} error={errors.email} />
           <Input label={t('upisnica.phone')} type="tel" value={v.phone} onChange={(e) => set({ phone: e.target.value })} error={errors.phone} />
-          <Input label={t('upisnica.dob')} placeholder={t('upisnica.dobPlaceholder')} value={v.dob} onChange={(e) => set({ dob: e.target.value })} error={errors.dob} />
+          <Input
+            label={t('upisnica.dob')}
+            placeholder={t('upisnica.dobPlaceholder')}
+            inputMode="decimal"
+            value={v.dob}
+            onChange={(e) => set({ dob: typingDate(v.dob, e.target.value) })}
+            onBlur={() => set({ dob: tidyDisplayDate(v.dob) })}
+            error={errors.dob}
+          />
           <div className={styles.labelled}>
             <span className={styles.label}>{t('upisnica.student')}</span>
             <Choice
@@ -134,7 +142,15 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
 
       <div className={styles.footer}>
         <Input label={t('upisnica.place')} value={signed.place} onChange={(e) => setSigned({ ...signed, place: e.target.value })} />
-        <Input label={t('upisnica.signedDate')} placeholder={t('upisnica.dobPlaceholder')} value={signed.date} onChange={(e) => setSigned({ ...signed, date: e.target.value })} error={errors.date} />
+        <Input
+          label={t('upisnica.signedDate')}
+          placeholder={t('upisnica.dobPlaceholder')}
+          inputMode="decimal"
+          value={signed.date}
+          onChange={(e) => setSigned({ ...signed, date: typingDate(signed.date, e.target.value) })}
+          onBlur={() => setSigned({ ...signed, date: tidyDisplayDate(signed.date) })}
+          error={errors.date}
+        />
         <div className={styles.signatureField}>
           <span className={styles.label}>{t('upisnica.signature')}</span>
           <div className={styles.signatureBox}>

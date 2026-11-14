@@ -8,6 +8,9 @@ export interface InputProps {
   value?: string;
   defaultValue?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onBlur?: () => void;
+  /** The on-screen keyboard to offer, e.g. "decimal" for dates. */
+  inputMode?: 'text' | 'decimal' | 'numeric' | 'tel' | 'email';
   placeholder?: string;
   /** Error message; turns the border terracotta. */
   error?: string;
@@ -21,7 +24,7 @@ export interface InputProps {
   style?: CSSProperties;
 }
 
-export function Input({ label, value, defaultValue, onChange, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
+export function Input({ label, value, defaultValue, onChange, onBlur, inputMode, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
   const id = useId();
   const noteId = `${id}-note`;
   const field = {
@@ -29,6 +32,8 @@ export function Input({ label, value, defaultValue, onChange, placeholder, error
     value,
     defaultValue,
     onChange,
+    onBlur,
+    inputMode,
     placeholder,
     readOnly,
     name,

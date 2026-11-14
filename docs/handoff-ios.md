@@ -42,12 +42,14 @@ Member self-booking, online payments, multi-location UI, staff-roles UI, sending
 | Offline | iOS keeps a local copy and syncs. The web is online-only. | The studio may have weak Wi-Fi. |
 | Language | Croatian first, English as a switch | Brand rule. |
 | Design | Kadulja design system ("Yoga CRM") | See A7. |
+| Feedback | Staff right-click anything in the web app and send a comment about it. Entries go to **Firestore** (collection `feedback`) in the same Firebase project, `eur3` (EU). `firestore.rules` lets only verified owners add entries; nobody reads them from the app. Mario reads them with `npm run feedback`. | The preview has no server, so feedback can't go through the API yet. Firestore's free quota (20,000 writes and 50,000 reads a day) covers it. **Rejected:** e-mail through a form service (another account and key); the API's own database (in the preview it stays in the tester's browser). |
 | Cost target | 0 €/month at studio scale | The Apple Developer Program (yearly fee) is needed for TestFlight, the App Store and Sign in with Apple. |
 
 ### Current status
 
 - **Mario has no Cloudflare account yet.** Develop everything locally with `wrangler dev` (local D1 and R2 through Miniflare). Deployment is the last milestone.
-- **The Firebase project is not created yet.** Use the Firebase Auth emulator locally until it exists.
+- **The Firebase project "Prana" (`prana-studio-crm`) exists** and gives the GitHub Pages preview its sign-in. Locally, use the Auth emulator.
+- **Firestore is on in that project** (since 2026-11-13, `eur3`), for feedback only. Studio data never goes there. Locally, use the Firestore emulator.
 - All secrets and IDs come from environment variables. Never commit them.
 
 ## A3. Repo layout
@@ -336,6 +338,7 @@ Health notes are sensitive personal data (GDPR special category). Mario should c
 - Documents are served only through the authenticated endpoint.
 - Deleting a member deletes their document files.
 - The newsletter consent stays separate from the accuracy consent.
+- Feedback entries record the text of the element they are about, which can be a member's name. Settle this before real member data is in the app (e.g. leave out text inside member rows).
 
 ## A9. Open items for Mario
 
