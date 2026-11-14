@@ -472,5 +472,15 @@
   "upisnica.firstName": "First name",
   "upisnica.lastName": "Last name",
   "upisnica.firstNameRequired": "Enter the first name.",
-  "upisnica.lastNameRequired": "Enter the last name."
+  "upisnica.lastNameRequired": "Enter the last name.",
+  "plans.new": "New membership",
+  "plans.newTitle": "New membership",
+  "plans.visits": "Visits per month",
+  "plans.visitsHint": "Empty means unlimited.",
+  "plans.visitsInvalid": "Enter a number from 1 to 100, or leave it empty.",
+  "plans.remove": "Remove",
+  "plans.removeConfirm": "Remove “{name}”? Memberships already on it stay.",
+  "plans.removed": "“{name}” was removed.",
+  "plans.own": "Own",
+  "plans.added": "“{name}” was added."
 }

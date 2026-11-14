@@ -47,10 +47,12 @@ export const routes: RouteSpec[] = [
   { method: 'delete', path: '/visits/{id}', summary: 'Undo a check-in' },
 
   { method: 'get', path: '/plans', summary: 'Membership plans', response: s.plansResponseSchema },
-  { method: 'patch', path: '/plans/{id}', summary: 'Change a plan name or price', body: s.planPatchSchema, response: s.planResponseSchema },
+  { method: 'post', path: '/plans', summary: "Add one of the studio's own plans (code custom)", body: s.planInputSchema, response: s.planResponseSchema, status: 201 },
+  { method: 'patch', path: '/plans/{id}', summary: 'Change a plan name or price (and visits, for the studio\'s own plans)', body: s.planPatchSchema, response: s.planResponseSchema },
+  { method: 'delete', path: '/plans/{id}', summary: "Remove one of the studio's own plans; memberships on it keep it" },
 
   { method: 'post', path: '/memberships', summary: 'Start a membership', body: s.membershipInputSchema, response: s.membershipResponseSchema, status: 201 },
-  { method: 'post', path: '/memberships/{id}/renew', summary: 'Start the following one-month period', body: s.membershipRenewSchema, response: s.membershipResponseSchema, status: 201 },
+  { method: 'post', path: '/memberships/{id}/renew', summary: 'Start the following calendar-month period', body: s.membershipRenewSchema, response: s.membershipResponseSchema, status: 201 },
   { method: 'post', path: '/memberships/{id}/freeze', summary: 'Freeze until a date, or lift the freeze', body: s.membershipFreezeSchema, response: s.membershipResponseSchema },
 
   { method: 'get', path: '/payments', summary: 'Payments between two dates, with the total', query: s.paymentsQuerySchema, response: s.paymentsResponseSchema },

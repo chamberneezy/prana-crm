@@ -472,5 +472,15 @@
   "upisnica.firstName": "Ime",
   "upisnica.lastName": "Prezime",
   "upisnica.firstNameRequired": "Upišite ime.",
-  "upisnica.lastNameRequired": "Upišite prezime."
+  "upisnica.lastNameRequired": "Upišite prezime.",
+  "plans.new": "Nova članarina",
+  "plans.newTitle": "Nova članarina",
+  "plans.visits": "Dolasci mjesečno",
+  "plans.visitsHint": "Prazno znači neograničeno.",
+  "plans.visitsInvalid": "Upišite broj od 1 do 100, ili ostavite prazno.",
+  "plans.remove": "Ukloni",
+  "plans.removeConfirm": "Ukloni „{name}”? Postojeće članarine na njoj ostaju.",
+  "plans.removed": "Članarina „{name}” je uklonjena.",
+  "plans.own": "Vlastita",
+  "plans.added": "Članarina „{name}” je dodana."
 }

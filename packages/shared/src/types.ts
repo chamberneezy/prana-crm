@@ -17,6 +17,8 @@ export interface UpisnicaValue {
   dob: string;
   student: boolean;
   plan: UpisnicaPlan;
+  /** Not on the paper form: one of the studio's own plans, chosen instead of `plan`. */
+  planId?: string;
   health: boolean;
   healthText: string;
   /** Accuracy consent. Required to save. */

@@ -1,11 +1,13 @@
 import type { Database } from 'sql.js';
 import m0001 from '../../migrations/0001_init.sql?raw';
 import m0002 from '../../migrations/0002_member_names.sql?raw';
+import m0003 from '../../migrations/0003_custom_plans.sql?raw';
 
 /** Every migration, in order. A test checks this lists each file in migrations/. */
 export const MIGRATIONS: Array<{ name: string; sql: string }> = [
   { name: '0001_init.sql', sql: m0001 },
   { name: '0002_member_names.sql', sql: m0002 },
+  { name: '0003_custom_plans.sql', sql: m0003 },
 ];
 
 /**

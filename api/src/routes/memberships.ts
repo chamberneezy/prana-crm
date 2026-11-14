@@ -6,6 +6,7 @@ import {
   membershipPeriod,
   monthPeriodEnd,
   renewalStart,
+  planInputSchema,
   planPatchSchema,
   type PlansResponse,
 } from '@prana/shared';
@@ -14,7 +15,7 @@ import { Hono } from 'hono';
 import { member, membership, plan } from '../db/schema';
 import type { AppContext, AppEnv } from '../env';
 import { ApiError } from '../errors';
-import { created, ctx, owned, parseBody, publicRow, touched } from '../lib/http';
+import { created, ctx, owned, parseBody, publicRow, removed, touched } from '../lib/http';
 import { summaryFor } from '../lib/members';
 
 export const plans = new Hono<AppEnv>();
@@ -31,13 +32,32 @@ plans.get('/', async (c) => {
   return c.json(body);
 });
 
+// The studio's own kinds of membership. The standard ones (1×, 2×, 3×, unlimited, trial) come with the studio.
+plans.post('/', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const input = await parseBody(c, planInputSchema);
+  const row = { ...created(businessId, now), code: 'custom' as const, name: input.name, visits_per_month: input.visits_per_month, price_cents: input.price_cents ?? null };
+  await db.insert(plan).values(row);
+  return c.json({ plan: publicRow(row) }, 201);
+});
+
 plans.patch('/:id', async (c) => {
   const { db, businessId, now } = ctx(c);
   const input = await parseBody(c, planPatchSchema);
   const existing = await owned(db, plan, c.req.param('id'), businessId);
+  if (input.visits_per_month !== undefined && existing.code !== 'custom') throw new ApiError('invalid_input', ['visits_per_month']);
   const patch = { ...input, ...touched(now) };
   await db.update(plan).set(patch).where(eq(plan.id, existing.id));
   return c.json({ plan: publicRow({ ...existing, ...patch }) });
+});
+
+// Only the studio's own plans can be removed. Memberships already on it keep it; it just can't be chosen any more.
+plans.delete('/:id', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const existing = await owned(db, plan, c.req.param('id'), businessId);
+  if (existing.code !== 'custom') throw new ApiError('invalid_input', ['code']);
+  await db.update(plan).set(removed(now)).where(eq(plan.id, existing.id));
+  return c.body(null, 204);
 });
 
 async function respond(c: AppContext, row: typeof membership.$inferSelect, status: 200 | 201) {

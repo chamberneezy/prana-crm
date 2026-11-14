@@ -115,7 +115,7 @@ export function MemberProfileScreen() {
               member={value}
               status={summary.status}
               statusLabel={statusLabel(summary.status, summary.days_left, strings)}
-              planLabel={membership ? planLabel(membership.plan_code, strings) : undefined}
+              planLabel={membership ? planLabel(membership, strings) : undefined}
               since={since}
               onEdit={() => setEditing(true)}
             />
@@ -145,7 +145,7 @@ export function MemberProfileScreen() {
             <h2 className={styles.overline}>{t('profileScreen.membership', { month: t(`month.${Number(localDate(new Date()).slice(5, 7))}` as 'month.1') })}</h2>
             {membership ? (
               <MembershipCard
-                plan={planLabel(membership.plan_code, strings)}
+                plan={planLabel(membership, strings)}
                 used={membership.visits_used}
                 total={membership.visits_total ?? 0}
                 renewal={isoToDisplayDate(membership.period_end).slice(0, 6)}

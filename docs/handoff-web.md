@@ -84,7 +84,7 @@ prana-crm/
 | `offering` (class type) | id, business_id, group_id, name, color_token, default_duration_min, entry_rule (null), default_capacity (null), active |
 | `session` | id, business_id, location_id, offering_id, starts_at, ends_at, teacher_staff_id (null), capacity (null), note |
 | `member` | id, business_id, first_name, last_name, full_name (always "first last", for lists and search), email, phone, dob, is_student_or_retired, health_flag, health_text, consent_accuracy, consent_news, signed_place, signed_date, member_since, notes |
-| `plan` | id, business_id, code (`1x` \| `2x` \| `3x` \| `unl` \| `trial`), name, visits_per_month (null = unlimited), price_cents (null) |
+| `plan` | id, business_id, code (`1x` \| `2x` \| `3x` \| `unl` \| `trial` \| `custom`), name, visits_per_month (null = unlimited), price_cents (null). The five standard plans come with the studio; `custom` ones are the studio's own (added, edited and removed on Članarine; shown by name). |
 | `membership` | id, business_id, member_id, plan_id, period_start, period_end, frozen_until (null). **Periods are calendar months** (1st to last day), at the full price even when someone joins mid-month; a trial runs one month from its first day. A renewal starts the day after the old period ends, or on the 1st of this month if that has passed. |
 | `visit` | id, business_id, member_id, session_id, membership_id (null), checked_in_at |
 | `payment` | id, business_id, member_id, membership_id (null), amount_cents, currency, method (`cash` \| `card` \| `transfer`), paid_at, note. Signing up asks "Plaćeno?" (cash, card, transfer, or not yet): paid now is recorded as a payment of the plan's price (`paid_with` on `POST /members`). |
@@ -460,7 +460,7 @@ These match the artboards on the canvas's Web page.
    - Right: a `Notice` "N polja za provjeru: …" and `UpisnicaForm` pre-filled with flagged fields in the error state.
    - On save: create the member and the document link (PATCH the document with member_id and ocr_json). Show the Toast "<Ime> je spremljen/a kao novi član." with "Poništi", plus an "Otvori profil ›" link.
 
-**Članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns.
+**Članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns. Članarine has "Nova članarina" (top right) for the studio's own plans: name, visits per month (empty = unlimited) and price; they are offered on the sign-up form after the standard ones.
 
 ## B6. Milestones and acceptance criteria
 

@@ -16,9 +16,10 @@ import type { useLang } from '../i18n';
 
 type Strings = Pick<ReturnType<typeof useLang>, 't' | 'tn'>;
 
-/** "2× tjedno", or "Proba" for a trial. */
-export function planLabel(code: PlanCode, { t }: Strings): string {
-  return code === 'trial' ? t('status.trial') : t(`plan.${code}`);
+/** "2× tjedno", "Proba" for a trial, or the name the studio gave its own plan. */
+export function planLabel(plan: { plan_code: PlanCode; plan_name: string }, { t }: Strings): string {
+  if (plan.plan_code === 'custom') return plan.plan_name;
+  return plan.plan_code === 'trial' ? t('status.trial') : t(`plan.${plan.plan_code}`);
 }
 
 /** The chip label: the status word, or "Ističe za N dana" for an expiring membership. */
@@ -34,7 +35,7 @@ export function memberSubline(summary: MemberSummary, strings: Strings): string 
   const lastVisit = summary.last_visit_at ? t('member.sub.lastVisit', { date: formatDayMonth(summary.last_visit_at) }) : null;
   if (!m) return [t('member.sub.none'), lastVisit].filter(Boolean).join(' · ');
 
-  const plan = planLabel(m.plan_code, strings);
+  const plan = planLabel(m, strings);
   if (summary.status === 'frozen' && m.frozen_until) {
     return `${plan} · ${t('member.sub.frozenUntil', { date: isoToDisplayDate(m.frozen_until).slice(0, 6) })}`;
   }
@@ -54,7 +55,7 @@ export function memberToUpisnica(member: Member, summary: MemberSummary): Upisni
     phone: member.phone ?? '',
     dob: member.dob ? isoToDisplayDate(member.dob) : '',
     student: member.is_student_or_retired,
-    plan: code && code !== 'trial' ? code : '2x',
+    plan: code && code !== 'trial' && code !== 'custom' ? code : '2x',
     health: member.health_flag,
     healthText: member.health_text ?? '',
     consent: member.consent_accuracy,
@@ -113,7 +114,8 @@ export function upisnicaToPatch(v: UpisnicaValue, signed: Signed): MemberPatch {
 
 /** A new member from the form, with the chosen plan as the first membership, paid now or not yet. */
 export function upisnicaToInput(v: UpisnicaValue, signed: Signed): MemberInput {
-  return { ...upisnicaToPatch(v, signed), consent_accuracy: v.consent, plan_code: v.plan, paid_with: v.paid && v.paid !== 'later' ? v.paid : null };
+  const plan = v.planId ? { plan_id: v.planId } : { plan_code: v.plan };
+  return { ...upisnicaToPatch(v, signed), consent_accuracy: v.consent, ...plan, paid_with: v.paid && v.paid !== 'later' ? v.paid : null };
 }
 
 /** Each upisnica plan's price, from the studio's plans, for the form. */
@@ -122,4 +124,16 @@ export function upisnicaPrices(plans: Array<{ code: string; price_cents: number 
   const prices: Partial<Record<UpisnicaPlan, number | null>> = {};
   for (const p of plans) if (p.code === '1x' || p.code === '2x' || p.code === '3x' || p.code === 'unl') prices[p.code] ??= p.price_cents;
   return prices;
+}
+
+/** The studio's own plans, as the sign-up form offers them. */
+export function ownPlanChoices(plans: Array<{ id: string; code: string; name: string; visits_per_month: number | null; price_cents: number | null }> | undefined, { t, tn }: Strings) {
+  return (plans ?? [])
+    .filter((p) => p.code === 'custom')
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      sub: p.visits_per_month === null ? t('plans.unlimited') : t('plans.visitsPerMonth', { n: `${p.visits_per_month} ${tn('visits', p.visits_per_month)}` }),
+      price_cents: p.price_cents,
+    }));
 }

@@ -20,7 +20,8 @@ const meta = {
 };
 
 export const STAFF_ROLES = ['owner', 'teacher', 'front_desk'] as const;
-export const PLAN_CODES = ['1x', '2x', '3x', 'unl', 'trial'] as const;
+/** `custom`: a kind of membership the studio added itself, shown by its name. */
+export const PLAN_CODES = ['1x', '2x', '3x', 'unl', 'trial', 'custom'] as const;
 export const PAYMENT_METHODS = ['cash', 'card', 'transfer'] as const;
 export const DOCUMENT_SOURCES = ['camera', 'pdf', 'image'] as const;
 export const COLOR_TOKENS = ['class-spine', 'class-restorative', 'class-ashtanga', 'class-black-lotus', 'class-pranayama', 'class-workshop'] as const;
@@ -315,10 +316,12 @@ export const memberInputSchema = z.object({
   notes: longText.nullable().optional(),
   /** When given, a membership on this plan for the month of member_since. */
   plan_code: planCodeSchema.optional(),
+  /** Instead of plan_code: any of the studio's plans, its own ones included. */
+  plan_id: id.optional(),
   /** With a plan: how its price was paid at sign-up, recorded as a payment. Left out or null: not paid yet. */
   paid_with: paymentMethodSchema.nullable().optional(),
 });
-export const memberPatchSchema = memberInputSchema.omit({ plan_code: true, paid_with: true }).partial();
+export const memberPatchSchema = memberInputSchema.omit({ plan_code: true, plan_id: true, paid_with: true }).partial();
 
 export const membersQuerySchema = z.object({
   q: z.string().trim().max(200).optional(),
@@ -382,9 +385,19 @@ export const membershipFreezeSchema = z.object({
   until: isoDate.nullable(),
 });
 
+/** A kind of membership the studio adds itself (code `custom`). */
+export const planInputSchema = z.object({
+  name: shortText.min(1),
+  /** null = unlimited */
+  visits_per_month: z.number().int().min(1).max(100).nullable(),
+  price_cents: cents.min(0).nullable().optional(),
+});
+
 export const planPatchSchema = z.object({
   name: shortText.min(1).optional(),
   price_cents: cents.min(0).nullable().optional(),
+  /** Only for the studio's own plans; the standard ones are defined by their code. */
+  visits_per_month: z.number().int().min(1).max(100).nullable().optional(),
 });
 
 export const paymentsQuerySchema = z.object({
@@ -424,6 +437,7 @@ export type SessionInput = z.infer<typeof sessionInputSchema>;
 export type SessionPatch = z.infer<typeof sessionPatchSchema>;
 export type MembershipInput = z.infer<typeof membershipInputSchema>;
 export type PaymentInput = z.infer<typeof paymentInputSchema>;
+export type PlanInput = z.infer<typeof planInputSchema>;
 export type PlanPatch = z.infer<typeof planPatchSchema>;
 export type DocumentPatch = z.infer<typeof documentPatchSchema>;
 

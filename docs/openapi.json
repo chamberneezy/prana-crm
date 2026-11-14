@@ -475,7 +475,8 @@
               "2x",
               "3x",
               "unl",
-              "trial"
+              "trial",
+              "custom"
             ]
           },
           "plan_name": {
@@ -1334,7 +1335,8 @@
               "2x",
               "3x",
               "unl",
-              "trial"
+              "trial",
+              "custom"
             ]
           },
           "name": {
@@ -2158,8 +2160,14 @@
                       "2x",
                       "3x",
                       "unl",
-                      "trial"
+                      "trial",
+                      "custom"
                     ]
+                  },
+                  "plan_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "paid_with": {
                     "anyOf": [
@@ -3331,11 +3339,89 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Add one of the studio's own plans (code custom)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "visits_per_month": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "price_cents": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "visits_per_month"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plan": {
+                      "$ref": "#/components/schemas/Plan"
+                    }
+                  },
+                  "required": [
+                    "plan"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/plans/{id}": {
       "patch": {
-        "summary": "Change a plan name or price",
+        "summary": "Change a plan name or price (and visits, for the studio's own plans)",
         "parameters": [
           {
             "name": "id",
@@ -3370,6 +3456,18 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "visits_per_month": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 }
               }
@@ -3394,6 +3492,35 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove one of the studio's own plans; memberships on it keep it",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Done"
           },
           "default": {
             "description": "Error",
@@ -3485,7 +3612,7 @@
     },
     "/memberships/{id}/renew": {
       "post": {
-        "summary": "Start the following one-month period",
+        "summary": "Start the following calendar-month period",
         "parameters": [
           {
             "name": "id",

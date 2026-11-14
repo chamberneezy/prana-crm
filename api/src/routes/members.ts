@@ -98,13 +98,13 @@ members.post('/', async (c) => {
     notes: blankToNull(input.notes),
   };
 
-  if (input.plan_code) {
+  if (input.plan_id || input.plan_code) {
     const [chosen] = await db
       .select()
       .from(plan)
-      .where(and(eq(plan.business_id, businessId), eq(plan.code, input.plan_code), isNull(plan.deleted_at)))
+      .where(and(eq(plan.business_id, businessId), input.plan_id ? eq(plan.id, input.plan_id) : eq(plan.code, input.plan_code!), isNull(plan.deleted_at)))
       .limit(1);
-    if (!chosen) throw new ApiError('invalid_input', ['plan_code']);
+    if (!chosen) throw new ApiError('invalid_input', [input.plan_id ? 'plan_id' : 'plan_code']);
     const period = membershipPeriod(chosen.code, row.member_since);
     const first = {
       ...created(businessId, now),

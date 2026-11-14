@@ -310,6 +310,26 @@ describe('plans, memberships and payments', () => {
     expect(current.renewed_until).toBeNull();
   });
 
+  it("adds the studio's own plan, which can be chosen, edited and removed", async () => {
+    const made = await t.call('POST', '/plans', { body: { name: 'Studentska 4×', visits_per_month: 4, price_cents: 4000 } });
+    expect(made.status).toBe(201);
+    expect(made.body.plan).toMatchObject({ code: 'custom', name: 'Studentska 4×', visits_per_month: 4, price_cents: 4000 });
+    const planId = made.body.plan.id;
+
+    const member = await t.call('POST', '/members', { body: { first_name: 'Iva', last_name: 'Studentić', consent_accuracy: true, plan_id: planId, paid_with: 'cash' } });
+    expect(member.body.summary.membership).toMatchObject({ plan_code: 'custom', plan_name: 'Studentska 4×', visits_total: 4, paid_cents: 4000 });
+
+    expect((await t.call('PATCH', `/plans/${planId}`, { body: { visits_per_month: null } })).body.plan.visits_per_month).toBeNull();
+    // The standard plans' visits come with their code.
+    expect((await t.call('PATCH', `/plans/${SEED.plans['2x']}`, { body: { visits_per_month: 12 } })).status).toBe(400);
+    expect((await t.call('DELETE', `/plans/${SEED.plans['2x']}`)).status).toBe(400);
+
+    expect((await t.call('DELETE', `/plans/${planId}`)).status).toBe(204);
+    expect((await t.call('GET', '/plans')).body.plans.map((p: { id: string }) => p.id)).not.toContain(planId);
+    // The member keeps the membership on the removed plan.
+    expect((await t.call('GET', `/members/${member.body.member.id}`)).body.summary.membership).toMatchObject({ plan_name: 'Studentska 4×' });
+  });
+
   it('starts a membership for a member who has none', async () => {
     const { status, body } = await t.call('POST', '/memberships', { body: { member_id: SEED.member(7), plan_id: SEED.plans.trial } });
     expect(status).toBe(201);
@@ -464,7 +484,9 @@ describe('sync (iOS)', () => {
     const { status, body } = await t.call('GET', '/sync');
     expect(status).toBe(200);
     expect(Object.keys(body.changes).sort()).toEqual(['document', 'location', 'member', 'membership', 'offering', 'offering_group', 'payment', 'plan', 'session', 'staff', 'visit']);
-    expect(body.changes.plan).toHaveLength(5);
+    // The five standard plans, plus the studio's own one added and removed above.
+    expect(body.changes.plan.filter((p: { code: string }) => p.code !== 'custom')).toHaveLength(5);
+    expect(body.changes.plan.some((p: { code: string; deleted_at: string | null }) => p.code === 'custom' && p.deleted_at !== null)).toBe(true);
     expect(body.changes.member.some((m: { deleted_at: string | null }) => m.deleted_at !== null)).toBe(true);
     const text = JSON.stringify(body);
     expect(text).not.toContain('r2_key');

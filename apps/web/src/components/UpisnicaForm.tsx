@@ -36,6 +36,8 @@ export interface UpisnicaFormProps {
   busy?: boolean;
   /** Each plan's price in cents (null: none set). Shown with the plans; a plan without a price skips "Plaćeno?". */
   prices?: Partial<Record<UpisnicaPlan, number | null>>;
+  /** The studio's own plans, offered after the standard ones. */
+  ownPlans?: Array<{ id: string; name: string; sub: string; price_cents: number | null }>;
 }
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
@@ -49,7 +51,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
   );
 }
 
-export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false, prices }: UpisnicaFormProps) {
+export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel, mode = 'new', errors = {}, busy = false, prices, ownPlans = [] }: UpisnicaFormProps) {
   const edit = mode === 'edit';
   const { t } = useLang();
   const [v, setV] = useState<UpisnicaValue>(() => {
@@ -73,7 +75,8 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
     setV(next);
     onChange?.(next);
   };
-  const price = prices?.[v.plan];
+  const ownPlan = v.planId ? ownPlans.find((p) => p.id === v.planId) : undefined;
+  const price = ownPlan ? ownPlan.price_cents : prices?.[v.plan];
   // Asked only on a new member, and only when the chosen plan has something to pay.
   const askPaid = !edit && price !== null && price !== 0;
   const save = () => {
@@ -132,15 +135,19 @@ export function UpisnicaForm({ initial, place, date, onChange, onSave, onCancel,
 
       {!edit && (
         <Section n="02" title={t('upisnica.section.plan')}>
-          <Choice
+          <Choice<string>
             layout="grid"
             columns={2}
-            value={v.plan}
-            onChange={(plan) => set({ plan })}
-            options={PLANS.map((plan) => {
-              const cost = prices?.[plan];
-              return { value: plan, label: t(`plan.${plan}`), sub: cost ? `${t(`plan.${plan}.sub`)} · ${formatMoney(cost)}` : t(`plan.${plan}.sub`) };
-            })}
+            value={v.planId ?? v.plan}
+            // A standard plan is chosen by its code, one of the studio's own by its id.
+            onChange={(choice) => set((PLANS as string[]).includes(choice) ? { plan: choice as UpisnicaPlan, planId: undefined } : { planId: choice })}
+            options={[
+              ...PLANS.map((plan) => {
+                const cost = prices?.[plan];
+                return { value: plan as string, label: t(`plan.${plan}`), sub: cost ? `${t(`plan.${plan}.sub`)} · ${formatMoney(cost)}` : t(`plan.${plan}.sub`) };
+              }),
+              ...ownPlans.map((p) => ({ value: p.id, label: p.name, sub: p.price_cents ? `${p.sub} · ${formatMoney(p.price_cents)}` : p.sub })),
+            ]}
           />
           {askPaid && (
             <div className={styles.labelled}>

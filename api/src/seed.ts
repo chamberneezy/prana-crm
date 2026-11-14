@@ -1,5 +1,8 @@
 import { STUDIO_PLACE, addDays, addMonths, type ColorToken, localDate, type PaymentMethod, type PlanCode, splitFullName, startOfWeek, TIME_ZONE, zonedTimeToUtc } from '@prana/shared';
 
+/** The plans every studio starts with. The studio's own ones (`custom`) are added in the app. */
+type StandardPlan = Exclude<PlanCode, 'custom'>;
+
 /** Seed data as plain rows, turned into SQL by toSql(). Used by scripts/seed.ts and by the tests. */
 
 type Value = string | number | boolean | null;
@@ -17,7 +20,7 @@ export const SEED = {
   group: fixedId(0x3),
   owner: fixedId(0x4),
   offerings: { spine: fixedId(0x11), ashtanga: fixedId(0x12), restorative: fixedId(0x13), blackLotus: fixedId(0x14), pranayama: fixedId(0x15) },
-  plans: { '1x': fixedId(0x21), '2x': fixedId(0x22), '3x': fixedId(0x23), unl: fixedId(0x24), trial: fixedId(0x25) } satisfies Record<PlanCode, string>,
+  plans: { '1x': fixedId(0x21), '2x': fixedId(0x22), '3x': fixedId(0x23), unl: fixedId(0x24), trial: fixedId(0x25) } satisfies Record<StandardPlan, string>,
   member: (n: number) => fixedId(0x100 + n),
 };
 
@@ -32,7 +35,7 @@ const OFFERINGS: Array<{ key: OfferingKey; name: string; color_token: ColorToken
   { key: 'pranayama', name: 'Pranayama & meditacija', color_token: 'class-pranayama', minutes: 30, entry_rule: 'Slobodan ulaz' },
 ];
 
-const PLANS: Array<{ code: PlanCode; name: string; visits_per_month: number | null }> = [
+const PLANS: Array<{ code: StandardPlan; name: string; visits_per_month: number | null }> = [
   { code: '1x', name: '1× tjedno', visits_per_month: 4 },
   { code: '2x', name: '2× tjedno', visits_per_month: 8 },
   { code: '3x', name: '3× tjedno', visits_per_month: 12 },
@@ -95,7 +98,7 @@ export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
 export const DEV_OWNER_EMAIL = 'mario@prana.test';
 
 /** Made-up prices so the "unpaid" state can be seen locally. Not the studio's prices. */
-const DEV_PRICES: Record<PlanCode, number | null> = { '1x': 6500, '2x': 8500, '3x': 10000, unl: 12000, trial: null };
+const DEV_PRICES: Record<StandardPlan, number | null> = { '1x': 6500, '2x': 8500, '3x': 10000, unl: 12000, trial: null };
 
 // One sample week, Mon–Sun: [weekday offset, start, class].
 const WEEK: Array<[number, string, OfferingKey]> = [
@@ -120,7 +123,7 @@ interface DevMember {
   health?: string;
   news?: boolean;
   /** No membership when left out. */
-  plan?: PlanCode;
+  plan?: StandardPlan;
   /** Period end relative to today; the period is the month before it. */
   endsInDays?: number;
   frozenForDays?: number;
@@ -146,7 +149,7 @@ export function devSeed({ now }: { now: string }): SeedRow[] {
   const today = localDate(now);
   const rows = prodSeed({ now, owners: [{ email: DEV_OWNER_EMAIL, name: 'Mario' }] });
   for (const r of rows) {
-    if (r.table === 'plan') r.row.price_cents = DEV_PRICES[r.row.code as PlanCode];
+    if (r.table === 'plan') r.row.price_cents = DEV_PRICES[r.row.code as StandardPlan];
   }
 
   // The three weeks before this one (past sessions to hang visits on), this week, and the next

@@ -6,6 +6,7 @@ import type {
   PaymentInput,
   PaymentResponse,
   PaymentsResponse,
+  PlanInput,
   PlanPatch,
   PlanResponse,
   PlansResponse,
@@ -183,6 +184,22 @@ export function useDashboard() {
 
 export function usePlans() {
   return useQuery({ queryKey: ['plans'], queryFn: () => api<PlansResponse>('GET', '/plans') });
+}
+
+export function useCreatePlan() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: PlanInput) => api<PlanResponse>('POST', '/plans', input),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['plans'] }),
+  });
+}
+
+export function useDeletePlan() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<null>('DELETE', `/plans/${id}`),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['plans'] }),
+  });
 }
 
 export function useSavePlan(id: string) {

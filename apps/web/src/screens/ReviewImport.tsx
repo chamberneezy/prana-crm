@@ -8,7 +8,7 @@ import { Button, MemberProfile, Notice, PageHeader, Toast, UpisnicaForm } from '
 import { cx } from '../components/cx';
 import { useLang } from '../i18n';
 import { isPdf } from '../import/extract';
-import { fieldErrors, planLabel, type Signed, statusLabel, type UpisnicaErrors, upisnicaPrices, upisnicaToInput, validateUpisnica } from '../lib/member';
+import { fieldErrors, planLabel, type Signed, statusLabel, type UpisnicaErrors, ownPlanChoices, upisnicaPrices, upisnicaToInput, validateUpisnica } from '../lib/member';
 import type { ImportedForm } from './ImportMember';
 import styles from './ReviewImport.module.css';
 
@@ -197,14 +197,14 @@ export function ReviewImport({ imported, onAnother }: Props) {
               member={value}
               status={saved.summary.status}
               statusLabel={statusLabel(saved.summary.status, saved.summary.days_left, strings)}
-              planLabel={saved.summary.membership ? planLabel(saved.summary.membership.plan_code, strings) : undefined}
+              planLabel={saved.summary.membership ? planLabel(saved.summary.membership, strings) : undefined}
               since={t('overview.today').toLowerCase()}
             />
           ) : (
             <>
               {noText && <Notice title={t('review.noText.title')}>{t('review.noText.body')}</Notice>}
               {flagged.length > 0 && <Notice title={tn('review.count', flagged.length)}>{t('review.countBody', { fields: flagged.map(fieldName).join(', ') })}</Notice>}
-              <UpisnicaForm initial={value} prices={upisnicaPrices(plans.data?.plans)} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v, signed) => void save(v, signed)} onCancel={onAnother} />
+              <UpisnicaForm initial={value} prices={upisnicaPrices(plans.data?.plans)} ownPlans={ownPlanChoices(plans.data?.plans, strings)} place={signedPlace} date={scan.date || undefined} errors={{ ...reviewErrors, ...errors }} busy={busy} onChange={setValue} onSave={(v, signed) => void save(v, signed)} onCancel={onAnother} />
             </>
           )}
         </section>

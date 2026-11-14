@@ -26,7 +26,7 @@ export function Overview() {
     }));
 
   // In "Za provjeru" an unpaid member's line shows what is owed rather than visits.
-  const attentionSub = (m: MemberSummary) => (m.status === 'unpaid' && m.membership ? `${planLabel(m.membership.plan_code, strings)} · ${formatMoney(m.debt_cents)}` : memberSubline({ ...m, last_visit_at: null }, strings));
+  const attentionSub = (m: MemberSummary) => (m.status === 'unpaid' && m.membership ? `${planLabel(m.membership, strings)} · ${formatMoney(m.debt_cents)}` : memberSubline({ ...m, last_visit_at: null }, strings));
 
   const header = (
     <div className={styles.header}>
@@ -91,7 +91,7 @@ export function Overview() {
             {unpaid.length > 0 && (
               <Notice title={tn('overview.unpaid', unpaid.length)}>
                 {unpaid.length === 1 && first?.membership
-                  ? `${first.full_name}, ${planLabel(first.membership.plan_code, strings)} · ${formatMoney(first.debt_cents)}.`
+                  ? `${first.full_name}, ${planLabel(first.membership, strings)} · ${formatMoney(first.debt_cents)}.`
                   : t('overview.unpaidTotal', { amount: formatMoney(counts.debts_total_cents) })}
               </Notice>
             )}
