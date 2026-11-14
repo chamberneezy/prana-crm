@@ -3,7 +3,6 @@ import { resolve } from 'node:path';
 import { getPlatformProxy } from 'wrangler';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Env } from '../src/env';
-import { devSeed, toSql } from '../src/seed';
 
 const dir = resolve(import.meta.dirname, '../migrations');
 const files = readdirSync(dir).filter((f) => f.endsWith('.sql')).sort();
@@ -31,7 +30,16 @@ describe('migrations on a database with data', () => {
   it('keeps every membership pointing at its plan through the plan rebuild', async () => {
     const upTo = files.indexOf('0003_custom_plans.sql');
     for (const file of files.slice(0, upTo)) await run(statements(file));
-    await run(toSql(devSeed({ now: new Date().toISOString() }), 'keep'));
+    // Data as the schema was then (the seed follows the latest schema, so it isn't used here).
+    const t0 = '2026-11-01T10:00:00.000Z';
+    await run([
+      `INSERT INTO business (id, name, created_at, updated_at) VALUES ('b', 'Prana', '${t0}', '${t0}')`,
+      `INSERT INTO member (id, business_id, full_name, first_name, last_name, member_since, created_at, updated_at, changed_at) VALUES ('m1', 'b', 'Ana Horvat', 'Ana', 'Horvat', '2026-11-01', '${t0}', '${t0}', '${t0}')`,
+      `INSERT INTO member (id, business_id, full_name, first_name, last_name, member_since, created_at, updated_at, changed_at) VALUES ('m2', 'b', 'Ivo Ivić', 'Ivo', 'Ivić', '2026-11-01', '${t0}', '${t0}', '${t0}')`,
+      ...['1x', '2x', 'trial'].map((code) => `INSERT INTO plan (id, business_id, code, name, created_at, updated_at, changed_at) VALUES ('p-${code}', 'b', '${code}', '${code}', '${t0}', '${t0}', '${t0}')`),
+      `INSERT INTO membership (id, business_id, member_id, plan_id, period_start, period_end, created_at, updated_at, changed_at) VALUES ('ms1', 'b', 'm1', 'p-2x', '2026-11-01', '2026-11-30', '${t0}', '${t0}', '${t0}')`,
+      `INSERT INTO membership (id, business_id, member_id, plan_id, period_start, period_end, created_at, updated_at, changed_at) VALUES ('ms2', 'b', 'm2', 'p-trial', '2026-11-05', '2026-12-04', '${t0}', '${t0}', '${t0}')`,
+    ]);
     const before = await db.prepare('SELECT m.id, p.code FROM membership m JOIN plan p ON p.id = m.plan_id ORDER BY m.id').all();
     expect(before.results.length).toBeGreaterThan(0);
 

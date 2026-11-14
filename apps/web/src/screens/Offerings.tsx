@@ -2,7 +2,7 @@ import type { Offering } from '@prana/shared';
 import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { errorMessage } from '../api/client';
-import { useCreateOfferingGroup, useOfferingGroups, useOfferings } from '../api/queries';
+import { useCreateOfferingGroup, useOfferingGroups, useOfferings, useStaff } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
 import { Button, EmptyState, Input, Notice, PageHeader, SidePanel, Tag } from '../components';
 import { useLang } from '../i18n';
@@ -53,6 +53,12 @@ export function Offerings() {
   const navigate = useNavigate();
   const groups = useOfferingGroups();
   const offerings = useOfferings();
+  const staff = useStaff();
+  const teacherNames = (ids: string[]) =>
+    ids
+      .map((id) => staff.data?.staff.find((s) => s.id === id)?.name)
+      .filter(Boolean)
+      .join(', ');
   const [panel, setPanel] = useState<Panel>(null);
   const close = () => setPanel(null);
 
@@ -91,6 +97,7 @@ export function Offerings() {
                       <th scope="col">{t('offerings.col.class')}</th>
                       <th scope="col">{t('offerings.col.duration')}</th>
                       <th scope="col">{t('offerings.col.entry')}</th>
+                      <th scope="col">{t('offerings.col.teachers')}</th>
                       <th scope="col" className={styles.number}>
                         {t('offerings.col.thisWeek')}
                       </th>
@@ -111,6 +118,7 @@ export function Offerings() {
                         </td>
                         <td className={styles.tabular}>{t('common.minutes', { n: o.default_duration_min })}</td>
                         <td className={styles.muted}>{o.entry_rule ?? t('offerings.entryDefault')}</td>
+                        <td className={styles.muted}>{teacherNames(o.teacher_ids) || t('common.none')}</td>
                         <td className={styles.number}>{o.sessions_this_week}</td>
                         <td className={styles.actions}>
                           {o.active && (

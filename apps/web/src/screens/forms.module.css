@@ -134,3 +134,35 @@
   color: var(--text-2);
   font-size: 13px;
 }
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+/* A field with its button beside it, e.g. adding a teacher by name. */
+.inlineAdd {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.inlineAdd > :first-child {
+  flex: 1;
+}

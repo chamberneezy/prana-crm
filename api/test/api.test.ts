@@ -133,8 +133,28 @@ describe('staff', () => {
   it('lists the business\u2019s staff without sign-in details', async () => {
     const { status, body } = await t.call('GET', '/staff');
     expect(status).toBe(200);
-    expect(body.staff).toEqual([expect.objectContaining({ id: SEED.owner, name: 'Mario', role: 'owner' })]);
+    expect(body.staff).toEqual([
+      expect.objectContaining({ name: 'Ivan', role: 'teacher', email: '' }),
+      expect.objectContaining({ id: SEED.owner, name: 'Mario', role: 'owner' }),
+      expect.objectContaining({ name: 'Petra', role: 'teacher' }),
+    ]);
     expect(body.staff[0]).not.toHaveProperty('firebase_uid');
+  });
+
+  it('adds, renames and removes a teacher by name; such a teacher has no e-mail, so no sign-in', async () => {
+    const added = await t.call('POST', '/staff', { body: { name: 'Nova Učiteljica' } });
+    expect(added.status).toBe(201);
+    expect(added.body.staff).toMatchObject({ name: 'Nova Učiteljica', role: 'teacher', email: '' });
+    // A second one by name only: the empty address doesn't clash.
+    const second = await t.call('POST', '/staff', { body: { name: 'Drugi Učitelj' } });
+    expect(second.status).toBe(201);
+    expect((await t.call('PATCH', `/staff/${added.body.staff.id}`, { body: { name: 'Lana' } })).body.staff.name).toBe('Lana');
+    // Owners are not changed or removed here.
+    expect((await t.call('PATCH', `/staff/${SEED.owner}`, { body: { name: 'X' } })).status).toBe(400);
+    expect((await t.call('DELETE', `/staff/${SEED.owner}`)).status).toBe(400);
+    expect((await t.call('DELETE', `/staff/${second.body.staff.id}`)).status).toBe(204);
+    expect((await t.call('DELETE', `/staff/${added.body.staff.id}`)).status).toBe(204);
+    expect((await t.call('GET', '/staff')).body.staff).toHaveLength(3);
   });
 });
 
@@ -165,6 +185,21 @@ describe('class types', () => {
     expect((await t.call('POST', '/offerings', { body: { group_id: uuidv7(), name: 'X', color_token: 'class-spine', default_duration_min: 60 } })).status).toBe(404);
     expect((await t.call('POST', '/offerings', { body: { group_id: SEED.group, name: 'X', color_token: 'purple', default_duration_min: 60 } })).status).toBe(400);
   });
+
+  it('names who teaches a class type; the first one teaches its new sessions', async () => {
+    const [petra, ivan] = SEED.teachers;
+    const made = await t.call('POST', '/offerings', { body: { group_id: SEED.group, name: 'Yin', color_token: 'class-restorative', default_duration_min: 60, teacher_ids: [ivan, petra, ivan] } });
+    expect(made.body.offering.teacher_ids).toEqual([ivan, petra]);
+    expect((await t.call('PATCH', `/offerings/${made.body.offering.id}`, { body: { teacher_ids: [uuidv7()] } })).status).toBe(400);
+
+    const starts = `${addDays(today, 3)}T09:00:00.000Z`;
+    const session = await t.call('POST', '/sessions', { body: { offering_id: made.body.offering.id, starts_at: starts } });
+    expect(session.body.session.teacher_name).toBe('Ivan');
+    // Said outright, even "nobody", it is kept.
+    const none = await t.call('POST', '/sessions', { body: { offering_id: made.body.offering.id, starts_at: starts, teacher_staff_id: null } });
+    expect(none.body.session.teacher_name).toBeNull();
+    for (const s of [session, none]) await t.call('DELETE', `/sessions/${s.body.session.id}`);
+  });
 });
 
 describe('sessions and check-in', () => {
@@ -183,7 +218,8 @@ describe('sessions and check-in', () => {
       location_id: SEED.location,
       booked: 0,
       effective_capacity: 2,
-      teacher_name: null,
+      // Not given: the class type's first teacher.
+      teacher_name: 'Mario',
     });
     sessionId = body.session.id;
   });

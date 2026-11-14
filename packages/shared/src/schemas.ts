@@ -107,6 +107,8 @@ export const offeringSchema = z.object({
   entry_rule: z.string().nullable(),
   default_capacity: z.number().int().nullable(),
   active: z.boolean(),
+  /** Staff who teach it, in order; the first is the default teacher of a new session. */
+  teacher_ids: z.array(id),
   ...meta,
 }).meta({ id: 'Offering' });
 
@@ -341,8 +343,13 @@ export const offeringInputSchema = z.object({
   entry_rule: shortText.nullable().optional(),
   default_capacity: z.number().int().min(1).max(1000).nullable().optional(),
   active: z.boolean().optional(),
+  /** Staff ids, in order. Defaults to none. */
+  teacher_ids: z.array(id).max(20).optional(),
 });
 export const offeringPatchSchema = offeringInputSchema.partial();
+
+/** A teacher added by name. They can't sign in (no e-mail); they are there to be named on classes. */
+export const teacherInputSchema = z.object({ name: shortText.min(1) });
 
 export const sessionsQuerySchema = z.object({
   /** First day, inclusive. Defaults to the Monday of this week. */
@@ -358,6 +365,7 @@ export const sessionInputSchema = z.object({
   ends_at: isoDateTime.optional(),
   /** Defaults to the business's first location. */
   location_id: id.optional(),
+  /** Left out: the class type's first teacher, if it has one. */
   teacher_staff_id: id.nullable().optional(),
   capacity: z.number().int().min(1).max(1000).nullable().optional(),
   note: longText.nullable().optional(),
@@ -433,6 +441,7 @@ export type MemberPatch = z.infer<typeof memberPatchSchema>;
 export type OfferingGroupInput = z.infer<typeof offeringGroupInputSchema>;
 export type OfferingInput = z.infer<typeof offeringInputSchema>;
 export type OfferingPatch = z.infer<typeof offeringPatchSchema>;
+export type TeacherInput = z.infer<typeof teacherInputSchema>;
 export type SessionInput = z.infer<typeof sessionInputSchema>;
 export type SessionPatch = z.infer<typeof sessionPatchSchema>;
 export type MembershipInput = z.infer<typeof membershipInputSchema>;
@@ -445,6 +454,7 @@ export type DocumentPatch = z.infer<typeof documentPatchSchema>;
 
 export const meResponseSchema = z.object({ staff: staffSchema, business: businessSchema });
 export const staffListResponseSchema = z.object({ staff: z.array(staffSchema) });
+export const staffResponseSchema = z.object({ staff: staffSchema });
 
 export const dashboardResponseSchema = z.object({
   date: isoDate,
@@ -513,6 +523,7 @@ export const documentResponseSchema = z.object({ document: documentSchema });
 
 export type MeResponse = z.infer<typeof meResponseSchema>;
 export type StaffListResponse = z.infer<typeof staffListResponseSchema>;
+export type StaffResponse = z.infer<typeof staffResponseSchema>;
 export type DashboardResponse = z.infer<typeof dashboardResponseSchema>;
 export type MembersResponse = z.infer<typeof membersResponseSchema>;
 export type MemberResponse = z.infer<typeof memberResponseSchema>;

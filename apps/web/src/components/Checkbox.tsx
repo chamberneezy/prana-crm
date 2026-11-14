@@ -33,7 +33,9 @@ export function Checkbox({ checked = false, onChange, required = false, invalid 
       }}
       className={styles.checkbox}
     >
-      <span className={cx(styles.box, checked && styles.checked, invalid && !checked && styles.invalid)}>{checked ? '✓' : ''}</span>
+      <span aria-hidden className={cx(styles.box, checked && styles.checked, invalid && !checked && styles.invalid)}>
+        {checked ? '✓' : ''}
+      </span>
       <span className={styles.label}>
         {children}
         {required && <strong className={styles.required}> {t('checkbox.required')}</strong>}

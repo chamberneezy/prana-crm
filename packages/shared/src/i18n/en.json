@@ -482,5 +482,14 @@
   "plans.removeConfirm": "Remove “{name}”? Memberships already on it stay.",
   "plans.removed": "“{name}” was removed.",
   "plans.own": "Own",
-  "plans.added": "“{name}” was added."
+  "plans.added": "“{name}” was added.",
+  "offerings.col.teachers": "Teaches",
+  "offeringForm.teachers": "Who teaches",
+  "offeringForm.teachersHint": "The first one ticked teaches new sessions, unless another is chosen.",
+  "offeringForm.addTeacher": "Add a teacher",
+  "offeringForm.newTeacher": "Teacher's name",
+  "offeringForm.addTeacherButton": "Add",
+  "offeringForm.noStaff": "No teachers yet.",
+  "toast.teacherAdded": "{name} was added as a teacher.",
+  "offeringForm.first": "first"
 }

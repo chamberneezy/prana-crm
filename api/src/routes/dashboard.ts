@@ -1,9 +1,10 @@
-import { addDays, addMonths, type DashboardResponse, type MeResponse, type StaffListResponse, dashboardQuerySchema, dayStartUtc, EXPIRING_WITHIN_DAYS, startOfMonth } from '@prana/shared';
+import { addDays, addMonths, type DashboardResponse, type MeResponse, type StaffListResponse, type StaffResponse, dashboardQuerySchema, teacherInputSchema, dayStartUtc, EXPIRING_WITHIN_DAYS, startOfMonth } from '@prana/shared';
 import { and, eq, gte, isNull, lt, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { member, payment, staff as staffTable } from '../db/schema';
 import type { AppEnv } from '../env';
-import { ctx, parseQuery, publicRow } from '../lib/http';
+import { ApiError } from '../errors';
+import { created, ctx, owned, parseBody, parseQuery, publicRow, removed, touched } from '../lib/http';
 import { loadMemberFacts, toSummary } from '../lib/members';
 import { loadSessionViews, startsBetween } from '../lib/sessions';
 
@@ -27,6 +28,36 @@ staffList.get('/', async (c) => {
     .orderBy(staffTable.name);
   const body: StaffListResponse = { staff: rows.map(publicRow) };
   return c.json(body);
+});
+
+// Teachers added by name. They have no e-mail, so they can't sign in; owners are managed by the seed.
+staffList.post('/', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const input = await parseBody(c, teacherInputSchema);
+  const row = { ...created(businessId, now), firebase_uid: null, email: '', name: input.name, role: 'teacher' as const };
+  await db.insert(staffTable).values(row);
+  const body: StaffResponse = { staff: publicRow(row) };
+  return c.json(body, 201);
+});
+
+staffList.patch('/:id', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const input = await parseBody(c, teacherInputSchema);
+  const existing = await owned(db, staffTable, c.req.param('id'), businessId);
+  if (existing.role !== 'teacher') throw new ApiError('invalid_input', ['role']);
+  const patch = { name: input.name, ...touched(now) };
+  await db.update(staffTable).set(patch).where(eq(staffTable.id, existing.id));
+  const body: StaffResponse = { staff: publicRow({ ...existing, ...patch }) };
+  return c.json(body);
+});
+
+// Past sessions keep their teacher's name; class types simply stop listing them.
+staffList.delete('/:id', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const existing = await owned(db, staffTable, c.req.param('id'), businessId);
+  if (existing.role !== 'teacher') throw new ApiError('invalid_input', ['role']);
+  await db.update(staffTable).set(removed(now)).where(eq(staffTable.id, existing.id));
+  return c.body(null, 204);
 });
 
 dashboard.get('/', async (c) => {

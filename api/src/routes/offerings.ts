@@ -8,11 +8,24 @@ import {
   type OfferingsResponse,
   startOfWeek,
 } from '@prana/shared';
-import { and, asc, eq, gte, isNull, lt, sql } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, lt, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { offering, offeringGroup, session } from '../db/schema';
-import type { AppEnv } from '../env';
+import { offering, offeringGroup, session, staff } from '../db/schema';
+import type { AppEnv, Db } from '../env';
+import { ApiError } from '../errors';
 import { blankToNull, created, ctx, owned, parseBody, publicRow, touched } from '../lib/http';
+
+/** Teacher ids as given, once each, each one a live staff member of this business. */
+async function checkedTeachers(db: Db, businessId: string, ids: string[]): Promise<string[]> {
+  const unique = [...new Set(ids)];
+  if (!unique.length) return [];
+  const found = await db
+    .select({ id: staff.id })
+    .from(staff)
+    .where(and(eq(staff.business_id, businessId), isNull(staff.deleted_at), inArray(staff.id, unique)));
+  if (found.length !== unique.length) throw new ApiError('invalid_input', ['teacher_ids']);
+  return unique;
+}
 
 export const offeringGroups = new Hono<AppEnv>();
 export const offerings = new Hono<AppEnv>();
@@ -84,6 +97,7 @@ offerings.post('/', async (c) => {
     entry_rule: blankToNull(input.entry_rule),
     default_capacity: input.default_capacity ?? null,
     active: input.active ?? true,
+    teacher_ids: await checkedTeachers(db, businessId, input.teacher_ids ?? []),
   };
   await db.insert(offering).values(row);
   return c.json({ offering: publicRow(row) }, 201);
@@ -97,6 +111,7 @@ offerings.patch('/:id', async (c) => {
   const patch = {
     ...input,
     ...('entry_rule' in input ? { entry_rule: blankToNull(input.entry_rule) } : {}),
+    ...(input.teacher_ids ? { teacher_ids: await checkedTeachers(db, businessId, input.teacher_ids) } : {}),
     ...touched(now),
   };
   await db.update(offering).set(patch).where(eq(offering.id, existing.id));

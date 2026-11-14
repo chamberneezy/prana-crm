@@ -23,6 +23,9 @@ export interface RouteSpec {
 export const routes: RouteSpec[] = [
   { method: 'get', path: '/me', summary: 'The signed-in staff member and their business', response: s.meResponseSchema },
   { method: 'get', path: '/staff', summary: 'Staff of the business, for the teacher picker', response: s.staffListResponseSchema },
+  { method: 'post', path: '/staff', summary: 'Add a teacher by name (no e-mail, so no sign-in)', body: s.teacherInputSchema, response: s.staffResponseSchema, status: 201 },
+  { method: 'patch', path: '/staff/{id}', summary: "Rename a teacher", body: s.teacherInputSchema, response: s.staffResponseSchema },
+  { method: 'delete', path: '/staff/{id}', summary: 'Remove a teacher; past sessions keep their name' },
   { method: 'get', path: '/dashboard', summary: "Today's and tomorrow's sessions, the attention list and counts", query: s.dashboardQuerySchema, response: s.dashboardResponseSchema },
 
   { method: 'get', path: '/members', summary: 'Members with their derived status', query: s.membersQuerySchema, response: s.membersResponseSchema },

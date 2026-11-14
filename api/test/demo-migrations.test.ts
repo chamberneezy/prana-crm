@@ -10,6 +10,7 @@ const files = readdirSync(dir).filter((f) => f.endsWith('.sql')).sort();
 vi.mock('../migrations/0001_init.sql?raw', () => ({ default: readFileSync(resolve(dir, '0001_init.sql'), 'utf8') }));
 vi.mock('../migrations/0002_member_names.sql?raw', () => ({ default: readFileSync(resolve(dir, '0002_member_names.sql'), 'utf8') }));
 vi.mock('../migrations/0003_custom_plans.sql?raw', () => ({ default: readFileSync(resolve(dir, '0003_custom_plans.sql'), 'utf8') }));
+vi.mock('../migrations/0004_offering_teachers.sql?raw', () => ({ default: readFileSync(resolve(dir, '0004_offering_teachers.sql'), 'utf8') }));
 
 const { MIGRATIONS, migrate } = await import('../src/demo/migrations');
 

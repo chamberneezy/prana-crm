@@ -56,6 +56,8 @@ export const offering = sqliteTable('offering', {
   entry_rule: text(),
   default_capacity: integer(),
   active: integer({ mode: 'boolean' }).notNull(),
+  /** Who teaches it, in order; the first is the default teacher of a new session. */
+  teacher_ids: text({ mode: 'json' }).$type<string[]>().notNull(),
   ...meta,
 });
 

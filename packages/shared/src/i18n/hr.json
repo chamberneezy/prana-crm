@@ -482,5 +482,14 @@
   "plans.removeConfirm": "Ukloni „{name}”? Postojeće članarine na njoj ostaju.",
   "plans.removed": "Članarina „{name}” je uklonjena.",
   "plans.own": "Vlastita",
-  "plans.added": "Članarina „{name}” je dodana."
+  "plans.added": "Članarina „{name}” je dodana.",
+  "offerings.col.teachers": "Vodi",
+  "offeringForm.teachers": "Tko vodi",
+  "offeringForm.teachersHint": "Prvi označeni vodi nove termine, osim ako se odabere drugi.",
+  "offeringForm.addTeacher": "Dodaj učitelja",
+  "offeringForm.newTeacher": "Ime učitelja",
+  "offeringForm.addTeacherButton": "Dodaj",
+  "offeringForm.noStaff": "Još nema učitelja.",
+  "toast.teacherAdded": "{name} je dodan/a kao učitelj.",
+  "offeringForm.first": "prvi"
 }

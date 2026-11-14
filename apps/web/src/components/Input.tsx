@@ -1,4 +1,4 @@
-import { type ChangeEvent, type CSSProperties, useId } from 'react';
+import { type ChangeEvent, type CSSProperties, type KeyboardEvent, useId } from 'react';
 import { cx } from './cx';
 import styles from './Input.module.css';
 
@@ -9,6 +9,7 @@ export interface InputProps {
   defaultValue?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onBlur?: () => void;
+  onKeyDown?: (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   /** The on-screen keyboard to offer, e.g. "decimal" for dates. */
   inputMode?: 'text' | 'decimal' | 'numeric' | 'tel' | 'email';
   placeholder?: string;
@@ -24,7 +25,7 @@ export interface InputProps {
   style?: CSSProperties;
 }
 
-export function Input({ label, value, defaultValue, onChange, onBlur, inputMode, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
+export function Input({ label, value, defaultValue, onChange, onBlur, onKeyDown, inputMode, placeholder, error, hint, readOnly = false, multiline = false, rows = 2, type = 'text', name, autoComplete, style }: InputProps) {
   const id = useId();
   const noteId = `${id}-note`;
   const field = {
@@ -33,6 +34,7 @@ export function Input({ label, value, defaultValue, onChange, onBlur, inputMode,
     defaultValue,
     onChange,
     onBlur,
+    onKeyDown,
     inputMode,
     placeholder,
     readOnly,

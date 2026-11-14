@@ -35,16 +35,19 @@ export function SessionForm({ offerings, session, offeringId, date, onDone }: Pr
   const [day, setDay] = useState(session ? localDate(session.starts_at, business.timezone) : (date ?? ''));
   const [time, setTime] = useState(session ? formatTime(session.starts_at) : '');
   const [duration, setDuration] = useState(String(session ? Math.round((Date.parse(session.ends_at) - Date.parse(session.starts_at)) / 60_000) : (start?.default_duration_min ?? '')));
-  const [teacher, setTeacher] = useState(session?.teacher_staff_id ?? '');
+  // A new session starts with the class type's first teacher; an existing one keeps its own.
+  const [teacher, setTeacher] = useState(session ? (session.teacher_staff_id ?? '') : (start?.teacher_ids[0] ?? ''));
   const [capacity, setCapacity] = useState(session?.capacity ? String(session.capacity) : '');
   const [note, setNote] = useState(session?.note ?? '');
   const [tried, setTried] = useState(false);
 
-  // Choosing another class type brings its usual length with it.
+  // Choosing another class type brings its usual length with it…
   const pickOffering = (id: string) => {
     setOffering(id);
     const next = byId(id);
     if (next) setDuration(String(next.default_duration_min));
+    // …and, for a new session, its teacher.
+    if (next && !session) setTeacher(next.teacher_ids[0] ?? '');
   };
 
   const minutes = wholeNumber(duration);

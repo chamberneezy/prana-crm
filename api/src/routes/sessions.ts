@@ -59,7 +59,8 @@ sessions.post('/', async (c) => {
     offering_id: template.id,
     starts_at: new Date(input.starts_at).toISOString(),
     ends_at: new Date(ends_at).toISOString(),
-    teacher_staff_id: input.teacher_staff_id ?? null,
+    // Not said: the class type's first teacher, if it has one.
+    teacher_staff_id: input.teacher_staff_id === undefined ? (template.teacher_ids[0] ?? null) : input.teacher_staff_id,
     capacity: input.capacity ?? null,
     note: blankToNull(input.note),
   };

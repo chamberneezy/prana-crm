@@ -1,7 +1,7 @@
 import { COLOR_TOKENS, type ColorToken, type Offering, type OfferingGroup } from '@prana/shared';
 import { type FormEvent, useState } from 'react';
 import { errorMessage } from '../api/client';
-import { useSaveOffering } from '../api/queries';
+import { useAddTeacher, useSaveOffering, useStaff } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
 import { Button, Checkbox, Input, Notice, Select } from '../components';
 import { cx } from '../components/cx';
@@ -29,6 +29,26 @@ export function OfferingForm({ offering, groups, onDone }: Props) {
   const [entryRule, setEntryRule] = useState(offering?.entry_rule ?? '');
   const [capacity, setCapacity] = useState(offering?.default_capacity ? String(offering.default_capacity) : '');
   const [active, setActive] = useState(offering?.active ?? true);
+  // Ticked teachers, in the order they were ticked: the first teaches new sessions.
+  const [teachers, setTeachers] = useState<string[]>(offering?.teacher_ids ?? []);
+  const [newTeacher, setNewTeacher] = useState('');
+  const staff = useStaff();
+  const addTeacher = useAddTeacher();
+  const toggleTeacher = (id: string, on: boolean) => setTeachers((list) => (on ? [...list.filter((x) => x !== id), id] : list.filter((x) => x !== id)));
+  const add = () => {
+    const name = newTeacher.trim();
+    if (!name) return;
+    addTeacher.mutate(
+      { name },
+      {
+        onSuccess: ({ staff: added }) => {
+          setTeachers((list) => [...list, added.id]);
+          setNewTeacher('');
+          toast({ message: t('toast.teacherAdded', { name: added.name }) });
+        },
+      },
+    );
+  };
   const [tried, setTried] = useState(false);
 
   const minutes = wholeNumber(duration);
@@ -44,7 +64,7 @@ export function OfferingForm({ offering, groups, onDone }: Props) {
     setTried(true);
     if (errors.name || errors.duration || errors.capacity || !groupId) return;
     save.mutate(
-      { group_id: groupId, name: name.trim(), color_token: color, default_duration_min: minutes ?? 60, entry_rule: entryRule.trim() || null, default_capacity: places, active },
+      { group_id: groupId, name: name.trim(), color_token: color, default_duration_min: minutes ?? 60, entry_rule: entryRule.trim() || null, default_capacity: places, active, teacher_ids: teachers },
       {
         onSuccess: ({ offering: saved }) => {
           toast({ message: t('toast.offeringSaved', { name: saved.name }) });
@@ -78,6 +98,34 @@ export function OfferingForm({ offering, groups, onDone }: Props) {
         <Input label={t('offeringForm.capacity')} value={capacity} onChange={(e) => setCapacity(e.target.value)} error={tried ? errors.capacity : undefined} hint={t('offeringForm.capacityHint')} />
       </div>
       <Input label={t('offeringForm.entry')} value={entryRule} onChange={(e) => setEntryRule(e.target.value)} hint={t('offeringForm.entryHint')} />
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.label}>{t('offeringForm.teachers')}</legend>
+        {(staff.data?.staff ?? []).length === 0 && <span className={styles.hint}>{t('offeringForm.noStaff')}</span>}
+        {(staff.data?.staff ?? []).map((person) => (
+          <Checkbox key={person.id} checked={teachers.includes(person.id)} onChange={(on) => toggleTeacher(person.id, on)}>
+            {person.name}
+            {teachers[0] === person.id && teachers.length > 1 ? ` · ${t('offeringForm.first')}` : ''}
+          </Checkbox>
+        ))}
+        <span className={styles.hint}>{t('offeringForm.teachersHint')}</span>
+        <div className={styles.inlineAdd}>
+          <Input
+            label={t('offeringForm.newTeacher')}
+            value={newTeacher}
+            onChange={(e) => setNewTeacher(e.target.value)}
+            onKeyDown={(e) => {
+              // Enter adds the teacher rather than saving the whole form.
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                add();
+              }
+            }}
+          />
+          <Button variant="secondary" disabled={!newTeacher.trim() || addTeacher.isPending} onClick={add}>
+            {t('offeringForm.addTeacherButton')}
+          </Button>
+        </div>
+      </fieldset>
       <Checkbox checked={active} onChange={setActive}>
         {t('offeringForm.active')}
       </Checkbox>

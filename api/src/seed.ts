@@ -22,6 +22,7 @@ export const SEED = {
   offerings: { spine: fixedId(0x11), ashtanga: fixedId(0x12), restorative: fixedId(0x13), blackLotus: fixedId(0x14), pranayama: fixedId(0x15) },
   plans: { '1x': fixedId(0x21), '2x': fixedId(0x22), '3x': fixedId(0x23), unl: fixedId(0x24), trial: fixedId(0x25) } satisfies Record<StandardPlan, string>,
   member: (n: number) => fixedId(0x100 + n),
+  teachers: [fixedId(0x31), fixedId(0x32)],
 };
 
 type OfferingKey = keyof typeof SEED.offerings;
@@ -82,6 +83,7 @@ export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
         entry_rule: o.entry_rule,
         default_capacity: null,
         active: true,
+        teacher_ids: '[]',
         ...stamps(now),
       },
     });
@@ -150,6 +152,15 @@ export function devSeed({ now }: { now: string }): SeedRow[] {
   const rows = prodSeed({ now, owners: [{ email: DEV_OWNER_EMAIL, name: 'Mario' }] });
   for (const r of rows) {
     if (r.table === 'plan') r.row.price_cents = DEV_PRICES[r.row.code as StandardPlan];
+  }
+  // Two sample teachers, added by name (no e-mail, so no sign-in), and who teaches what.
+  const [petra, ivan] = SEED.teachers as [string, string];
+  rows.push({ table: 'staff', row: { id: petra, business_id: b, firebase_uid: null, email: '', name: 'Petra', role: 'teacher', ...stamps(now) } });
+  rows.push({ table: 'staff', row: { id: ivan, business_id: b, firebase_uid: null, email: '', name: 'Ivan', role: 'teacher', ...stamps(now) } });
+  const teaching: Partial<Record<OfferingKey, string[]>> = { spine: [petra], ashtanga: [SEED.owner, ivan], restorative: [petra, ivan], blackLotus: [ivan] };
+  for (const r of rows) {
+    const key = (Object.keys(SEED.offerings) as OfferingKey[]).find((k) => SEED.offerings[k] === r.row.id);
+    if (r.table === 'offering' && key) r.row.teacher_ids = JSON.stringify(teaching[key] ?? []);
   }
 
   // The three weeks before this one (past sessions to hang visits on), this week, and the next

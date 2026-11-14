@@ -26,6 +26,8 @@ import type {
   SessionResponse,
   SessionsResponse,
   StaffListResponse,
+  StaffResponse,
+  TeacherInput,
   VisitResponse,
 } from '@prana/shared';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -113,6 +115,14 @@ export function useSaveOffering(id?: string) {
 
 export function useStaff() {
   return useQuery({ queryKey: ['staff'], queryFn: () => api<StaffListResponse>('GET', '/staff'), staleTime: 5 * 60_000 });
+}
+
+export function useAddTeacher() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: TeacherInput) => api<StaffResponse>('POST', '/staff', input),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['staff'] }),
+  });
 }
 
 export function useSessions(from: string, to: string) {

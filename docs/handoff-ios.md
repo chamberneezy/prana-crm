@@ -79,9 +79,9 @@ prana-crm/
 |---|---|
 | `business` | id, name, locale (`hr`), timezone (`Europe/Zagreb`) |
 | `location` | id, business_id, name. One row in v1. |
-| `staff` | id, business_id, firebase_uid (null until first login), email, name, role (`owner` \| `teacher` \| `front_desk`) |
+| `staff` | id, business_id, firebase_uid (null until first login), email, name, role (`owner` \| `teacher` \| `front_desk`). Teachers added in the app by name have an empty e-mail, so they can't sign in (the unique e-mail index ignores empty ones). |
 | `offering_group` | id, business_id, name, sort. v1: `Joga`. |
-| `offering` (class type) | id, business_id, group_id, name, color_token, default_duration_min, entry_rule (null), default_capacity (null), active |
+| `offering` (class type) | id, business_id, group_id, name, color_token, default_duration_min, entry_rule (null; shown as "5 min prije sata"), default_capacity (null), active, teacher_ids (JSON list of staff ids, in order; the first teaches a new session unless another is chosen) |
 | `session` | id, business_id, location_id, offering_id, starts_at, ends_at, teacher_staff_id (null), capacity (null), note |
 | `member` | id, business_id, first_name, last_name, full_name (always "first last", for lists and search), email, phone, dob, is_student_or_retired, health_flag, health_text, consent_accuracy, consent_news, signed_place, signed_date, member_since, notes |
 | `plan` | id, business_id, code (`1x` \| `2x` \| `3x` \| `unl` \| `trial` \| `custom`), name, visits_per_month (null = unlimited), price_cents (null). The five standard plans come with the studio; `custom` ones are the studio's own (added, edited and removed on Članarine; shown by name). |
