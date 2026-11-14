@@ -1,6 +1,7 @@
 import type { Offering } from '@prana/shared';
 import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useAccess } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { useCreateOfferingGroup, useOfferingGroups, useOfferings, useStaff } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
@@ -49,6 +50,7 @@ function GroupForm({ onDone }: { onDone: () => void }) {
 }
 
 export function Offerings() {
+  const { canEdit } = useAccess();
   const { t, tn, lang } = useLang();
   const navigate = useNavigate();
   const groups = useOfferingGroups();
@@ -70,7 +72,7 @@ export function Offerings() {
     <>
       <div className={styles.intro}>
         <PageHeader title={t('offerings.title')}>
-          <Button onClick={() => setPanel({ kind: 'new' })} disabled={groupList.length === 0}>
+          <Button onClick={() => setPanel({ kind: 'new' })} disabled={groupList.length === 0} hidden={!canEdit('offerings')}>
             {t('offerings.new')}
           </Button>
         </PageHeader>
@@ -121,12 +123,12 @@ export function Offerings() {
                         <td className={styles.muted}>{teacherNames(o.teacher_ids) || t('common.none')}</td>
                         <td className={styles.number}>{o.sessions_this_week}</td>
                         <td className={styles.actions}>
-                          {o.active && (
+                          {o.active && canEdit('schedule') && (
                             <button type="button" className={styles.link} onClick={() => navigate('/raspored', { state: { newFrom: o.id } })}>
                               {t('offerings.schedule')}
                             </button>
                           )}
-                          <Button variant="ghost" size="sm" onClick={() => setPanel({ kind: 'edit', offering: o })}>
+                          <Button variant="ghost" size="sm" hidden={!canEdit('offerings')} onClick={() => setPanel({ kind: 'edit', offering: o })}>
                             {t('offerings.edit')}
                           </Button>
                         </td>
@@ -145,7 +147,7 @@ export function Offerings() {
           <EmptyState
             title={t('offerings.newGroup.title')}
             action={
-              <Button variant="secondary" size="sm" onClick={() => setPanel({ kind: 'group' })}>
+              <Button variant="secondary" size="sm" hidden={!canEdit('offerings')} onClick={() => setPanel({ kind: 'group' })}>
                 {t('offerings.newGroup.add')}
               </Button>
             }

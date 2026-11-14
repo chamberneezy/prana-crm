@@ -4,6 +4,7 @@ export * from './dates';
 export * from './ids';
 export * from './text';
 export * from './status';
+export * from './access';
 export * from './schemas';
 export * from './openapi';
 export * from './upisnica';

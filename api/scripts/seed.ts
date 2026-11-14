@@ -1,7 +1,9 @@
 // Prints seed SQL for `wrangler d1 execute --file`.
 //   tsx scripts/seed.ts --dev
 //   tsx scripts/seed.ts --prod --owner "Mario <mario@example.com>" --owner "Matija <matija@example.com>"
-// Each --owner is someone who may sign in as owner of the studio. Addresses are passed here, not kept in the repository.
+//     [--teacher "Ana <ana@example.com>"]
+// Each --owner is someone who may sign in as owner of the studio (everything); each --teacher signs in with a teacher's
+// access (ROLE_ACCESS in @prana/shared: view-only, for now nothing). Addresses are passed here, not kept in the repository.
 import { devSeed, prodSeed, toSql } from '../src/seed';
 
 const args = process.argv.slice(2);
@@ -25,7 +27,8 @@ function build(): string[] {
   if (args.includes('--prod')) {
     const owners = options('--owner').map(parseOwner);
     if (!owners.length) return fail('The production seed needs at least one --owner "Name <address>": the people who sign in as owner.');
-    return toSql(prodSeed({ now, owners }), 'keep');
+    const teachers = options('--teacher').map(parseOwner);
+    return toSql(prodSeed({ now, owners, teachers }), 'keep');
   }
   return fail('Pass --dev or --prod.');
 }

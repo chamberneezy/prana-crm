@@ -1,5 +1,7 @@
 import { generateKeyPair, UnsecuredJWT } from 'jose';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { routes } from '@prana/shared';
+import { ROUTES } from '../src/access';
 import { DEV_OWNER_EMAIL } from '../src/seed';
 import { ISSUER, PROJECT, setup, type TestApi } from './helpers';
 
@@ -114,5 +116,39 @@ describe('emulator mode (local development only)', () => {
   it('is ignored in production', async () => {
     const env = { FIREBASE_AUTH_EMULATOR: 'true', ENVIRONMENT: 'production' };
     expect((await t.call('GET', '/me', { token: unsigned('teacher@example.com', 'uid-teacher'), env })).status).toBe(401);
+  });
+});
+
+describe('roles', () => {
+  // The teacher row from above, already bound to this account id by the emulator tests.
+  const teacherToken = () => t.sign({ uid: 'uid-after-restart', email: 'teacher@example.com' });
+
+  it('a teacher signs in and sees their own role, and (for now) nothing else', async () => {
+    const token = await teacherToken();
+    const me = await t.call('GET', '/me', { token });
+    expect(me.status).toBe(200);
+    expect(me.body.staff.role).toBe('teacher');
+
+    for (const path of ['/dashboard', '/members', '/sessions', '/offerings', '/plans', '/payments', '/analytics', '/staff', '/sync']) {
+      const res = await t.call('GET', path, { token });
+      expect(res.status, path).toBe(403);
+      // "No permission", not "no access": the app keeps them signed in.
+      expect(res.body.error.code, path).toBe('forbidden');
+    }
+    expect((await t.call('POST', '/members', { token, body: { full_name: 'X Y', consent_accuracy: true } })).status).toBe(403);
+    expect((await t.call('POST', '/staff', { token, body: { name: 'X' } })).status).toBe(403);
+  });
+
+  it('owners can do everything', async () => {
+    for (const path of ['/dashboard', '/members', '/sessions', '/offerings', '/plans', '/payments', '/analytics', '/staff', '/sync']) {
+      expect((await t.call('GET', path)).status, path).toBe(200);
+    }
+  });
+
+  it('every endpoint belongs to a part of the app (so none falls back to owners-only by accident)', () => {
+    for (const route of routes) {
+      const path = route.path.replace(/\{[^}]+\}/g, 'x');
+      expect(ROUTES.some((r) => path === r.prefix || path.startsWith(`${r.prefix}/`)), path).toBe(true);
+    }
   });
 });

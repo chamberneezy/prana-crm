@@ -2,6 +2,7 @@ import { formatDate, formatDayMonth, formatMoney, isoToDisplayDate, localDate, t
 import { FileText } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
+import { CanEdit, useAccess } from '../auth/access';
 import { ApiClientError, apiFile, errorMessage } from '../api/client';
 import { useFreezeMembership, useMember, useUpdateMember } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
@@ -15,6 +16,7 @@ import { PaymentForm } from './PaymentForm';
 type Panel = 'renew' | 'freeze' | 'add' | 'payment' | null;
 
 export function MemberProfileScreen() {
+  const { canEdit } = useAccess();
   const { id = '' } = useParams();
   const listSearch = (useLocation().state as { listSearch?: string } | null)?.listSearch;
   const strings = useLang();
@@ -117,7 +119,7 @@ export function MemberProfileScreen() {
               statusLabel={statusLabel(summary.status, summary.days_left, strings)}
               planLabel={membership ? planLabel(membership, strings) : undefined}
               since={since}
-              onEdit={() => setEditing(true)}
+              onEdit={canEdit('members') ? () => setEditing(true) : undefined}
             />
           )}
 
@@ -157,7 +159,7 @@ export function MemberProfileScreen() {
               </Card>
             )}
             {membership && summary.debt_cents > 0 && <Notice title={t('membershipActions.debt.title', { amount: formatMoney(summary.debt_cents) })}>{t('membershipActions.debt.body')}</Notice>}
-            <div className={styles.actions}>
+            <div className={styles.actions} hidden={!canEdit('members')}>
               {!membership && <Button onClick={() => setPanel('add')}>{t('membershipActions.add')}</Button>}
               {membership &&
                 (membership.renewed_until ? (
@@ -204,9 +206,11 @@ export function MemberProfileScreen() {
           <section className={styles.listCard}>
             <div className={styles.listHead}>
               <h2 className={styles.overline}>{t('profileScreen.payments')}</h2>
-              <Button variant="secondary" size="sm" onClick={() => setPanel('payment')}>
-                {t('payments.record')}
-              </Button>
+              <CanEdit area="members">
+                <Button variant="secondary" size="sm" onClick={() => setPanel('payment')}>
+                  {t('payments.record')}
+                </Button>
+              </CanEdit>
             </div>
             {payments.map((p) => (
               <div key={p.id} className={styles.row}>

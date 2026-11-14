@@ -53,12 +53,14 @@ export interface SeedOwner {
 
 export interface ProdSeedOptions {
   now: string;
-  /** Who may sign in as owner. Left out: no staff rows, so nobody can sign in yet. */
+  /** Who may sign in as owner (everything). Left out: no staff rows, so nobody can sign in yet. */
   owners?: SeedOwner[];
+  /** Teachers who may sign in, with what ROLE_ACCESS gives teachers (view-only; for now nothing). */
+  teachers?: SeedOwner[];
 }
 
 /** Production seed: the business, one location, the Joga group, the five classes and the five plans. No members. */
-export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
+export function prodSeed({ now, owners = [], teachers = [] }: ProdSeedOptions): SeedRow[] {
   const b = SEED.business;
   const rows: SeedRow[] = [
     { table: 'business', row: { id: b, name: 'Prana Yoga Studio', locale: 'hr', timezone: TIME_ZONE, created_at: now, updated_at: now } },
@@ -69,6 +71,9 @@ export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
     // The first owner keeps the fixed id the sample data points at; further ones follow it.
     const id = i === 0 ? SEED.owner : fixedId(0x40 + i);
     rows.push({ table: 'staff', row: { id, business_id: b, firebase_uid: null, email: owner.email.toLowerCase(), name: owner.name, role: 'owner', ...stamps(now) } });
+  });
+  teachers.forEach((teacher, i) => {
+    rows.push({ table: 'staff', row: { id: fixedId(0x60 + i), business_id: b, firebase_uid: null, email: teacher.email.toLowerCase(), name: teacher.name, role: 'teacher', ...stamps(now) } });
   });
   for (const o of OFFERINGS) {
     rows.push({
@@ -98,6 +103,8 @@ export function prodSeed({ now, owners = [] }: ProdSeedOptions): SeedRow[] {
 // ── Dev only ──────────────────────────────────────────────────────────────────
 
 export const DEV_OWNER_EMAIL = 'mario@prana.test';
+/** A sample teacher who can sign in locally, with a teacher's access. */
+export const DEV_TEACHER_EMAIL = 'petra@prana.test';
 
 /** Made-up prices so the "unpaid" state can be seen locally. Not the studio's prices. */
 const DEV_PRICES: Record<StandardPlan, number | null> = { '1x': 6500, '2x': 8500, '3x': 10000, unl: 12000, trial: null };
@@ -155,7 +162,8 @@ export function devSeed({ now }: { now: string }): SeedRow[] {
   }
   // Two sample teachers, added by name (no e-mail, so no sign-in), and who teaches what.
   const [petra, ivan] = SEED.teachers as [string, string];
-  rows.push({ table: 'staff', row: { id: petra, business_id: b, firebase_uid: null, email: '', name: 'Petra', role: 'teacher', ...stamps(now) } });
+  // Petra can sign in locally, to try the teacher's view; Ivan is a name only.
+  rows.push({ table: 'staff', row: { id: petra, business_id: b, firebase_uid: null, email: DEV_TEACHER_EMAIL, name: 'Petra', role: 'teacher', ...stamps(now) } });
   rows.push({ table: 'staff', row: { id: ivan, business_id: b, firebase_uid: null, email: '', name: 'Ivan', role: 'teacher', ...stamps(now) } });
   const teaching: Partial<Record<OfferingKey, string[]>> = { spine: [petra], ashtanga: [SEED.owner, ivan], restorative: [petra, ivan], blackLotus: [ivan] };
   for (const r of rows) {

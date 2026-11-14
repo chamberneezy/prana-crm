@@ -1,6 +1,7 @@
 import { addDays, addMonths, formatDate, formatMoney, localDate, startOfMonth } from '@prana/shared';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import { CanEdit } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { usePayments } from '../api/queries';
 import { useMe } from '../auth/AuthProvider';
@@ -39,7 +40,9 @@ export function Payments() {
             ›
           </Button>
         </div>
-        <Button onClick={() => setRecording(true)}>{t('payments.record')}</Button>
+        <CanEdit area="payments">
+          <Button onClick={() => setRecording(true)}>{t('payments.record')}</Button>
+        </CanEdit>
       </PageHeader>
 
       {error && <Notice title={t('payments.loadFailed')}>{errorMessage(error, lang, { generic: t('error.generic'), offline: t('error.offline') })}</Notice>}

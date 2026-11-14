@@ -2,6 +2,8 @@ import { expect, type Page } from '@playwright/test';
 
 /** The dev seed allowlists this address as the owner. */
 export const OWNER = { email: 'mario@prana.test', password: 'prana-e2e-owner' };
+/** The sample teacher: on the staff list as a teacher, so (for now) the app shows them nothing. */
+export const TEACHER = { email: 'petra@prana.test', password: 'prana-e2e-teacher' };
 /** A real Firebase account that is not on the studio's staff list. */
 export const STRANGER = { email: 'stranger@prana.test', password: 'prana-e2e-stranger' };
 

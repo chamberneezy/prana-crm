@@ -1,11 +1,14 @@
+import type { Area } from '@prana/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { ApiClientError } from '../api/client';
+import { AreaRoute, useAccess } from '../auth/access';
 import { AuthProvider, useAuth } from '../auth/AuthProvider';
 import { FeedbackProvider } from '../feedback/FeedbackProvider';
 import { LangProvider, useLang } from '../i18n';
 import { Analytics } from '../screens/Analytics';
+import { NoAccess } from '../screens/NoAccess';
 import { ImportMember } from '../screens/ImportMember';
 import { Login } from '../screens/Login';
 import { MemberProfileScreen } from '../screens/MemberProfileScreen';
@@ -16,7 +19,7 @@ import { Overview } from '../screens/Overview';
 import { Payments } from '../screens/Payments';
 import { Plans } from '../screens/Plans';
 import { Schedule } from '../screens/Schedule';
-import { Shell } from './Shell';
+import { homePath, Shell } from './Shell';
 import { ToastProvider } from './ToastProvider';
 
 // The component demo is a development aid; it is loaded only when opened.
@@ -33,26 +36,34 @@ const queryClient = new QueryClient({
 });
 
 function SignedIn() {
-  return (
-    <FeedbackProvider>
-      <Routes>
-        <Route element={<Shell />}>
-          <Route index element={<Navigate to="/pregled" replace />} />
-          <Route path="pregled" element={<Overview />} />
-          <Route path="raspored" element={<Schedule />} />
-          <Route path="vrste-satova" element={<Offerings />} />
-          <Route path="clanovi" element={<Members />} />
-          <Route path="clanovi/novi" element={<ImportMember />} />
-          <Route path="clanovi/novi/rucno" element={<NewMember />} />
-          <Route path="clanovi/:id" element={<MemberProfileScreen />} />
-          <Route path="karte" element={<Plans />} />
-          <Route path="uplate" element={<Payments />} />
-          <Route path="analitika" element={<Analytics />} />
-          <Route path="*" element={<Navigate to="/pregled" replace />} />
-        </Route>
-      </Routes>
-    </FeedbackProvider>
+  const { areas, full } = useAccess();
+  const home = homePath(areas);
+  const page = (area: Area, element: JSX.Element, edit = false) => (
+    <AreaRoute area={area} edit={edit} home={home}>
+      {element}
+    </AreaRoute>
   );
+  const routes = (
+    <Routes>
+      <Route element={<Shell />}>
+        <Route index element={<Navigate to={home} replace />} />
+        <Route path="pregled" element={page('overview', <Overview />)} />
+        <Route path="raspored" element={page('schedule', <Schedule />)} />
+        <Route path="vrste-satova" element={page('offerings', <Offerings />)} />
+        <Route path="clanovi" element={page('members', <Members />)} />
+        <Route path="clanovi/novi" element={page('members', <ImportMember />, true)} />
+        <Route path="clanovi/novi/rucno" element={page('members', <NewMember />, true)} />
+        <Route path="clanovi/:id" element={page('members', <MemberProfileScreen />)} />
+        <Route path="karte" element={page('plans', <Plans />)} />
+        <Route path="uplate" element={page('payments', <Payments />)} />
+        <Route path="analitika" element={page('analytics', <Analytics />)} />
+        <Route path="bez-pristupa" element={areas.length ? <Navigate to={home} replace /> : <NoAccess />} />
+        <Route path="*" element={<Navigate to={home} replace />} />
+      </Route>
+    </Routes>
+  );
+  // Feedback goes to the owners' Firestore, which only they can write to.
+  return full ? <FeedbackProvider>{routes}</FeedbackProvider> : routes;
 }
 
 function Gate() {

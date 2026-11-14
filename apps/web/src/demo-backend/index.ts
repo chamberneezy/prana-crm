@@ -33,7 +33,9 @@ const storage: DemoStorage = {
   delete: async (key) => void (await withStore('readwrite', (s) => s.delete(key))),
 };
 
-const allowedHashes = (import.meta.env.VITE_OWNER_HASHES ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+const hashes = (list: string | undefined) => (list ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+const ownerHashes = hashes(import.meta.env.VITE_OWNER_HASHES);
+const teacherHashes = hashes(import.meta.env.VITE_TEACHER_HASHES);
 
 async function sha256(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -41,16 +43,18 @@ async function sha256(text: string): Promise<string> {
 }
 
 /**
- * With real sign-in (the public preview), only the listed people are put on the staff list;
+ * With real sign-in (the public preview), only the listed people are put on the staff list, as owner or teacher;
  * everyone else is answered "no access", as the deployed API would. This runs in the browser,
  * so it keeps the preview tidy rather than secret: the data here is sample data.
  */
-async function ownerFor(email: string | null): Promise<{ ownerEmail: string; ownerName: string } | undefined> {
+async function ownerFor(email: string | null): Promise<{ ownerEmail: string; ownerName: string; ownerRole: 'owner' | 'teacher' } | undefined> {
   if (!REAL_SIGN_IN || !email) return undefined;
-  if (!allowedHashes.includes(await sha256(email))) return undefined;
+  const hash = await sha256(email);
+  const ownerRole = ownerHashes.includes(hash) ? 'owner' : teacherHashes.includes(hash) ? 'teacher' : null;
+  if (!ownerRole) return undefined;
   // The name shown in the app: the one on their account, or else the first part of the address ("matija.z…" → "Matija").
   const fromAddress = (email.split('@')[0] ?? '').split(/[._-]/)[0] ?? '';
-  return { ownerEmail: email, ownerName: session.displayName() ?? fromAddress.charAt(0).toUpperCase() + fromAddress.slice(1) };
+  return { ownerEmail: email, ownerName: session.displayName() ?? fromAddress.charAt(0).toUpperCase() + fromAddress.slice(1), ownerRole };
 }
 
 let started: { email: string | null; backend: ReturnType<typeof startDemoBackend> } | undefined;

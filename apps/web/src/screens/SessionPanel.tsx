@@ -1,5 +1,6 @@
 import { formatDate, formatTimeRange, localDate, type OfferingView, weekdayIndex } from '@prana/shared';
 import { useEffect, useState } from 'react';
+import { useAccess } from '../auth/access';
 import { ApiClientError, errorMessage } from '../api/client';
 import { useCheckIn, useDeleteSession, useMembers, useRemoveVisit, useSession } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
@@ -20,6 +21,7 @@ const SEARCH_DELAY_MS = 250;
 
 /** One session: details, the class list with health notes, check-in, edit and delete. */
 export function SessionPanel({ sessionId, offerings, onClose }: Props) {
+  const { canEdit } = useAccess();
   const strings = useLang();
   const { t, tn, lang } = strings;
   const toast = useToast();
@@ -144,7 +146,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
                   </span>
                 )}
               </span>
-              <Button variant="ghost" size="sm" aria-label={t('session.removeVisitLabel', { name: a.full_name })} disabled={removeVisit.isPending} onClick={() => removeVisit.mutate(a.visit_id)}>
+              <Button variant="ghost" size="sm" hidden={!canEdit('schedule')} aria-label={t('session.removeVisitLabel', { name: a.full_name })} disabled={removeVisit.isPending} onClick={() => removeVisit.mutate(a.visit_id)}>
                 {t('session.removeVisit')}
               </Button>
             </li>
@@ -152,7 +154,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
         </ul>
       </section>
 
-      <section className={styles.section}>
+      <section className={styles.section} hidden={!canEdit('schedule')}>
         <h3 className={styles.overline}>{t('session.checkIn')}</h3>
         <Input placeholder={t('members.search.placeholder')} label={t('session.checkIn.search')} value={text} onChange={(e) => setText(e.target.value)} />
         {q.length >= 2 && found.data && (
@@ -191,7 +193,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
           </span>
         </Notice>
       ) : (
-        <div className={styles.actions}>
+        <div className={styles.actions} hidden={!canEdit('schedule')}>
           <Button variant="secondary" onClick={() => setMode('edit')}>
             {t('session.edit')}
           </Button>

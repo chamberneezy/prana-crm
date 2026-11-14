@@ -47,6 +47,7 @@ export type ColorToken = z.infer<typeof colorTokenSchema>;
 export const ERROR_CODES = [
   'unauthenticated',
   'no_access',
+  'forbidden',
   'not_found',
   'invalid_input',
   'consent_required',

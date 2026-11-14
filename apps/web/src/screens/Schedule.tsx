@@ -1,6 +1,7 @@
 import { addDays, formatTimeRange, formatWeekRange, isoToDisplayDate, localDate, type SessionView, startOfWeek } from '@prana/shared';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { CanEdit } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { useOfferings, useSessions } from '../api/queries';
 import { useMe } from '../auth/AuthProvider';
@@ -71,7 +72,9 @@ export function Schedule() {
             </Button>
           )}
         </div>
-        <Button onClick={() => setPanel({ kind: 'new', date: defaultDate })}>{t('schedule.newSession')}</Button>
+        <CanEdit area="schedule">
+          <Button onClick={() => setPanel({ kind: 'new', date: defaultDate })}>{t('schedule.newSession')}</Button>
+        </CanEdit>
       </PageHeader>
 
       {error && <Notice title={t('schedule.loadFailed')}>{errorMessage(error, lang, { generic: t('error.generic'), offline: t('error.offline') })}</Notice>}
@@ -104,23 +107,26 @@ export function Schedule() {
         </div>
       </div>
 
-      <section className={styles.addFrom}>
-        <div className={styles.addHead}>
-          <h2>{t('schedule.addFrom')}</h2>
-          <Link to="/vrste-satova">{t('schedule.editOfferings')} ›</Link>
-        </div>
-        <div className={styles.templates}>
-          {all
-            .filter((o) => o.active)
-            .map((o) => (
-              <button key={o.id} type="button" className={styles.template} onClick={() => setPanel({ kind: 'new', offeringId: o.id, date: defaultDate })}>
-                <span className={styles.pill} style={{ background: `var(--${o.color_token})` }} />
-                {o.name}
-              </button>
-            ))}
-          {offerings.data && all.length === 0 && <span className={styles.none}>{t('schedule.noOfferings')}</span>}
-        </div>
-      </section>
+      {/* Adding a session from a class type is a change: only for those who can make one. */}
+      <CanEdit area="schedule">
+        <section className={styles.addFrom}>
+          <div className={styles.addHead}>
+            <h2>{t('schedule.addFrom')}</h2>
+            <Link to="/vrste-satova">{t('schedule.editOfferings')} ›</Link>
+          </div>
+          <div className={styles.templates}>
+            {all
+              .filter((o) => o.active)
+              .map((o) => (
+                <button key={o.id} type="button" className={styles.template} onClick={() => setPanel({ kind: 'new', offeringId: o.id, date: defaultDate })}>
+                  <span className={styles.pill} style={{ background: `var(--${o.color_token})` }} />
+                  {o.name}
+                </button>
+              ))}
+            {offerings.data && all.length === 0 && <span className={styles.none}>{t('schedule.noOfferings')}</span>}
+          </div>
+        </section>
+      </CanEdit>
 
       {panel?.kind === 'new' && (
         <SidePanel title={t('sessionForm.newTitle')} onClose={() => setPanel(null)}>

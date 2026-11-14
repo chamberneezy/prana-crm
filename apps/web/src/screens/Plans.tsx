@@ -1,5 +1,6 @@
 import { formatMoney, formatMoneyInput, parseMoney, type Plan } from '@prana/shared';
 import { type FormEvent, useState } from 'react';
+import { CanEdit, useAccess } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { useCreatePlan, useDeletePlan, usePlans, useSavePlan } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
@@ -90,6 +91,7 @@ function PlanForm({ plan, onDone }: { plan?: Plan; onDone: () => void }) {
 
 /** "Članarine": the plans and what each costs for a month. */
 export function Plans() {
+  const { canEdit } = useAccess();
   const { t, tn, lang } = useLang();
   const { data, error } = usePlans();
   // A plan being edited, `new` for adding one, or null.
@@ -99,7 +101,9 @@ export function Plans() {
     <>
       <div className={styles.intro}>
         <PageHeader title={t('plans.title')}>
-          <Button onClick={() => setEditing('new')}>{t('plans.new')}</Button>
+          <CanEdit area="plans">
+            <Button onClick={() => setEditing('new')}>{t('plans.new')}</Button>
+          </CanEdit>
         </PageHeader>
         <p>{t('plans.intro')}</p>
       </div>
@@ -132,7 +136,7 @@ export function Plans() {
                     <td className={styles.muted}>{p.visits_per_month === null ? t('plans.unlimited') : t('plans.visitsPerMonth', { n: `${p.visits_per_month} ${tn('visits', p.visits_per_month)}` })}</td>
                     <td className={styles.number}>{p.price_cents === null ? <span className={styles.muted}>{t('plans.noPrice')}</span> : <strong>{formatMoney(p.price_cents)}</strong>}</td>
                     <td className={styles.actions}>
-                      <Button variant="ghost" size="sm" aria-label={`${t('plans.edit')}: ${p.name}`} onClick={() => setEditing(p)}>
+                      <Button variant="ghost" size="sm" hidden={!canEdit('plans')} aria-label={`${t('plans.edit')}: ${p.name}`} onClick={() => setEditing(p)}>
                         {t('plans.edit')}
                       </Button>
                     </td>

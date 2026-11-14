@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/d1';
 import { Hono } from 'hono';
 import type { JWTVerifyGetKey } from 'jose';
+import { requireAccess } from './access';
 import { requireStaff } from './auth';
 import type { AppEnv } from './env';
 import { ApiError, errorBody, ERRORS } from './errors';
@@ -29,6 +30,8 @@ export function createApp(options: AppOptions = {}) {
     if (!c.res.headers.has('Cache-Control')) c.res.headers.set('Cache-Control', 'no-store');
   });
   api.use(requireStaff(options.keys));
+  // What the signed-in role may see and change (ROLE_ACCESS in @prana/shared).
+  api.use(requireAccess());
 
   api.route('/me', me);
   api.route('/staff', staffList);

@@ -12,10 +12,13 @@ export interface ButtonProps {
   style?: CSSProperties;
   /** For buttons whose visible text is a symbol or needs more context for screen readers. */
   'aria-label'?: string;
+  /** Not shown at all, e.g. to someone who may only look. */
+  hidden?: boolean;
   children?: ReactNode;
 }
 
-export function Button({ variant = 'primary', size = 'md', disabled = false, type = 'button', onClick, style, 'aria-label': ariaLabel, children }: ButtonProps) {
+export function Button({ variant = 'primary', size = 'md', disabled = false, type = 'button', onClick, style, 'aria-label': ariaLabel, hidden = false, children }: ButtonProps) {
+  if (hidden) return null;
   return (
     <button
       type={type}

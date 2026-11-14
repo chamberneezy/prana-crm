@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_PROVIDERS?: string;
   /** SHA-256 of the e-mails allowed into the preview, comma-separated. */
   readonly VITE_OWNER_HASHES?: string;
+  /** SHA-256 of the e-mails let into the preview as teachers (view-only; for now nothing), comma-separated. */
+  readonly VITE_TEACHER_HASHES?: string;
   readonly VITE_FIREBASE_API_KEY: string;
   readonly VITE_FIREBASE_AUTH_DOMAIN: string;
   readonly VITE_FIREBASE_PROJECT_ID: string;

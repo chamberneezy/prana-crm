@@ -36,7 +36,7 @@ Member self-booking, online payments, multi-location UI, staff-roles UI, sending
 | Database | **Cloudflare D1** (SQLite), EU location | Free plan (10 DBs, 500 MB each, 5 GB per account) covers this and Mario's other projects. **Rejected:** Supabase (2 free projects, paused after 1 week idle, Pro $25/month); GitHub as a database (health data in git history, write conflicts, rate limits); iCloud-only sync (the web would need an Apple ID). |
 | Files | **Cloudflare R2**, private bucket, EU jurisdiction | Stores the scanned upisnica files. Never public URLs. |
 | Logins | **Firebase Authentication** in a **new, dedicated Firebase project** (`prana-crm`). Providers: Sign in with Apple, Google, e-mail/password. | Mario already uses Firebase. D1 has no users built in. Free for these providers (SMS login costs money, so it isn't used). |
-| Access | The Worker verifies the Firebase ID token, then checks a **staff allowlist** in D1. v1 has one row: Mario, role `owner`. | Signing in to Firebase alone grants nothing. |
+| Access | The Worker verifies the Firebase ID token, then checks a **staff allowlist** in D1. Then the **role** decides what they may see and change: `ROLE_ACCESS` in `packages/shared/src/access.ts`, per section (`none`, `view` or `edit`). The API enforces it on every request (`api/src/access.ts` maps each endpoint to a section) and the apps show only what the role can use. **Owners** (Mario and Matija) can do everything. **Teachers** will be view-only on part of the app; which part isn't decided, so for now they see an empty tool. | Signing in to Firebase alone grants nothing. Opening a section to teachers later is one line in `ROLE_ACCESS`. |
 | Web hosting | Cloudflare (Workers static assets or Pages), deployed from GitHub | Same account, zero cost. |
 | Text recognition | **On device / in browser only.** iOS: Apple Vision. Web: pdf.js text layer, else tesseract.js with Croatian (`hrv`). | Member data and health notes never go to third-party OCR services. |
 | Offline | iOS keeps a local copy and syncs. The web is online-only. | The studio may have weak Wi-Fi. |
@@ -333,7 +333,7 @@ All names, numbers and teachers in the designs are sample data.
 Health notes are sensitive personal data (GDPR special category). Mario should confirm his own legal obligations; this list isn't legal advice.
 
 - Keep D1 and R2 in the EU.
-- Only allowlisted staff can read data.
+- Only allowlisted staff can read data, and only the sections their role allows (teachers: none yet). Only owners can change anything.
 - Never log member names, contacts or health text.
 - Documents are served only through the authenticated endpoint.
 - Deleting a member deletes their document files.

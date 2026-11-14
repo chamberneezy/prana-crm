@@ -516,5 +516,7 @@
   "analytics.noPlan": "No membership",
   "analytics.empty": "No data for this period yet.",
   "analytics.lastVisit": "last visit {date}",
-  "analytics.neverCame": "hasn't come yet"
+  "analytics.neverCame": "hasn't come yet",
+  "noAccess.title": "Your access isn't set up yet",
+  "noAccess.body": "The studio's owners are still deciding what teachers will see here. When it's ready, it will appear in the menu."
 }

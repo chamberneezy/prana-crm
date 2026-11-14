@@ -1,5 +1,6 @@
 import { addDays, formatMoney, formatTimeRange, isoToDisplayDate, type MemberSummary, type SessionView, weekdayIndex } from '@prana/shared';
 import { Link, useNavigate } from 'react-router';
+import { CanEdit } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { useDashboard } from '../api/queries';
 import { Button, Card, ClassTable, EmptyState, MemberRow, Notice, PageHeader, Stat } from '../components';
@@ -36,7 +37,9 @@ export function Overview() {
         </span>
       )}
       <PageHeader title={t('overview.title')}>
-        <Button onClick={() => navigate('/clanovi/novi')}>{t('overview.newMember')}</Button>
+        <CanEdit area="members">
+          <Button onClick={() => navigate('/clanovi/novi')}>{t('overview.newMember')}</Button>
+        </CanEdit>
       </PageHeader>
     </div>
   );

@@ -516,5 +516,7 @@
   "analytics.noPlan": "Bez članarine",
   "analytics.empty": "Još nema podataka za ovo razdoblje.",
   "analytics.lastVisit": "zadnji dolazak {date}",
-  "analytics.neverCame": "još nije dolazio/la"
+  "analytics.neverCame": "još nije dolazio/la",
+  "noAccess.title": "Pristup još nije postavljen",
+  "noAccess.body": "Vlasnici studija još odlučuju što će učitelji ovdje vidjeti. Kad to bude spremno, pojavit će se u izborniku."
 }

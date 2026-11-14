@@ -121,6 +121,7 @@
                 "enum": [
                   "unauthenticated",
                   "no_access",
+                  "forbidden",
                   "not_found",
                   "invalid_input",
                   "consent_required",
@@ -4925,6 +4926,7 @@
                             "enum": [
                               "unauthenticated",
                               "no_access",
+                              "forbidden",
                               "not_found",
                               "invalid_input",
                               "consent_required",

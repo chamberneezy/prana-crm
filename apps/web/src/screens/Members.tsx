@@ -2,6 +2,7 @@ import type { ApiMemberStatus, MessageKey } from '@prana/shared';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { CanEdit, useAccess } from '../auth/access';
 import { errorMessage } from '../api/client';
 import { useMembers } from '../api/queries';
 import { Button, Card, EmptyState, MemberRow, Notice, PageHeader } from '../components';
@@ -24,6 +25,7 @@ const FILTERS: Array<{ id: Filter; label: MessageKey }> = [
 const SEARCH_DELAY_MS = 250;
 
 export function Members() {
+  const { canEdit } = useAccess();
   const strings = useLang();
   const { t, tn, lang } = strings;
   const navigate = useNavigate();
@@ -73,7 +75,9 @@ export function Members() {
           <span className={styles.srOnly}>{t('members.search.label')}</span>
           <input type="search" placeholder={t('members.search.placeholder')} value={text} onChange={(e) => setText(e.target.value)} />
         </label>
-        <Button onClick={() => navigate('/clanovi/novi')}>{t('members.new')}</Button>
+        <CanEdit area="members">
+          <Button onClick={() => navigate('/clanovi/novi')}>{t('members.new')}</Button>
+        </CanEdit>
       </PageHeader>
 
       <div role="tablist" aria-label={t('members.filterLabel')} className={styles.filters}>
@@ -97,9 +101,11 @@ export function Members() {
           <EmptyState
             title={t('members.empty.title')}
             action={
-              <Button variant="secondary" size="sm" onClick={() => navigate('/clanovi/novi')}>
-                {t('members.new')}
-              </Button>
+              canEdit('members') ? (
+                <Button variant="secondary" size="sm" onClick={() => navigate('/clanovi/novi')}>
+                  {t('members.new')}
+                </Button>
+              ) : undefined
             }
           >
             {t('members.empty.body')}

@@ -1,9 +1,10 @@
-import type { MessageKey } from '@prana/shared';
+import type { Area, MessageKey } from '@prana/shared';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import logo from '../assets/prana-mark.png';
 import { useAuth, useMe } from '../auth/AuthProvider';
+import { useAccess } from '../auth/access';
 import { DEMO, REAL_SIGN_IN } from '../auth/session';
 import { LangSwitch, Sidebar } from '../components';
 import { cx } from '../components/cx';
@@ -11,7 +12,8 @@ import { FeedbackHint } from '../feedback/FeedbackProvider';
 import { useLang } from '../i18n';
 import styles from './Shell.module.css';
 
-export const SECTIONS: Array<{ id: string; path: string; label: MessageKey }> = [
+/** The sidebar sections; each is one area of ROLE_ACCESS, shown only to those who can open it. */
+export const SECTIONS: Array<{ id: Area; path: string; label: MessageKey }> = [
   { id: 'overview', path: '/pregled', label: 'nav.overview' },
   { id: 'schedule', path: '/raspored', label: 'nav.schedule' },
   { id: 'offerings', path: '/vrste-satova', label: 'nav.offerings' },
@@ -20,6 +22,11 @@ export const SECTIONS: Array<{ id: string; path: string; label: MessageKey }> = 
   { id: 'payments', path: '/uplate', label: 'nav.payments' },
   { id: 'analytics', path: '/analitika', label: 'nav.analytics' },
 ];
+
+/** Where someone lands: the first section they can open, or the page that says nothing is open to them yet. */
+export function homePath(areas: Area[]): string {
+  return SECTIONS.find((s) => areas.includes(s.id))?.path ?? '/bez-pristupa';
+}
 
 /** The signed-in app: ink sidebar beside the linen workspace; a top bar with a menu below 768 px. */
 export function Shell() {
@@ -33,7 +40,8 @@ export function Shell() {
   // Navigating closes the mobile menu.
   useEffect(() => setMenuOpen(false), [pathname]);
 
-  const items = SECTIONS.map((s) => ({ id: s.id, label: t(s.label) }));
+  const access = useAccess();
+  const items = SECTIONS.filter((s) => access.canView(s.id)).map((s) => ({ id: s.id, label: t(s.label) }));
   const active = SECTIONS.find((s) => pathname === s.path || pathname.startsWith(`${s.path}/`))?.id;
   const select = (id: string) => navigate(SECTIONS.find((s) => s.id === id)?.path ?? '/');
   const langCode = lang.toUpperCase();
@@ -48,7 +56,7 @@ export function Shell() {
       <button type="button" className={styles.signOut} onClick={() => void signOut()}>
         {t('auth.logout')}
       </button>
-      <FeedbackHint className={styles.feedbackHint} />
+      {access.full && <FeedbackHint className={styles.feedbackHint} />}
     </div>
   );
 

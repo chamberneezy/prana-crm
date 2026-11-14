@@ -11,6 +11,7 @@ interface ErrorSpec {
 export const ERRORS: Record<ErrorCode, ErrorSpec> = {
   unauthenticated: { status: 401, message_hr: 'Prijavite se ponovno.', message_en: 'Please sign in again.' },
   no_access: { status: 403, message_hr: 'Ovaj račun nema pristup studiju.', message_en: 'This account has no access to the studio.' },
+  forbidden: { status: 403, message_hr: 'Za ovo nemate ovlasti.', message_en: "You don't have permission to do this." },
   not_found: { status: 404, message_hr: 'Traženi podatak više ne postoji.', message_en: 'This item no longer exists.' },
   invalid_input: { status: 400, message_hr: 'Provjerite unesene podatke.', message_en: 'Please check the details you entered.' },
   consent_required: { status: 400, message_hr: 'Potrebna je potvrda točnosti podataka.', message_en: 'The accuracy consent is needed.' },

@@ -33,6 +33,8 @@ export interface DemoOptions {
   ownerEmail?: string;
   /** Their name, shown in the app. */
   ownerName?: string;
+  /** Their role, which decides what they see (ROLE_ACCESS). Left out: owner. */
+  ownerRole?: 'owner' | 'teacher';
 }
 
 export async function startDemoBackend(storage: DemoStorage, options: DemoOptions = {}) {
@@ -48,8 +50,8 @@ export async function startDemoBackend(storage: DemoStorage, options: DemoOption
     for (const statement of toSql(devSeed({ now: new Date().toISOString() }), 'keep')) db.run(statement);
   }
 
-  // The staff allowlist has one row. Put the allowed person's e-mail on it; anyone else gets "no access".
-  db.run('UPDATE staff SET email = ?, name = ?, firebase_uid = NULL WHERE id = ?', [(options.ownerEmail ?? DEV_OWNER_EMAIL).toLowerCase(), options.ownerName || 'Mario', SEED.owner]);
+  // The staff allowlist has one row. Put the allowed person's e-mail and role on it; anyone else gets "no access".
+  db.run('UPDATE staff SET email = ?, name = ?, role = ?, firebase_uid = NULL WHERE id = ?', [(options.ownerEmail ?? DEV_OWNER_EMAIL).toLowerCase(), options.ownerName || 'Mario', options.ownerRole ?? 'owner', SEED.owner]);
 
   // Every change is written to the browser's storage before its response goes back,
   // so nothing is lost if the tab is closed or reloaded straight afterwards.

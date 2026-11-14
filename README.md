@@ -27,6 +27,19 @@ To let another address into the preview, add the SHA-256 of its lower-cased e-ma
 `apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`), and to the list in `firestore.rules`
 so they can send feedback too (a test checks the two agree), then `npm run deploy:rules`.
 
+## Roles
+
+Who may see and change what is decided in one place, `ROLE_ACCESS` in `packages/shared/src/access.ts`: per role and
+section, `none`, `view` or `edit`. The API enforces it on every request and the web app shows only those sections
+(and hides the buttons that change things where a role may only look).
+
+- **Owners** can do everything. On the preview they are `VITE_OWNER_HASHES`; in production, `--owner` in the seed.
+- **Teachers** will be view-only on part of the app. For now they see an empty tool ("Pristup još nije postavljen").
+  Let one in with `VITE_TEACHER_HASHES` on the preview or `--teacher "Name <address>"` in the production seed.
+  Locally, sign in as `petra@prana.test` / `prana-dev` to see a teacher's view.
+- To open a section to teachers: set it in `ROLE_ACCESS`, e.g. `schedule: 'view'`. A new endpoint goes in
+  `api/src/access.ts` with the section it belongs to (a test fails until it does).
+
 ## Feedback
 
 In the signed-in app, **right-click on anything** (a button, a row, a card, the page) to send feedback about it.
