@@ -1,5 +1,6 @@
 import {
   addDays,
+  localDate,
   type SessionDetailResponse,
   sessionInputSchema,
   sessionPatchSchema,
@@ -16,7 +17,7 @@ import type { AppEnv } from '../env';
 import { ApiError } from '../errors';
 import { blankToNull, created, ctx, owned, parseBody, parseQuery, publicRow, removed, touched } from '../lib/http';
 import { loadMemberFacts, toSummary } from '../lib/members';
-import { loadSessionView, loadSessionViews, startsBetween } from '../lib/sessions';
+import { closureOn, firstLocationId, loadSessionView, loadSessionViews, startsBetween } from '../lib/sessions';
 
 export const sessions = new Hono<AppEnv>();
 export const visits = new Hono<AppEnv>();
@@ -26,28 +27,18 @@ sessions.get('/', async (c) => {
   const query = parseQuery(c, sessionsQuerySchema);
   const from = query.from ?? startOfWeek(today);
   const to = query.to ?? addDays(from, 6);
-  const body: SessionsResponse = { sessions: await loadSessionViews(db, businessId, startsBetween(from, to, timeZone)) };
+  const body: SessionsResponse = { sessions: await loadSessionViews(db, businessId, timeZone, startsBetween(from, to, timeZone)) };
   return c.json(body);
 });
 
 sessions.post('/', async (c) => {
-  const { db, businessId, now } = ctx(c);
+  const { db, businessId, now, timeZone } = ctx(c);
   const input = await parseBody(c, sessionInputSchema);
   const template = await owned(db, offering, input.offering_id, businessId);
 
   let locationId = input.location_id;
-  if (locationId) {
-    await owned(db, location, locationId, businessId);
-  } else {
-    const [first] = await db
-      .select({ id: location.id })
-      .from(location)
-      .where(and(eq(location.business_id, businessId), isNull(location.deleted_at)))
-      .orderBy(asc(location.created_at))
-      .limit(1);
-    if (!first) throw new ApiError('invalid_input', ['location_id']);
-    locationId = first.id;
-  }
+  if (locationId) await owned(db, location, locationId, businessId);
+  else locationId = await firstLocationId(db, businessId);
   if (input.teacher_staff_id) await owned(db, staff, input.teacher_staff_id, businessId);
 
   const ends_at = input.ends_at ?? new Date(Date.parse(input.starts_at) + template.default_duration_min * 60_000).toISOString();
@@ -65,12 +56,12 @@ sessions.post('/', async (c) => {
     note: blankToNull(input.note),
   };
   await db.insert(session).values(row);
-  return c.json({ session: await loadSessionView(db, businessId, row.id) }, 201);
+  return c.json({ session: await loadSessionView(db, businessId, timeZone, row.id) }, 201);
 });
 
 sessions.get('/:id', async (c) => {
-  const { db, businessId } = ctx(c);
-  const view = await loadSessionView(db, businessId, c.req.param('id'));
+  const { db, businessId, timeZone } = ctx(c);
+  const view = await loadSessionView(db, businessId, timeZone, c.req.param('id'));
   if (!view) throw new ApiError('not_found');
   const attendees = await db
     .select({
@@ -90,7 +81,7 @@ sessions.get('/:id', async (c) => {
 });
 
 sessions.patch('/:id', async (c) => {
-  const { db, businessId, now } = ctx(c);
+  const { db, businessId, now, timeZone } = ctx(c);
   const input = await parseBody(c, sessionPatchSchema);
   const existing = await owned(db, session, c.req.param('id'), businessId);
   if (input.offering_id) await owned(db, offering, input.offering_id, businessId);
@@ -112,7 +103,7 @@ sessions.patch('/:id', async (c) => {
     ...touched(now),
   };
   await db.update(session).set(patch).where(eq(session.id, existing.id));
-  return c.json({ session: await loadSessionView(db, businessId, existing.id) });
+  return c.json({ session: await loadSessionView(db, businessId, timeZone, existing.id) });
 });
 
 sessions.delete('/:id', async (c) => {
@@ -130,10 +121,12 @@ sessions.delete('/:id', async (c) => {
 });
 
 sessions.post('/:id/visits', async (c) => {
-  const { db, businessId, now, today } = ctx(c);
+  const { db, businessId, now, today, timeZone } = ctx(c);
   const input = await parseBody(c, visitInputSchema);
   const target = await owned(db, session, c.req.param('id'), businessId);
   const who = await owned(db, member, input.member_id, businessId);
+  // A holiday cancels the day's classes.
+  if (await closureOn(db, businessId, localDate(target.starts_at, timeZone))) throw new ApiError('day_closed');
 
   const [already] = await db
     .select({ id: visit.id })

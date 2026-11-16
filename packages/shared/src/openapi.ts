@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import * as s from './schemas';
 
-type Method = 'get' | 'post' | 'patch' | 'delete';
+type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 export interface RouteSpec {
   method: Method;
@@ -25,7 +25,8 @@ export const routes: RouteSpec[] = [
   { method: 'get', path: '/staff', summary: 'Staff of the business, for the teacher picker', response: s.staffListResponseSchema },
   { method: 'post', path: '/staff', summary: 'Add a teacher by name (no e-mail, so no sign-in)', body: s.teacherInputSchema, response: s.staffResponseSchema, status: 201 },
   { method: 'patch', path: '/staff/{id}', summary: "Rename a teacher", body: s.teacherInputSchema, response: s.staffResponseSchema },
-  { method: 'delete', path: '/staff/{id}', summary: 'Remove a teacher; past sessions keep their name' },
+  { method: 'delete', path: '/staff/{id}', summary: 'Remove a teacher; past sessions keep their name, class types stop listing them' },
+  { method: 'put', path: '/staff/{id}/offerings', summary: 'Set which class types a staff member teaches', body: s.teacherOfferingsInputSchema },
   { method: 'get', path: '/analytics', summary: 'Attendance and income over the last calendar months', query: s.analyticsQuerySchema, response: s.analyticsResponseSchema },
   { method: 'get', path: '/dashboard', summary: "Today's and tomorrow's sessions, the attention list and counts", query: s.dashboardQuerySchema, response: s.dashboardResponseSchema },
 
@@ -47,7 +48,15 @@ export const routes: RouteSpec[] = [
   { method: 'patch', path: '/sessions/{id}', summary: 'Change a session', body: s.sessionPatchSchema, response: s.sessionResponseSchema },
   { method: 'delete', path: '/sessions/{id}', summary: 'Delete a session' },
 
-  { method: 'post', path: '/sessions/{id}/visits', summary: 'Check a member in', body: s.visitInputSchema, response: s.visitResponseSchema, status: 201 },
+  { method: 'post', path: '/sessions/{id}/visits', summary: 'Check a member in (not on a closed day)', body: s.visitInputSchema, response: s.visitResponseSchema, status: 201 },
+
+  { method: 'get', path: '/closures', summary: 'Days the studio is closed, between two dates', query: s.closuresQuerySchema, response: s.closuresResponseSchema },
+  { method: 'post', path: '/closures', summary: "Close a day (a holiday): its sessions are cancelled", body: s.closureInputSchema, response: s.closureResponseSchema, status: 201 },
+  { method: 'delete', path: '/closures/{id}', summary: 'Open a closed day again; its sessions come back' },
+
+  { method: 'put', path: '/week-plan/{monday}', summary: "Set every class of a week: changes, adds and deletes that week's sessions", body: s.weekPlanInputSchema, response: s.sessionsResponseSchema },
+  { method: 'get', path: '/week-template', summary: 'The standard week', response: s.weekTemplateResponseSchema },
+  { method: 'put', path: '/week-template', summary: 'Replace the standard week', body: s.weekTemplateInputSchema, response: s.weekTemplateResponseSchema },
   { method: 'delete', path: '/visits/{id}', summary: 'Undo a check-in' },
 
   { method: 'get', path: '/plans', summary: 'Membership plans', response: s.plansResponseSchema },

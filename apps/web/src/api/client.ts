@@ -53,7 +53,7 @@ async function request(method: string, path: string, body?: unknown): Promise<Re
 }
 
 /** Calls the API as the signed-in user and returns the JSON body (undefined for 204). */
-export async function api<T>(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string, body?: unknown): Promise<T> {
+export async function api<T>(method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', path: string, body?: unknown): Promise<T> {
   const res = await request(method, path, body);
   return (res.status === 204 ? undefined : await res.json()) as T;
 }

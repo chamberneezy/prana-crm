@@ -16,6 +16,8 @@ export const ERRORS: Record<ErrorCode, ErrorSpec> = {
   invalid_input: { status: 400, message_hr: 'Provjerite unesene podatke.', message_en: 'Please check the details you entered.' },
   consent_required: { status: 400, message_hr: 'Potrebna je potvrda točnosti podataka.', message_en: 'The accuracy consent is needed.' },
   already_checked_in: { status: 409, message_hr: 'Dolazak je već evidentiran za ovaj sat.', message_en: 'This member is already checked in to this class.' },
+  day_closed: { status: 409, message_hr: 'Taj dan je neradni, sat je otkazan.', message_en: 'The studio is closed that day; the class is cancelled.' },
+  session_has_visits: { status: 409, message_hr: 'Termin s evidentiranim dolascima ne može se ukloniti.', message_en: 'A class with check-ins can’t be removed.' },
   file_too_large: { status: 413, message_hr: 'Datoteka je veća od 20 MB.', message_en: 'The file is larger than 20 MB.' },
   unsupported_file: { status: 415, message_hr: 'Odaberite PDF, JPG, PNG ili HEIC datoteku.', message_en: 'Choose a PDF, JPG, PNG or HEIC file.' },
   internal: { status: 500, message_hr: 'Nešto nije uspjelo. Pokušajte ponovno.', message_en: 'Something went wrong. Please try again.' },

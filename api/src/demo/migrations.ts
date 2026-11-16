@@ -3,6 +3,7 @@ import m0001 from '../../migrations/0001_init.sql?raw';
 import m0002 from '../../migrations/0002_member_names.sql?raw';
 import m0003 from '../../migrations/0003_custom_plans.sql?raw';
 import m0004 from '../../migrations/0004_offering_teachers.sql?raw';
+import m0005 from '../../migrations/0005_week_plan.sql?raw';
 
 /** Every migration, in order. A test checks this lists each file in migrations/. */
 export const MIGRATIONS: Array<{ name: string; sql: string }> = [
@@ -10,6 +11,7 @@ export const MIGRATIONS: Array<{ name: string; sql: string }> = [
   { name: '0002_member_names.sql', sql: m0002 },
   { name: '0003_custom_plans.sql', sql: m0003 },
   { name: '0004_offering_teachers.sql', sql: m0004 },
+  { name: '0005_week_plan.sql', sql: m0005 },
 ];
 
 /**

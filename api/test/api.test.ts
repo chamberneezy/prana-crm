@@ -1,4 +1,4 @@
-import { addDays, addMonths, localDate, type MemberSummary, monthPeriodEnd, monthPeriodStart, routes, splitFullName, uuidv7 } from '@prana/shared';
+import { addDays, addMonths, formatTime, localDate, type MemberSummary, monthPeriodEnd, monthPeriodStart, routes, splitFullName, startOfWeek, uuidv7 } from '@prana/shared';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildOpenApi } from '@prana/shared';
@@ -550,7 +550,7 @@ describe('sync (iOS)', () => {
   it('pulls everything first, deleted rows included, without server-only columns', async () => {
     const { status, body } = await t.call('GET', '/sync');
     expect(status).toBe(200);
-    expect(Object.keys(body.changes).sort()).toEqual(['document', 'location', 'member', 'membership', 'offering', 'offering_group', 'payment', 'plan', 'session', 'staff', 'visit']);
+    expect(Object.keys(body.changes).sort()).toEqual(['closure', 'document', 'location', 'member', 'membership', 'offering', 'offering_group', 'payment', 'plan', 'session', 'staff', 'visit', 'week_slot']);
     // The five standard plans, plus the studio's own one added and removed above.
     expect(body.changes.plan.filter((p: { code: string }) => p.code !== 'custom')).toHaveLength(5);
     expect(body.changes.plan.some((p: { code: string; deleted_at: string | null }) => p.code === 'custom' && p.deleted_at !== null)).toBe(true);
@@ -622,6 +622,127 @@ describe('sync (iOS)', () => {
     const { body } = await t.call('POST', '/sync', { body: { mutations: [{ table: 'member', row: memberRow({ updated_at: at, deleted_at: at }) }] } });
     expect(body.applied).toBe(1);
     expect((await t.call('GET', `/members/${id}`)).status).toBe(404);
+  });
+});
+
+describe('week planner, standard week and closed days', () => {
+  // A week far ahead, empty in the sample data, so the other tests keep their numbers.
+  const monday = startOfWeek(addDays(today, 140));
+  const wednesday = addDays(monday, 2);
+  const [petra, ivan] = SEED.teachers as [string, string];
+
+  it('has the standard week from the poster, with each class’s usual teacher', async () => {
+    const { status, body } = await t.call('GET', '/week-template');
+    expect(status).toBe(200);
+    expect(body.slots).toHaveLength(10);
+    expect(body.slots[0]).toMatchObject({ weekday: 1, start_time: '09:00', duration_min: 60, offering_id: SEED.offerings.spine, teacher_staff_id: petra });
+    expect(body.slots.at(-1)).toMatchObject({ weekday: 7, start_time: '09:00', duration_min: 120, offering_id: SEED.offerings.ashtanga });
+  });
+
+  it('sets a whole week: adds, changes and deletes its sessions', async () => {
+    const path = `/week-plan/${monday}`;
+    const first = await t.call('PUT', path, {
+      body: {
+        sessions: [
+          { date: monday, start_time: '09:00', duration_min: 60, offering_id: SEED.offerings.spine, teacher_staff_id: petra },
+          { date: wednesday, start_time: '18:15', duration_min: 75, offering_id: SEED.offerings.blackLotus, teacher_staff_id: ivan },
+        ],
+      },
+    });
+    expect(first.status).toBe(200);
+    expect(first.body.sessions).toHaveLength(2);
+    const [spine, lotus] = first.body.sessions;
+    expect(spine).toMatchObject({ offering_name: 'Joga za kralježnicu', teacher_name: 'Petra', closure_name: null });
+    expect(formatTime(lotus.starts_at)).toBe('18:15');
+    expect(Date.parse(lotus.ends_at) - Date.parse(lotus.starts_at)).toBe(75 * 60_000);
+
+    // Keep the first (moved to 10:00, Ivan teaching), drop the second, add one on Friday.
+    const second = await t.call('PUT', path, {
+      body: {
+        sessions: [
+          { id: spine.id, date: monday, start_time: '10:00', duration_min: 60, offering_id: SEED.offerings.spine, teacher_staff_id: ivan },
+          { date: addDays(monday, 4), start_time: '19:45', duration_min: 30, offering_id: SEED.offerings.pranayama, teacher_staff_id: null },
+        ],
+      },
+    });
+    expect(second.status).toBe(200);
+    expect(second.body.sessions.map((s: { id: string }) => s.id)).toContain(spine.id);
+    expect(second.body.sessions.map((s: { id: string }) => s.id)).not.toContain(lotus.id);
+    expect(second.body.sessions[0]).toMatchObject({ id: spine.id, teacher_name: 'Ivan' });
+    expect(formatTime(second.body.sessions[0].starts_at)).toBe('10:00');
+    expect((await t.call('GET', `/sessions?from=${monday}`)).body.sessions).toHaveLength(2);
+  });
+
+  it('turns away a plan that is not for that week, or names what is not there', async () => {
+    const one = { date: monday, start_time: '09:00', duration_min: 60, offering_id: SEED.offerings.spine, teacher_staff_id: null };
+    expect((await t.call('PUT', `/week-plan/${addDays(monday, 1)}`, { body: { sessions: [] } })).body.error.fields).toEqual(['monday']);
+    expect((await t.call('PUT', `/week-plan/${monday}`, { body: { sessions: [{ ...one, date: addDays(monday, 7) }] } })).body.error.fields).toEqual(['sessions.0.date']);
+    expect((await t.call('PUT', `/week-plan/${monday}`, { body: { sessions: [{ ...one, offering_id: uuidv7() }] } })).body.error.fields).toEqual(['offering_id']);
+    expect((await t.call('PUT', `/week-plan/${monday}`, { body: { sessions: [{ ...one, teacher_staff_id: uuidv7() }] } })).body.error.fields).toEqual(['teacher_staff_id']);
+    expect((await t.call('PUT', `/week-plan/${monday}`, { body: { sessions: [{ ...one, id: uuidv7() }] } })).body.error.fields).toEqual(['sessions.0.id']);
+    expect((await t.call('PUT', `/week-plan/${monday}`, { body: { sessions: [{ ...one, start_time: '25:00' }] } })).status).toBe(400);
+  });
+
+  it('never deletes a session people were checked in to', async () => {
+    // Last week, from the sample data, has check-ins.
+    const lastMonday = startOfWeek(addDays(today, -7));
+    const res = await t.call('PUT', `/week-plan/${lastMonday}`, { body: { sessions: [] } });
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('session_has_visits');
+    expect((await t.call('GET', `/sessions?from=${lastMonday}`)).body.sessions.length).toBeGreaterThan(0);
+  });
+
+  it('a closed day cancels its sessions and check-in; opening it brings them back', async () => {
+    const closed = await t.call('POST', '/closures', { body: { date: monday, name: 'Praznik' } });
+    expect(closed.status).toBe(201);
+    // Closing it again renames it.
+    const renamed = await t.call('POST', '/closures', { body: { date: monday, name: 'Dan državnosti' } });
+    expect(renamed.status).toBe(200);
+    expect(renamed.body.closure.id).toBe(closed.body.closure.id);
+
+    expect((await t.call('GET', `/closures?from=${monday}`)).body.closures).toEqual([expect.objectContaining({ date: monday, name: 'Dan državnosti' })]);
+    const week = (await t.call('GET', `/sessions?from=${monday}`)).body.sessions;
+    expect(week[0].closure_name).toBe('Dan državnosti');
+    expect(week[1].closure_name).toBeNull();
+
+    const checkIn = await t.call('POST', `/sessions/${week[0].id}/visits`, { body: { member_id: SEED.member(0) } });
+    expect(checkIn.status).toBe(409);
+    expect(checkIn.body.error.code).toBe('day_closed');
+
+    expect((await t.call('DELETE', `/closures/${closed.body.closure.id}`)).status).toBe(204);
+    expect((await t.call('GET', `/sessions?from=${monday}`)).body.sessions[0].closure_name).toBeNull();
+    expect((await t.call('POST', '/closures', { body: { date: 'sutra', name: 'x' } })).status).toBe(400);
+  });
+
+  it('replaces the standard week', async () => {
+    const before = (await t.call('GET', '/week-template')).body.slots;
+    const slots = [{ weekday: 2, start_time: '19:15', duration_min: 60, offering_id: SEED.offerings.restorative, teacher_staff_id: petra }];
+    const res = await t.call('PUT', '/week-template', { body: { slots } });
+    expect(res.status).toBe(200);
+    expect(res.body.slots).toEqual([expect.objectContaining(slots[0])]);
+    expect((await t.call('PUT', '/week-template', { body: { slots: [{ ...slots[0], weekday: 8 }] } })).status).toBe(400);
+    // Put the poster's week back for the tests after this one.
+    await t.call('PUT', '/week-template', { body: { slots: before.map(({ weekday, start_time, duration_min, offering_id, teacher_staff_id }: Record<string, unknown>) => ({ weekday, start_time, duration_min, offering_id, teacher_staff_id })) } });
+    expect((await t.call('GET', '/week-template')).body.slots).toHaveLength(10);
+  });
+
+  it('sets which class types a teacher teaches, and removing a teacher takes them off', async () => {
+    const lana = (await t.call('POST', '/staff', { body: { name: 'Lana' } })).body.staff;
+    const set = await t.call('PUT', `/staff/${lana.id}/offerings`, { body: { offering_ids: [SEED.offerings.spine, SEED.offerings.pranayama] } });
+    expect(set.status).toBe(204);
+    const teachers = async () => Object.fromEntries((await t.call('GET', '/offerings')).body.offerings.map((o: { id: string; teacher_ids: string[] }) => [o.id, o.teacher_ids]));
+    let now = await teachers();
+    // Added last, so the usual teacher stays the default.
+    expect(now[SEED.offerings.spine]).toEqual([petra, lana.id]);
+    expect(now[SEED.offerings.pranayama]).toEqual([lana.id]);
+
+    await t.call('PUT', `/staff/${lana.id}/offerings`, { body: { offering_ids: [SEED.offerings.pranayama] } });
+    now = await teachers();
+    expect(now[SEED.offerings.spine]).toEqual([petra]);
+    expect((await t.call('PUT', `/staff/${lana.id}/offerings`, { body: { offering_ids: [uuidv7()] } })).status).toBe(400);
+
+    expect((await t.call('DELETE', `/staff/${lana.id}`)).status).toBe(204);
+    expect((await teachers())[SEED.offerings.pranayama]).toEqual([]);
   });
 });
 

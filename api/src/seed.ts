@@ -23,6 +23,7 @@ export const SEED = {
   plans: { '1x': fixedId(0x21), '2x': fixedId(0x22), '3x': fixedId(0x23), unl: fixedId(0x24), trial: fixedId(0x25) } satisfies Record<StandardPlan, string>,
   member: (n: number) => fixedId(0x100 + n),
   teachers: [fixedId(0x31), fixedId(0x32)],
+  weekSlot: (n: number) => fixedId(0x80 + n),
 };
 
 type OfferingKey = keyof typeof SEED.offerings;
@@ -34,6 +35,21 @@ const OFFERINGS: Array<{ key: OfferingKey; name: string; color_token: ColorToken
   { key: 'restorative', name: 'Restorativna joga', color_token: 'class-restorative', minutes: 60, entry_rule: null },
   { key: 'blackLotus', name: 'Black Lotus Yoga', color_token: 'class-black-lotus', minutes: 75, entry_rule: null },
   { key: 'pranayama', name: 'Pranayama & meditacija', color_token: 'class-pranayama', minutes: 30, entry_rule: 'Slobodan ulaz' },
+];
+
+// The studio's usual week, from its schedule poster (week of 8 November 2026), Mon–Sun:
+// [weekday offset, start, class]. It is the standard week the planner starts from.
+const WEEK: Array<[number, string, OfferingKey]> = [
+  [0, '09:00', 'spine'],
+  [0, '17:00', 'ashtanga'],
+  [1, '19:15', 'restorative'],
+  [2, '09:00', 'spine'],
+  [2, '18:15', 'blackLotus'],
+  [3, '17:00', 'ashtanga'],
+  [3, '19:15', 'restorative'],
+  [4, '18:15', 'blackLotus'],
+  [4, '19:45', 'pranayama'],
+  [6, '09:00', 'ashtanga'],
 ];
 
 const PLANS: Array<{ code: StandardPlan; name: string; visits_per_month: number | null }> = [
@@ -93,6 +109,13 @@ export function prodSeed({ now, owners = [], teachers = [] }: ProdSeedOptions): 
       },
     });
   }
+  WEEK.forEach(([day, time, key], i) => {
+    const minutes = OFFERINGS.find((o) => o.key === key)!.minutes;
+    rows.push({
+      table: 'week_slot',
+      row: { id: SEED.weekSlot(i), business_id: b, weekday: day + 1, start_time: time, duration_min: minutes, offering_id: SEED.offerings[key], teacher_staff_id: null, ...stamps(now) },
+    });
+  });
   for (const p of PLANS) {
     // price_cents stays empty until the studio provides prices.
     rows.push({ table: 'plan', row: { id: SEED.plans[p.code], business_id: b, code: p.code, name: p.name, visits_per_month: p.visits_per_month, price_cents: null, ...stamps(now) } });
@@ -108,20 +131,6 @@ export const DEV_TEACHER_EMAIL = 'petra@prana.test';
 
 /** Made-up prices so the "unpaid" state can be seen locally. Not the studio's prices. */
 const DEV_PRICES: Record<StandardPlan, number | null> = { '1x': 6500, '2x': 8500, '3x': 10000, unl: 12000, trial: null };
-
-// One sample week, Mon–Sun: [weekday offset, start, class].
-const WEEK: Array<[number, string, OfferingKey]> = [
-  [0, '09:00', 'spine'],
-  [0, '17:00', 'ashtanga'],
-  [1, '19:15', 'restorative'],
-  [2, '09:00', 'spine'],
-  [2, '18:15', 'blackLotus'],
-  [3, '17:00', 'ashtanga'],
-  [3, '19:15', 'restorative'],
-  [4, '18:15', 'blackLotus'],
-  [4, '19:45', 'pranayama'],
-  [6, '09:00', 'ashtanga'],
-];
 
 interface DevMember {
   name: string;
@@ -169,6 +178,13 @@ export function devSeed({ now }: { now: string }): SeedRow[] {
   for (const r of rows) {
     const key = (Object.keys(SEED.offerings) as OfferingKey[]).find((k) => SEED.offerings[k] === r.row.id);
     if (r.table === 'offering' && key) r.row.teacher_ids = JSON.stringify(teaching[key] ?? []);
+  }
+  // The standard week names each class's usual teacher, so its rows go after the teachers'.
+  const slots = rows.filter((r) => r.table === 'week_slot');
+  rows.splice(0, rows.length, ...rows.filter((r) => r.table !== 'week_slot'), ...slots);
+  for (const r of slots) {
+    const slotKey = (Object.keys(SEED.offerings) as OfferingKey[]).find((k) => SEED.offerings[k] === r.row.offering_id)!;
+    r.row.teacher_staff_id = teaching[slotKey]?.[0] ?? null;
   }
 
   // The three weeks before this one (past sessions to hang visits on), this week, and the next

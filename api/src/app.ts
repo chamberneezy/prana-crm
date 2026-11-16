@@ -12,6 +12,7 @@ import { members } from './routes/members';
 import { memberships, plans } from './routes/memberships';
 import { offeringGroups, offerings } from './routes/offerings';
 import { payments } from './routes/payments';
+import { closures, weekPlan, weekTemplate } from './routes/planner';
 import { sessions, visits } from './routes/sessions';
 import { sync } from './routes/sync';
 
@@ -42,6 +43,9 @@ export function createApp(options: AppOptions = {}) {
   api.route('/offerings', offerings);
   api.route('/sessions', sessions);
   api.route('/visits', visits);
+  api.route('/closures', closures);
+  api.route('/week-plan', weekPlan);
+  api.route('/week-template', weekTemplate);
   api.route('/plans', plans);
   api.route('/memberships', memberships);
   api.route('/payments', payments);

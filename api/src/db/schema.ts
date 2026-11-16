@@ -74,6 +74,25 @@ export const session = sqliteTable('session', {
   ...meta,
 });
 
+export const closure = sqliteTable('closure', {
+  id: text().primaryKey(),
+  business_id: text().notNull(),
+  date: text().notNull(),
+  name: text().notNull(),
+  ...meta,
+});
+
+export const weekSlot = sqliteTable('week_slot', {
+  id: text().primaryKey(),
+  business_id: text().notNull(),
+  weekday: integer().notNull(),
+  start_time: text().notNull(),
+  duration_min: integer().notNull(),
+  offering_id: text().notNull(),
+  teacher_staff_id: text(),
+  ...meta,
+});
+
 export const member = sqliteTable('member', {
   id: text().primaryKey(),
   business_id: text().notNull(),

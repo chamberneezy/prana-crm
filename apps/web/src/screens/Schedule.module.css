@@ -211,3 +211,22 @@
     height: 44px;
   }
 }
+
+/* A closed day (holiday): its name under the date, and its sessions shown as cancelled. */
+.closed {
+  padding: 6px 14px;
+  background: var(--bg-attention);
+  color: var(--text-attention);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cancelled .sessionName,
+.cancelled .sessionTime {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.cancelled .sessionMeta {
+  color: var(--text-attention);
+}

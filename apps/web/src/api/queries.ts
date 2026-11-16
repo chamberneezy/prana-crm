@@ -1,5 +1,12 @@
 import type {
   AnalyticsResponse,
+  ClosureInput,
+  ClosureResponse,
+  ClosuresResponse,
+  TeacherOfferingsInput,
+  WeekPlanInput,
+  WeekTemplateInput,
+  WeekTemplateResponse,
   ApiMemberStatus,
   DashboardResponse,
   MembershipInput,
@@ -124,6 +131,81 @@ export function useAddTeacher() {
     mutationFn: (input: TeacherInput) => api<StaffResponse>('POST', '/staff', input),
     onSuccess: () => client.invalidateQueries({ queryKey: ['staff'] }),
   });
+}
+
+export function useRenameTeacher(id: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: TeacherInput) => api<StaffResponse>('PATCH', `/staff/${id}`, input),
+    // Sessions show the teacher's name.
+    onSuccess: () => Promise.all([client.invalidateQueries({ queryKey: ['staff'] }), client.invalidateQueries({ queryKey: ['sessions'] })]),
+  });
+}
+
+export function useRemoveTeacher() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>('DELETE', `/staff/${id}`),
+    onSuccess: () => Promise.all([client.invalidateQueries({ queryKey: ['staff'] }), client.invalidateQueries({ queryKey: ['offerings'] }), client.invalidateQueries({ queryKey: ['week-template'] })]),
+  });
+}
+
+/** Which class types someone teaches. */
+export function useSetTeacherOfferings() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...input }: TeacherOfferingsInput & { id: string }) => api<void>('PUT', `/staff/${id}/offerings`, input),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['offerings'] }),
+  });
+}
+
+// ── Closed days and the week planner ─────────────────────────────────────────
+
+export function useClosures(from: string, to: string) {
+  return useQuery({
+    queryKey: ['closures', from, to],
+    queryFn: () => api<ClosuresResponse>('GET', `/closures?from=${from}&to=${to}`),
+    placeholderData: keepPreviousData,
+  });
+}
+
+function useClosuresChanged() {
+  const client = useQueryClient();
+  // Sessions carry whether their day is closed.
+  return () => Promise.all([client.invalidateQueries({ queryKey: ['closures'] }), client.invalidateQueries({ queryKey: ['sessions'] }), client.invalidateQueries({ queryKey: ['dashboard'] })]);
+}
+
+export function useAddClosure() {
+  const onSuccess = useClosuresChanged();
+  return useMutation({ mutationFn: (input: ClosureInput) => api<ClosureResponse>('POST', '/closures', input), onSuccess });
+}
+
+export function useRemoveClosure() {
+  const onSuccess = useClosuresChanged();
+  return useMutation({ mutationFn: (id: string) => api<void>('DELETE', `/closures/${id}`), onSuccess });
+}
+
+export function useWeekTemplate() {
+  return useQuery({ queryKey: ['week-template'], queryFn: () => api<WeekTemplateResponse>('GET', '/week-template') });
+}
+
+export function useSaveWeekTemplate() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: WeekTemplateInput) => api<WeekTemplateResponse>('PUT', '/week-template', input),
+    onSuccess: (data) => client.setQueryData(['week-template'], data),
+  });
+}
+
+/** Sessions of one week, read straight from the API (for copying a week). */
+export function useFetchWeek() {
+  const client = useQueryClient();
+  return (from: string, to: string) => client.fetchQuery({ queryKey: ['sessions', 'range', from, to], queryFn: () => api<SessionsResponse>('GET', `/sessions?from=${from}&to=${to}`) });
+}
+
+export function useSaveWeekPlan(monday: string) {
+  const onSuccess = useSessionsChanged();
+  return useMutation({ mutationFn: (input: WeekPlanInput) => api<SessionsResponse>('PUT', `/week-plan/${monday}`, input), onSuccess });
 }
 
 export function useSessions(from: string, to: string) {

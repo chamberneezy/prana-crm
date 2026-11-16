@@ -16,7 +16,9 @@ import styles from './Shell.module.css';
 export const SECTIONS: Array<{ id: Area; path: string; label: MessageKey }> = [
   { id: 'overview', path: '/pregled', label: 'nav.overview' },
   { id: 'schedule', path: '/raspored', label: 'nav.schedule' },
+  { id: 'planner', path: '/tjedni-plan', label: 'nav.planner' },
   { id: 'offerings', path: '/vrste-satova', label: 'nav.offerings' },
+  { id: 'teachers', path: '/ucitelji', label: 'nav.teachers' },
   { id: 'members', path: '/clanovi', label: 'nav.members' },
   { id: 'plans', path: '/karte', label: 'nav.plans' },
   { id: 'payments', path: '/uplate', label: 'nav.payments' },

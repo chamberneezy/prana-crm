@@ -3,17 +3,18 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { CanEdit } from '../auth/access';
 import { errorMessage } from '../api/client';
-import { useOfferings, useSessions } from '../api/queries';
+import { useClosures, useOfferings, useSessions } from '../api/queries';
 import { useMe } from '../auth/AuthProvider';
 import { Button, Notice, PageHeader, SidePanel } from '../components';
 import { cx } from '../components/cx';
 import { useLang } from '../i18n';
 import { sessionMeta } from '../lib/session';
 import styles from './Schedule.module.css';
+import { ClosuresPanel } from './ClosuresPanel';
 import { SessionForm } from './SessionForm';
 import { SessionPanel } from './SessionPanel';
 
-type Panel = { kind: 'session'; id: string } | { kind: 'new'; offeringId?: string; date?: string } | null;
+type Panel = { kind: 'session'; id: string } | { kind: 'new'; offeringId?: string; date?: string } | { kind: 'closures' } | null;
 
 const DAYS = [0, 1, 2, 3, 4, 5, 6];
 
@@ -43,6 +44,8 @@ export function Schedule() {
 
   const sessions = useSessions(monday, addDays(monday, 6));
   const offerings = useOfferings();
+  const closures = useClosures(monday, addDays(monday, 6));
+  const closed = new Map((closures.data?.closures ?? []).map((c) => [c.date, c.name]));
   const all = offerings.data?.offerings ?? [];
   const error = sessions.error ?? offerings.error;
 
@@ -73,6 +76,9 @@ export function Schedule() {
           )}
         </div>
         <CanEdit area="schedule">
+          <Button variant="secondary" onClick={() => setPanel({ kind: 'closures' })}>
+            {t('closures.button')}
+          </Button>
           <Button onClick={() => setPanel({ kind: 'new', date: defaultDate })}>{t('schedule.newSession')}</Button>
         </CanEdit>
       </PageHeader>
@@ -89,9 +95,10 @@ export function Schedule() {
                   <span className={styles.dayName}>{t(`weekday.short.${offset + 1}` as 'weekday.short.1')}</span>
                   <span className={cx(styles.dayDate, date === today && styles.today)}>{isoToDisplayDate(date).slice(0, 6)}</span>
                 </div>
+                {closed.has(date) && <div className={styles.closed}>{t('planner.closedDay', { name: closed.get(date)! })}</div>}
                 <div className={styles.dayBody}>
                   {(byDay.get(date) ?? []).map((s) => (
-                    <button key={s.id} type="button" className={cx(styles.session, panel?.kind === 'session' && panel.id === s.id && styles.sessionOpen)} onClick={() => setPanel({ kind: 'session', id: s.id })}>
+                    <button key={s.id} type="button" className={cx(styles.session, s.closure_name && styles.cancelled, panel?.kind === 'session' && panel.id === s.id && styles.sessionOpen)} onClick={() => setPanel({ kind: 'session', id: s.id })}>
                       <span className={styles.sessionTime}>
                         <span className={styles.pill} style={{ background: `var(--${s.color_token})` }} />
                         {formatTimeRange(s.starts_at, s.ends_at)}
@@ -134,6 +141,7 @@ export function Schedule() {
           {offerings.data && <SessionForm key={`${panel.offeringId}-${panel.date}`} offerings={all} offeringId={panel.offeringId} date={panel.date ?? defaultDate} onDone={() => setPanel(null)} />}
         </SidePanel>
       )}
+      {panel?.kind === 'closures' && <ClosuresPanel monday={monday} date={defaultDate} onClose={() => setPanel(null)} />}
       {panel?.kind === 'session' && <SessionPanel key={panel.id} sessionId={panel.id} offerings={all} onClose={() => setPanel(null)} />}
     </>
   );

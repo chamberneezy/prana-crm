@@ -1,0 +1,196 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.intro p {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.muted {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 13px;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.closedDay {
+  border-color: var(--blush);
+}
+
+.dayHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dayHead h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dayDate {
+  color: var(--text-3);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Class · start · length · teacher · remove. Below 768 px the row wraps into two lines. */
+.row {
+  display: grid;
+  grid-template-columns: 8px minmax(180px, 2fr) 136px 80px minmax(140px, 1.4fr) 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  width: 8px;
+  height: 22px;
+  border-radius: var(--radius-full);
+}
+
+.control {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-1);
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: var(--transition-color);
+}
+
+.control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.control[aria-invalid='true'] {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px var(--blush);
+}
+
+.remove {
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove:hover:not(:disabled) {
+  border-color: var(--border-field);
+  color: var(--text-attention);
+}
+
+.remove:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.remove:disabled {
+  color: var(--border-field);
+  cursor: not-allowed;
+}
+
+.closures {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.overline {
+  margin: 0;
+  color: var(--text-3);
+  font: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+}
+
+.closureList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.closureRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .row {
+    grid-template-columns: 8px 136px 64px minmax(0, 1fr) 44px;
+    grid-template-areas: 'pill class class class remove' 'pill start length teacher teacher';
+  }
+
+  .row > :nth-child(1) {
+    grid-area: pill;
+    height: 100%;
+  }
+  .classSelect {
+    grid-area: class;
+  }
+  .row > input[type='time'] {
+    grid-area: start;
+  }
+  .duration {
+    grid-area: length;
+  }
+  .teacherSelect {
+    grid-area: teacher;
+  }
+  .remove {
+    grid-area: remove;
+    width: 44px;
+    height: 44px;
+  }
+  .control {
+    height: 44px;
+  }
+}

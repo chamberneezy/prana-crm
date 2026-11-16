@@ -23,9 +23,13 @@ export const ROUTES: Array<{ prefix: string; read: Rule; write: Rule }> = [
   { prefix: '/payments', read: ['payments', 'members'], write: ['payments', 'members'] },
   { prefix: '/offering-groups', read: ['offerings', 'schedule'], write: ['offerings'] },
   { prefix: '/offerings', read: ['offerings', 'schedule'], write: ['offerings'] },
-  { prefix: '/sessions', read: ['schedule', 'overview'], write: ['schedule'] },
+  { prefix: '/sessions', read: ['schedule', 'overview', 'planner'], write: ['schedule'] },
   { prefix: '/visits', read: ['schedule'], write: ['schedule'] },
-  { prefix: '/staff', read: ['schedule', 'offerings'], write: ['offerings'] },
+  // Holidays are set on Raspored or in the week planner.
+  { prefix: '/closures', read: ['schedule', 'overview', 'planner'], write: ['schedule', 'planner'] },
+  { prefix: '/week-plan', read: ['planner'], write: ['planner'] },
+  { prefix: '/week-template', read: ['planner'], write: ['planner'] },
+  { prefix: '/staff', read: ['schedule', 'offerings', 'teachers', 'planner'], write: ['offerings', 'teachers'] },
   // The iOS app's sync reads and writes everything.
   { prefix: '/sync', read: 'full', write: 'full' },
 ];

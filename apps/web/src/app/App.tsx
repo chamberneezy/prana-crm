@@ -19,6 +19,8 @@ import { Overview } from '../screens/Overview';
 import { Payments } from '../screens/Payments';
 import { Plans } from '../screens/Plans';
 import { Schedule } from '../screens/Schedule';
+import { Teachers } from '../screens/Teachers';
+import { WeekPlanner } from '../screens/WeekPlanner';
 import { homePath, Shell } from './Shell';
 import { ToastProvider } from './ToastProvider';
 
@@ -49,7 +51,9 @@ function SignedIn() {
         <Route index element={<Navigate to={home} replace />} />
         <Route path="pregled" element={page('overview', <Overview />)} />
         <Route path="raspored" element={page('schedule', <Schedule />)} />
+        <Route path="tjedni-plan" element={page('planner', <WeekPlanner />)} />
         <Route path="vrste-satova" element={page('offerings', <Offerings />)} />
+        <Route path="ucitelji" element={page('teachers', <Teachers />)} />
         <Route path="clanovi" element={page('members', <Members />)} />
         <Route path="clanovi/novi" element={page('members', <ImportMember />, true)} />
         <Route path="clanovi/novi/rucno" element={page('members', <NewMember />, true)} />

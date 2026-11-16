@@ -93,6 +93,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
   return (
     <SidePanel title={session.offering_name} lead={lead} onClose={onClose}>
       {failure && <Notice>{failure}</Notice>}
+      {session.closure_name && <Notice title={t('session.cancelled')}>{t('session.cancelledNotice', { name: session.closure_name })}</Notice>}
 
       <dl className={styles.facts}>
         <div>
@@ -154,31 +155,34 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
         </ul>
       </section>
 
-      <section className={styles.section} hidden={!canEdit('schedule')}>
-        <h3 className={styles.overline}>{t('session.checkIn')}</h3>
-        <Input placeholder={t('members.search.placeholder')} label={t('session.checkIn.search')} value={text} onChange={(e) => setText(e.target.value)} />
-        {q.length >= 2 && found.data && (
-          <ul className={styles.list}>
-            {found.data.members.map((m) => (
-              <li key={m.id} className={styles.person}>
-                <Avatar name={m.full_name} size={32} />
-                <span className={styles.personText}>
-                  <strong>{m.full_name}</strong>
-                  <span className={styles.sub}>{memberSubline(m, strings)}</span>
-                </span>
-                {present.has(m.id) ? (
-                  <span className={styles.done}>{t('session.checkIn.done')}</span>
-                ) : (
-                  <Button variant="secondary" size="sm" aria-label={`${t('session.checkIn.action')}: ${m.full_name}`} disabled={checkIn.isPending} onClick={() => onCheckIn(m.id)}>
-                    {t('session.checkIn.action')}
-                  </Button>
-                )}
-              </li>
-            ))}
-            {found.data.members.length === 0 && <li className={styles.none}>{t('session.checkIn.noResults')}</li>}
-          </ul>
-        )}
-      </section>
+      {/* Nobody can be checked in to a class cancelled by a closed day. */}
+      {canEdit('schedule') && !session.closure_name && (
+        <section className={styles.section}>
+          <h3 className={styles.overline}>{t('session.checkIn')}</h3>
+          <Input placeholder={t('members.search.placeholder')} label={t('session.checkIn.search')} value={text} onChange={(e) => setText(e.target.value)} />
+          {q.length >= 2 && found.data && (
+            <ul className={styles.list}>
+              {found.data.members.map((m) => (
+                <li key={m.id} className={styles.person}>
+                  <Avatar name={m.full_name} size={32} />
+                  <span className={styles.personText}>
+                    <strong>{m.full_name}</strong>
+                    <span className={styles.sub}>{memberSubline(m, strings)}</span>
+                  </span>
+                  {present.has(m.id) ? (
+                    <span className={styles.done}>{t('session.checkIn.done')}</span>
+                  ) : (
+                    <Button variant="secondary" size="sm" aria-label={`${t('session.checkIn.action')}: ${m.full_name}`} disabled={checkIn.isPending} onClick={() => onCheckIn(m.id)}>
+                      {t('session.checkIn.action')}
+                    </Button>
+                  )}
+                </li>
+              ))}
+              {found.data.members.length === 0 && <li className={styles.none}>{t('session.checkIn.noResults')}</li>}
+            </ul>
+          )}
+        </section>
+      )}
 
       {mode === 'confirmDelete' ? (
         <Notice title={t('session.deleteConfirm.title')}>

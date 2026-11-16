@@ -52,6 +52,8 @@ export const ERROR_CODES = [
   'invalid_input',
   'consent_required',
   'already_checked_in',
+  'day_closed',
+  'session_has_visits',
   'file_too_large',
   'unsupported_file',
   'internal',
@@ -125,6 +127,31 @@ export const sessionSchema = z.object({
   note: z.string().nullable(),
   ...meta,
 }).meta({ id: 'Session' });
+
+/** "HH:MM", studio time. */
+const clockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+
+/** A day the studio is closed (a holiday): its sessions stay, shown as cancelled, and nobody can check in. */
+export const closureSchema = z.object({
+  id,
+  business_id: id,
+  date: isoDate,
+  name: z.string(),
+  ...meta,
+}).meta({ id: 'Closure' });
+
+/** One class of the standard week: what a usual week looks like, to start a week's plan from. */
+export const weekSlotSchema = z.object({
+  id,
+  business_id: id,
+  /** 1 = Monday … 7 = Sunday. */
+  weekday: z.number().int().min(1).max(7),
+  start_time: clockTime,
+  duration_min: z.number().int(),
+  offering_id: id,
+  teacher_staff_id: id.nullable(),
+  ...meta,
+}).meta({ id: 'WeekSlot' });
 
 export const memberSchema = z.object({
   id,
@@ -215,6 +242,8 @@ export type Staff = z.infer<typeof staffSchema>;
 export type OfferingGroup = z.infer<typeof offeringGroupSchema>;
 export type Offering = z.infer<typeof offeringSchema>;
 export type Session = z.infer<typeof sessionSchema>;
+export type Closure = z.infer<typeof closureSchema>;
+export type WeekSlot = z.infer<typeof weekSlotSchema>;
 export type Member = z.infer<typeof memberSchema>;
 export type Plan = z.infer<typeof planSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
@@ -233,6 +262,8 @@ export const sessionViewSchema = sessionSchema.extend({
   booked: z.number().int(),
   /** The session's capacity, or the class type's default; null = no limit set. */
   effective_capacity: z.number().int().nullable(),
+  /** Set when the studio is closed that day (the holiday's name): the session is cancelled. */
+  closure_name: z.string().nullable(),
 }).meta({ id: 'SessionView' });
 
 export const membershipViewSchema = membershipSchema.extend({
@@ -373,6 +404,34 @@ export const sessionInputSchema = z.object({
 });
 export const sessionPatchSchema = sessionInputSchema.partial();
 
+/** Which class types a teacher teaches. Ticked ones list them (last, if new); the rest stop listing them. */
+export const teacherOfferingsInputSchema = z.object({ offering_ids: z.array(id).max(100) });
+
+export const closuresQuerySchema = sessionsQuerySchema;
+export const closureInputSchema = z.object({ date: isoDate, name: shortText.min(1) });
+
+const weekSlotInputSchema = z.object({
+  weekday: z.number().int().min(1).max(7),
+  start_time: clockTime,
+  duration_min: z.number().int().min(5).max(24 * 60),
+  offering_id: id,
+  teacher_staff_id: id.nullable(),
+});
+/** The whole standard week; it replaces the one saved before. */
+export const weekTemplateInputSchema = z.object({ slots: z.array(weekSlotInputSchema).max(200) });
+
+/** One class of a week's plan. With `id`, an existing session of that week is changed; without, one is added. */
+const weekPlanSessionSchema = z.object({
+  id: id.optional(),
+  date: isoDate,
+  start_time: clockTime,
+  duration_min: z.number().int().min(5).max(24 * 60),
+  offering_id: id,
+  teacher_staff_id: id.nullable(),
+});
+/** Every class of the week: sessions of that week left out are deleted (never one with check-ins). */
+export const weekPlanInputSchema = z.object({ sessions: z.array(weekPlanSessionSchema).max(200) });
+
 export const visitInputSchema = z.object({ member_id: id });
 
 export const membershipInputSchema = z.object({
@@ -501,6 +560,9 @@ export const offeringsResponseSchema = z.object({ offerings: z.array(offeringVie
 export const offeringResponseSchema = z.object({ offering: offeringSchema });
 
 export const sessionsResponseSchema = z.object({ sessions: z.array(sessionViewSchema) });
+export const closuresResponseSchema = z.object({ closures: z.array(closureSchema) });
+export const closureResponseSchema = z.object({ closure: closureSchema });
+export const weekTemplateResponseSchema = z.object({ slots: z.array(weekSlotSchema) });
 export const sessionResponseSchema = z.object({ session: sessionViewSchema });
 export const sessionDetailResponseSchema = z.object({ session: sessionViewSchema, attendees: z.array(attendeeSchema) });
 
@@ -574,6 +636,13 @@ export type OfferingResponse = z.infer<typeof offeringResponseSchema>;
 export type SessionResponse = z.infer<typeof sessionResponseSchema>;
 export type OfferingsResponse = z.infer<typeof offeringsResponseSchema>;
 export type SessionsResponse = z.infer<typeof sessionsResponseSchema>;
+export type ClosuresResponse = z.infer<typeof closuresResponseSchema>;
+export type ClosureResponse = z.infer<typeof closureResponseSchema>;
+export type WeekTemplateResponse = z.infer<typeof weekTemplateResponseSchema>;
+export type ClosureInput = z.infer<typeof closureInputSchema>;
+export type WeekTemplateInput = z.infer<typeof weekTemplateInputSchema>;
+export type WeekPlanInput = z.infer<typeof weekPlanInputSchema>;
+export type TeacherOfferingsInput = z.infer<typeof teacherOfferingsInputSchema>;
 export type SessionDetailResponse = z.infer<typeof sessionDetailResponseSchema>;
 export type VisitResponse = z.infer<typeof visitResponseSchema>;
 export type PlansResponse = z.infer<typeof plansResponseSchema>;
@@ -630,6 +699,8 @@ export const syncPullResponseSchema = z.object({
     visit: z.array(visitSchema),
     payment: z.array(paymentSchema),
     document: z.array(documentSchema),
+    closure: z.array(closureSchema),
+    week_slot: z.array(weekSlotSchema),
   }),
 });
 

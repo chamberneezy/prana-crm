@@ -129,6 +129,8 @@ Status is derived in the API and nowhere else. Both apps only display it. Rules 
 
 `price_cents` stays null until Mario provides prices.
 
+**Standard week** (`week_slot`): the poster's week of 8 November 2026, the one the week planner starts from: Mon 09:00 Kralježnica · 17:00 Ashtanga; Tue 19:15 Restorativna; Wed 09:00 Kralježnica · 18:15 Black Lotus; Thu 17:00 Ashtanga · 19:15 Restorativna; Fri 18:15 Black Lotus · 19:45 Pranayama; Sun 09:00 Ashtanga. No teachers until the studio names them.
+
 ### Seed (dev only)
 
 **One sample week of sessions**, Mon–Sun:
@@ -169,7 +171,10 @@ Every request sends `Authorization: Bearer <Firebase ID token>`. The Worker:
 | Members | `GET /members?q=&status=` · `GET /members/:id` (with current membership, last visits, payments, documents) · `POST /members` · `PATCH /members/:id` · `DELETE /members/:id` (soft delete; the R2 file is deleted too) |
 | Class types | `GET /offering-groups` · `GET/POST/PATCH /offerings` |
 | Sessions | `GET /sessions?from=&to=` · `POST /sessions` (from an offering: offering_id, starts_at; ends_at defaults from duration) · `PATCH /sessions/:id` · `DELETE /sessions/:id` |
-| Visits | `POST /sessions/:id/visits {member_id}` (check-in) · `DELETE /visits/:id` |
+| Visits | `POST /sessions/:id/visits {member_id}` (check-in; 409 `day_closed` on a closed day) · `DELETE /visits/:id` |
+| Teachers | `GET/POST /staff` · `PATCH/DELETE /staff/:id` (teachers only; removing one takes them off class types and the standard week) · `PUT /staff/:id/offerings {offering_ids}` (which class types they teach; newly ticked ones list them last) |
+| Closed days | `GET /closures?from=&to=` · `POST /closures {date, name}` (closing a closed day renames it) · `DELETE /closures/:id`. A session on a closed day has `closure_name` set: it stays on the schedule as cancelled and nobody can check in. |
+| Week planner | `PUT /week-plan/:monday {sessions:[{id?, date, start_time, duration_min, offering_id, teacher_staff_id}]}` sets the whole week: listed ids are changed, new rows added, the week's other sessions deleted (409 `session_has_visits` if one has check-ins) · `GET/PUT /week-template {slots:[{weekday, start_time, duration_min, offering_id, teacher_staff_id}]}` (the standard week, replaced whole) |
 | Memberships | `POST /memberships` · `POST /memberships/:id/renew` · `POST /memberships/:id/freeze {until}` |
 | Payments | `GET /payments?from=&to=` · `POST /payments` |
 | Documents | `POST /documents` (multipart, ≤ 20 MB; pdf, jpg, png, heic; stored at `{business_id}/documents/{id}`) · `GET /documents/:id/file` (streamed after the auth check) · `PATCH /documents/:id {member_id, ocr_json}` |
@@ -412,7 +417,7 @@ Sections are numbered as on the paper form:
 
 ## B4. App shell
 
-- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Vrste satova, Članovi, Članarine, Uplate, Analitika**, with the HR/EN switch at the foot.
+- **Desktop**: an ink `Sidebar` (logo inverted). Items: **Pregled, Raspored, Tjedni plan, Vrste satova, Učitelji, Članovi, Članarine, Uplate, Analitika**, with the HR/EN switch at the foot.
 - **Workspace**: linen. Content max-width 1160 px, padding 32 px top and 48 px sides.
 - **Below 768 px**: the sidebar becomes a top bar with a menu button. Wide tables scroll horizontally inside their card.
 - **Feedback**: right-click on anything opens a form (`src/feedback/`) offering the element, each named section around it and the whole page, with a type (something's wrong / suggestion / question) and a comment. Shift + right-click keeps the browser's menu. A hint under the account in the sidebar says so. On where `VITE_FEEDBACK=firestore`.
@@ -461,6 +466,12 @@ These match the artboards on the canvas's Web page.
    - On save: create the member and the document link (PATCH the document with member_id and ocr_json). Show the Toast "<Ime> je spremljen/a kao novi član." with "Poništi", plus an "Otvori profil ›" link.
 
 **Članarine** and **Uplate** aren't designed yet. v1 is simple lists built from the same components: plans with prices; payments by month with totals. No new patterns. Članarine has "Nova članarina" (top right) for the studio's own plans: name, visits per month (empty = unlimited) and price; they are offered on the sign-up form after the standard ones.
+
+**Tjedni plan** (`/tjedni-plan?tjedan=`) and **Učitelji** (`/ucitelji`) aren't designed either; same cards and tokens.
+
+- **Tjedni plan**: week navigation as on Raspored and "Spremi tjedan" (primary). Tools: "Popuni iz standardnog tjedna", "Kopiraj prethodni tjedan", "Spremi kao standardni tjedan", "Neradni dan". One card per day (Ponedjeljak–Nedjelja) with a row per class: class · start · length · teacher · remove, and "+ Dodaj sat". Choosing a class fills in its length and first teacher. Filling skips closed days, keeps a class already at the same time (its session, check-ins, capacity and note) and never drops a session with check-ins (its remove button is disabled). Nothing reaches Raspored until "Spremi tjedan"; while there are unsaved changes the week can't be changed ("Odbaci promjene" drops them).
+- **Neradni dan** (a side panel, from Raspored and Tjedni plan): date and name ("Božić"); lists the closed days of the week shown, each with "Ukloni". On Raspored the day shows "Neradni dan · <name>" and its sessions are struck through with "Otkazano · <name>"; their panel says so and has no check-in.
+- **Učitelji**: table Ime · Vodi (class pills) · Termina ovaj tjedan · "Uredi". The form has the name (an owner's is read-only) and the class types they teach; teachers (not owners) can be removed.
 
 **Analitika** (`/analitika`, `GET /api/analytics?months=`) isn't designed either; it uses the same cards and tokens. Over the last 3, 6 or 12 calendar months: totals (visits, income, average per class, members who came); visits and income per month (columns); visits per class type (bars, with the class colour as a dot); when people come (weekday × start hour, one hue, darker is more); the most active members and the least active ones with a current membership (last 30 days); income by payment method and by membership. Every mark has its value on hover and for screen readers.
 

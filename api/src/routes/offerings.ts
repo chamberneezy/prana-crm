@@ -16,7 +16,7 @@ import { ApiError } from '../errors';
 import { blankToNull, created, ctx, owned, parseBody, publicRow, touched } from '../lib/http';
 
 /** Teacher ids as given, once each, each one a live staff member of this business. */
-async function checkedTeachers(db: Db, businessId: string, ids: string[]): Promise<string[]> {
+export async function checkedTeachers(db: Db, businessId: string, ids: string[]): Promise<string[]> {
   const unique = [...new Set(ids)];
   if (!unique.length) return [];
   const found = await db

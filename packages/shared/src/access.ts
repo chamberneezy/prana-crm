@@ -6,7 +6,7 @@ import type { StaffRole } from './schemas';
  */
 
 /** The parts of the app, one per sidebar section. */
-export const AREAS = ['overview', 'schedule', 'offerings', 'members', 'plans', 'payments', 'analytics'] as const;
+export const AREAS = ['overview', 'schedule', 'planner', 'offerings', 'teachers', 'members', 'plans', 'payments', 'analytics'] as const;
 export type Area = (typeof AREAS)[number];
 
 /** none: hidden; view: can open it, can't change anything; edit: everything. */
