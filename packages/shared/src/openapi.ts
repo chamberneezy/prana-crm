@@ -14,6 +14,8 @@ export interface RouteSpec {
   multipart?: Record<string, { type: 'string'; format?: 'binary'; enum?: readonly string[] }>;
   /** Left out: 204 with no body. */
   response?: z.ZodType;
+  /** Needs no sign-in (the studio's public app). */
+  public?: boolean;
   /** Set when the response is a file rather than JSON. */
   binaryResponse?: boolean;
   status?: 200 | 201 | 204;
@@ -53,6 +55,12 @@ export const routes: RouteSpec[] = [
   { method: 'get', path: '/closures', summary: 'Days the studio is closed, between two dates', query: s.closuresQuerySchema, response: s.closuresResponseSchema },
   { method: 'post', path: '/closures', summary: "Close a day (a holiday): its sessions are cancelled", body: s.closureInputSchema, response: s.closureResponseSchema, status: 201 },
   { method: 'delete', path: '/closures/{id}', summary: 'Open a closed day again; its sessions come back' },
+
+  { method: 'delete', path: '/bookings/{id}', summary: 'Remove a najava (a sign-up from the app)' },
+
+  { method: 'get', path: '/public/studios/{studioId}/schedule', summary: "The studio's classes for anyone, no sign-in", query: s.publicScheduleQuerySchema, response: s.publicScheduleResponseSchema, public: true },
+  { method: 'post', path: '/public/studios/{studioId}/bookings', summary: 'Sign up for a class by first and last name; only members match', body: s.publicBookingInputSchema, response: s.publicBookingResponseSchema, status: 201, public: true },
+  { method: 'delete', path: '/public/studios/{studioId}/bookings/{id}', summary: 'Cancel a sign-up with its cancel token (header X-Cancel-Token)', public: true },
 
   { method: 'put', path: '/week-plan/{monday}', summary: "Set every class of a week: changes, adds and deletes that week's sessions", body: s.weekPlanInputSchema, response: s.sessionsResponseSchema },
   { method: 'get', path: '/week-template', summary: 'The standard week', response: s.weekTemplateResponseSchema },
@@ -139,6 +147,7 @@ export function buildOpenApi() {
     paths[route.path] ??= {};
     paths[route.path]![route.method] = {
       summary: route.summary,
+      ...(route.public ? { security: [] } : {}),
       ...(parameters.length ? { parameters } : {}),
       ...(requestBody ? { requestBody } : {}),
       responses: {
@@ -153,7 +162,7 @@ export function buildOpenApi() {
     info: {
       title: 'Prana CRM API',
       version: '1.0.0',
-      description: 'Dates are YYYY-MM-DD, instants are UTC ISO 8601, money is integer cents. Every request needs a Firebase ID token.',
+      description: 'Dates are YYYY-MM-DD, instants are UTC ISO 8601, money is integer cents. Every request needs a Firebase ID token, except under /public (the studio app).',
     },
     servers: [{ url: '/api' }],
     security: [{ firebase: [] }],

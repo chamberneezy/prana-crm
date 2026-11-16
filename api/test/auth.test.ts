@@ -146,7 +146,8 @@ describe('roles', () => {
   });
 
   it('every endpoint belongs to a part of the app (so none falls back to owners-only by accident)', () => {
-    for (const route of routes) {
+    // The studio's public app (/public) needs no sign-in, so it has no part.
+    for (const route of routes.filter((r) => !r.public)) {
       const path = route.path.replace(/\{[^}]+\}/g, 'x');
       expect(ROUTES.some((r) => path === r.prefix || path.startsWith(`${r.prefix}/`)), path).toBe(true);
     }

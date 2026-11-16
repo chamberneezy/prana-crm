@@ -550,7 +550,7 @@ describe('sync (iOS)', () => {
   it('pulls everything first, deleted rows included, without server-only columns', async () => {
     const { status, body } = await t.call('GET', '/sync');
     expect(status).toBe(200);
-    expect(Object.keys(body.changes).sort()).toEqual(['closure', 'document', 'location', 'member', 'membership', 'offering', 'offering_group', 'payment', 'plan', 'session', 'staff', 'visit', 'week_slot']);
+    expect(Object.keys(body.changes).sort()).toEqual(['booking', 'closure', 'document', 'location', 'member', 'membership', 'offering', 'offering_group', 'payment', 'plan', 'session', 'staff', 'visit', 'week_slot']);
     // The five standard plans, plus the studio's own one added and removed above.
     expect(body.changes.plan.filter((p: { code: string }) => p.code !== 'custom')).toHaveLength(5);
     expect(body.changes.plan.some((p: { code: string; deleted_at: string | null }) => p.code === 'custom' && p.deleted_at !== null)).toBe(true);
@@ -743,6 +743,73 @@ describe('week planner, standard week and closed days', () => {
 
     expect((await t.call('DELETE', `/staff/${lana.id}`)).status).toBe(204);
     expect((await teachers())[SEED.offerings.pranayama]).toEqual([]);
+  });
+});
+
+describe("the studio's public app (no sign-in)", () => {
+  const studio = `/public/studios/${SEED.business}`;
+  const noToken = { token: null };
+  // The first session after today in the sample data (there is one most days); it hasn't finished.
+  let sessionId: string;
+  let day: string;
+
+  it('shows the classes without signing in, and nothing personal', async () => {
+    const { status, body } = await t.call('GET', `${studio}/schedule?from=${addDays(today, 1)}&to=${addDays(today, 7)}`, noToken);
+    expect(status).toBe(200);
+    expect(body.studio).toEqual({ name: 'Prana Yoga Studio', timezone: 'Europe/Zagreb' });
+    expect(body.sessions.length).toBeGreaterThan(0);
+    expect(Object.keys(body.sessions[0]).sort()).toEqual(['closure_name', 'color_token', 'ends_at', 'entry_rule', 'id', 'offering_id', 'offering_name', 'starts_at', 'teacher_name']);
+    sessionId = body.sessions[0].id;
+    day = localDate(body.sessions[0].starts_at);
+
+    expect((await t.call('GET', `/public/studios/${uuidv7()}/schedule`, noToken)).status).toBe(404);
+    expect((await t.call('GET', `${studio}/schedule?from=${today}&to=${addDays(today, 40)}`, noToken)).status).toBe(400);
+    // Signed-in staff routes stay closed.
+    expect((await t.call('GET', '/sessions', noToken)).status).toBe(401);
+  });
+
+  it('a member signs up by name (any case, without diacritics); staff see the najava', async () => {
+    const res = await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: '  nina ', last_name: 'SIMIC' } });
+    expect(res.status).toBe(201);
+    expect(res.body.booking).toEqual({ id: expect.any(String), session_id: sessionId, cancel_token: expect.stringMatching(/^[\w-]{40,}$/) });
+
+    const detail = (await t.call('GET', `/sessions/${sessionId}`)).body;
+    expect(detail.session.reserved).toBe(1);
+    expect(detail.reservations).toEqual([expect.objectContaining({ booking_id: res.body.booking.id, full_name: 'Nina Šimić', checked_in: false })]);
+
+    // Signing up again keeps one sign-up, with a new token.
+    const again = await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: 'Nina', last_name: 'Šimić' } });
+    expect(again.status).toBe(200);
+    expect(again.body.booking.id).toBe(res.body.booking.id);
+    expect((await t.call('GET', `/sessions/${sessionId}`)).body.session.reserved).toBe(1);
+
+    // Only the latest token cancels it.
+    const cancel = (token: string) => t.app.request(`/api${studio}/bookings/${res.body.booking.id}`, { method: 'DELETE', headers: { 'X-Cancel-Token': token } }, t.env);
+    expect((await cancel(res.body.booking.cancel_token)).status).toBe(404);
+    expect((await cancel(again.body.booking.cancel_token)).status).toBe(204);
+    expect((await t.call('GET', `/sessions/${sessionId}`)).body.session.reserved).toBe(0);
+  });
+
+  it('turns away a name that is not a member, a finished class and a closed day', async () => {
+    const stranger = await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: 'Netko', last_name: 'Nepoznat' } });
+    expect(stranger.status).toBe(404);
+    expect(stranger.body.error.code).toBe('member_not_found');
+    expect((await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: 'Nina', last_name: '' } })).status).toBe(400);
+
+    const lastWeek = (await t.call('GET', `${studio}/schedule?from=${addDays(today, -7)}&to=${addDays(today, -6)}`, noToken)).body.sessions[0];
+    expect((await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: lastWeek.id, first_name: 'Nina', last_name: 'Šimić' } })).body.error.code).toBe('session_over');
+
+    const closed = await t.call('POST', '/closures', { body: { date: day, name: 'Praznik' } });
+    const schedule = (await t.call('GET', `${studio}/schedule?from=${day}&to=${day}`, noToken)).body;
+    expect(schedule.sessions[0].closure_name).toBe('Praznik');
+    expect((await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: 'Nina', last_name: 'Šimić' } })).body.error.code).toBe('day_closed');
+    await t.call('DELETE', `/closures/${closed.body.closure.id}`);
+  });
+
+  it('staff can remove a najava', async () => {
+    const made = await t.call('POST', `${studio}/bookings`, { ...noToken, body: { session_id: sessionId, first_name: 'Ana', last_name: 'Horvat' } });
+    expect((await t.call('DELETE', `/bookings/${made.body.booking.id}`)).status).toBe(204);
+    expect((await t.call('GET', `/sessions/${sessionId}`)).body.reservations).toEqual([]);
   });
 });
 

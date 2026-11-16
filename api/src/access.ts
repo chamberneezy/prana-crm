@@ -25,6 +25,7 @@ export const ROUTES: Array<{ prefix: string; read: Rule; write: Rule }> = [
   { prefix: '/offerings', read: ['offerings', 'schedule'], write: ['offerings'] },
   { prefix: '/sessions', read: ['schedule', 'overview', 'planner'], write: ['schedule'] },
   { prefix: '/visits', read: ['schedule'], write: ['schedule'] },
+  { prefix: '/bookings', read: ['schedule'], write: ['schedule'] },
   // Holidays are set on Raspored or in the week planner.
   { prefix: '/closures', read: ['schedule', 'overview', 'planner'], write: ['schedule', 'planner'] },
   { prefix: '/week-plan', read: ['planner'], write: ['planner'] },

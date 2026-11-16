@@ -208,6 +208,12 @@ export function useSaveWeekPlan(monday: string) {
   return useMutation({ mutationFn: (input: WeekPlanInput) => api<SessionsResponse>('PUT', `/week-plan/${monday}`, input), onSuccess });
 }
 
+/** Staff remove a najava (a sign-up from the studio's app). */
+export function useRemoveBooking() {
+  const client = useQueryClient();
+  return useMutation({ mutationFn: (id: string) => api<void>('DELETE', `/bookings/${id}`), onSuccess: () => client.invalidateQueries({ queryKey: ['sessions'] }) });
+}
+
 export function useSessions(from: string, to: string) {
   return useQuery({
     queryKey: ['sessions', 'range', from, to],

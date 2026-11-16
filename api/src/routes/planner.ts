@@ -13,7 +13,7 @@ import {
 } from '@prana/shared';
 import { and, asc, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { closure, offering, session, visit, weekSlot } from '../db/schema';
+import { booking, closure, offering, session, visit, weekSlot } from '../db/schema';
 import type { AppEnv, Db } from '../env';
 import { ApiError } from '../errors';
 import { created, ctx, owned, parseBody, parseQuery, publicRow, removed, touched } from '../lib/http';
@@ -153,7 +153,16 @@ weekPlan.put('/:monday', async (c) => {
       writes.push(db.insert(session).values({ ...created(businessId, now), ...fields, location_id: locationId!, capacity: null, note: null }));
     }
   }
-  for (const s of gone) writes.push(db.update(session).set(removed(now)).where(eq(session.id, s.id)));
+  for (const s of gone) {
+    writes.push(db.update(session).set(removed(now)).where(eq(session.id, s.id)));
+    // Its najave go with it.
+    writes.push(
+      db
+        .update(booking)
+        .set(removed(now))
+        .where(and(eq(booking.session_id, s.id), isNull(booking.deleted_at))),
+    );
+  }
   if (writes.length) await db.batch(writes as [(typeof writes)[number], ...(typeof writes)[number][]]);
 
   const body: SessionsResponse = { sessions: await loadSessionViews(db, businessId, timeZone, inWeek) };

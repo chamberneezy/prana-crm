@@ -1,7 +1,7 @@
 import { joinName, type SyncPullResponse, type SyncPushResponse, syncPushRowSchemas, syncPushSchema, type SyncPushTable, syncQuerySchema } from '@prana/shared';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { closure, document, location, member, membership, offering, offeringGroup, payment, plan, session, staff, visit, weekSlot } from '../db/schema';
+import { booking, closure, document, location, member, membership, offering, offeringGroup, payment, plan, session, staff, visit, weekSlot } from '../db/schema';
 import type { AppEnv, Db } from '../env';
 import { deleteMemberDocuments } from '../lib/documents';
 import { ctx, parseBody, parseQuery, publicRow } from '../lib/http';
@@ -12,7 +12,7 @@ export const sync = new Hono<AppEnv>();
 type AnyTable = typeof member;
 const generic = (table: unknown) => table as AnyTable;
 
-const PULL_TABLES = { location, staff, offering_group: offeringGroup, offering, session, plan, member, membership, visit, payment, document, closure, week_slot: weekSlot };
+const PULL_TABLES = { location, staff, offering_group: offeringGroup, offering, session, plan, member, membership, visit, payment, document, closure, week_slot: weekSlot, booking };
 
 /** Tables the app may write offline, with the columns that must point at rows of the same business. */
 const PUSH_TABLES: Record<SyncPushTable, { table: unknown; refs: Record<string, unknown> }> = {

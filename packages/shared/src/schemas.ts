@@ -54,6 +54,8 @@ export const ERROR_CODES = [
   'already_checked_in',
   'day_closed',
   'session_has_visits',
+  'member_not_found',
+  'session_over',
   'file_too_large',
   'unsupported_file',
   'internal',
@@ -153,6 +155,18 @@ export const weekSlotSchema = z.object({
   ...meta,
 }).meta({ id: 'WeekSlot' });
 
+/**
+ * A najava: a member signed up for a session from the studio's app, without an account (by first and last name).
+ * It isn't a visit: it counts toward nothing until staff check the member in.
+ */
+export const bookingSchema = z.object({
+  id,
+  business_id: id,
+  session_id: id,
+  member_id: id,
+  ...meta,
+}).meta({ id: 'Booking' });
+
 export const memberSchema = z.object({
   id,
   business_id: id,
@@ -243,6 +257,7 @@ export type OfferingGroup = z.infer<typeof offeringGroupSchema>;
 export type Offering = z.infer<typeof offeringSchema>;
 export type Session = z.infer<typeof sessionSchema>;
 export type Closure = z.infer<typeof closureSchema>;
+export type Booking = z.infer<typeof bookingSchema>;
 export type WeekSlot = z.infer<typeof weekSlotSchema>;
 export type Member = z.infer<typeof memberSchema>;
 export type Plan = z.infer<typeof planSchema>;
@@ -264,6 +279,8 @@ export const sessionViewSchema = sessionSchema.extend({
   effective_capacity: z.number().int().nullable(),
   /** Set when the studio is closed that day (the holiday's name): the session is cancelled. */
   closure_name: z.string().nullable(),
+  /** Najave: members who signed up from the app. */
+  reserved: z.number().int(),
 }).meta({ id: 'SessionView' });
 
 export const membershipViewSchema = membershipSchema.extend({
@@ -564,7 +581,61 @@ export const closuresResponseSchema = z.object({ closures: z.array(closureSchema
 export const closureResponseSchema = z.object({ closure: closureSchema });
 export const weekTemplateResponseSchema = z.object({ slots: z.array(weekSlotSchema) });
 export const sessionResponseSchema = z.object({ session: sessionViewSchema });
-export const sessionDetailResponseSchema = z.object({ session: sessionViewSchema, attendees: z.array(attendeeSchema) });
+export const reservationSchema = z.object({
+  booking_id: id,
+  member_id: id,
+  full_name: z.string(),
+  created_at: isoDateTime,
+  /** Already checked in to this session. */
+  checked_in: z.boolean(),
+}).meta({ id: 'Reservation' });
+
+export const sessionDetailResponseSchema = z.object({ session: sessionViewSchema, attendees: z.array(attendeeSchema), reservations: z.array(reservationSchema) });
+
+// ── Public (the studio's app, no sign-in) ─────────────────────────────────────
+
+/** A session as anyone may see it: no capacity, notes or names of who comes. */
+export const publicSessionSchema = z.object({
+  id,
+  offering_id: id,
+  offering_name: z.string(),
+  color_token: colorTokenSchema,
+  entry_rule: z.string().nullable(),
+  starts_at: isoDateTime,
+  ends_at: isoDateTime,
+  teacher_name: z.string().nullable(),
+  /** Set when the studio is closed that day: the session is cancelled and takes no sign-ups. */
+  closure_name: z.string().nullable(),
+}).meta({ id: 'PublicSession' });
+
+export const publicScheduleQuerySchema = z.object({
+  /** First day, inclusive. Defaults to the Monday of this week. */
+  from: isoDate.optional(),
+  /** Last day, inclusive, at most 31 days after `from`. Defaults to six days after it. */
+  to: isoDate.optional(),
+});
+
+export const publicScheduleResponseSchema = z.object({
+  studio: z.object({ name: z.string(), timezone: z.string() }),
+  from: isoDate,
+  to: isoDate,
+  sessions: z.array(publicSessionSchema),
+});
+
+export const publicBookingInputSchema = z.object({
+  session_id: id,
+  first_name: z.string().trim().min(1).max(100),
+  last_name: z.string().trim().min(1).max(100),
+});
+
+export const publicBookingResponseSchema = z.object({
+  booking: z.object({
+    id,
+    session_id: id,
+    /** Keep it on the device: it is the only way to cancel this sign-up. */
+    cancel_token: z.string(),
+  }),
+});
 
 export const visitResponseSchema = z.object({ visit: visitSchema, summary: memberSummarySchema });
 
@@ -637,6 +708,10 @@ export type SessionResponse = z.infer<typeof sessionResponseSchema>;
 export type OfferingsResponse = z.infer<typeof offeringsResponseSchema>;
 export type SessionsResponse = z.infer<typeof sessionsResponseSchema>;
 export type ClosuresResponse = z.infer<typeof closuresResponseSchema>;
+export type PublicSession = z.infer<typeof publicSessionSchema>;
+export type PublicScheduleResponse = z.infer<typeof publicScheduleResponseSchema>;
+export type PublicBookingResponse = z.infer<typeof publicBookingResponseSchema>;
+export type Reservation = z.infer<typeof reservationSchema>;
 export type ClosureResponse = z.infer<typeof closureResponseSchema>;
 export type WeekTemplateResponse = z.infer<typeof weekTemplateResponseSchema>;
 export type ClosureInput = z.infer<typeof closureInputSchema>;
@@ -701,6 +776,7 @@ export const syncPullResponseSchema = z.object({
     document: z.array(documentSchema),
     closure: z.array(closureSchema),
     week_slot: z.array(weekSlotSchema),
+    booking: z.array(bookingSchema),
   }),
 });
 

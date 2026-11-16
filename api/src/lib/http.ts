@@ -75,10 +75,10 @@ export async function owned<T extends SQLiteTable>(db: Db, table: T, id: string,
 }
 
 /** Drops server-only columns before a row leaves the API. */
-export function publicRow<T extends object>(row: T): Omit<T, 'changed_at' | 'r2_key' | 'firebase_uid'> {
+export function publicRow<T extends object>(row: T): Omit<T, 'changed_at' | 'r2_key' | 'firebase_uid' | 'cancel_token_hash'> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { changed_at, r2_key, firebase_uid, ...rest } = row as T & { changed_at?: unknown; r2_key?: unknown; firebase_uid?: unknown };
-  return rest as Omit<T, 'changed_at' | 'r2_key' | 'firebase_uid'>;
+  const { changed_at, r2_key, firebase_uid, cancel_token_hash, ...rest } = row as T & { changed_at?: unknown; r2_key?: unknown; firebase_uid?: unknown; cancel_token_hash?: unknown };
+  return rest as Omit<T, 'changed_at' | 'r2_key' | 'firebase_uid' | 'cancel_token_hash'>;
 }
 
 /** Empty strings from forms are stored as null. */

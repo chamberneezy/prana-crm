@@ -93,6 +93,16 @@ export const weekSlot = sqliteTable('week_slot', {
   ...meta,
 });
 
+export const booking = sqliteTable('booking', {
+  id: text().primaryKey(),
+  business_id: text().notNull(),
+  session_id: text().notNull(),
+  member_id: text().notNull(),
+  /** SHA-256 of the cancel token, hex. The token itself stays with the app. */
+  cancel_token_hash: text().notNull(),
+  ...meta,
+});
+
 export const member = sqliteTable('member', {
   id: text().primaryKey(),
   business_id: text().notNull(),

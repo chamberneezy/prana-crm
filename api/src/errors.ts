@@ -18,6 +18,8 @@ export const ERRORS: Record<ErrorCode, ErrorSpec> = {
   already_checked_in: { status: 409, message_hr: 'Dolazak je već evidentiran za ovaj sat.', message_en: 'This member is already checked in to this class.' },
   day_closed: { status: 409, message_hr: 'Taj dan je neradni, sat je otkazan.', message_en: 'The studio is closed that day; the class is cancelled.' },
   session_has_visits: { status: 409, message_hr: 'Termin s evidentiranim dolascima ne može se ukloniti.', message_en: 'A class with check-ins can’t be removed.' },
+  member_not_found: { status: 404, message_hr: 'Ime i prezime ne odgovaraju nijednom članu studija. Upišite ih kao na upisnici ili se javite studiju.', message_en: 'That first and last name don’t match any member of the studio. Enter them as on your enrolment form, or contact the studio.' },
+  session_over: { status: 409, message_hr: 'Ovaj sat je već završio.', message_en: 'This class has already finished.' },
   file_too_large: { status: 413, message_hr: 'Datoteka je veća od 20 MB.', message_en: 'The file is larger than 20 MB.' },
   unsupported_file: { status: 415, message_hr: 'Odaberite PDF, JPG, PNG ili HEIC datoteku.', message_en: 'Choose a PDF, JPG, PNG or HEIC file.' },
   internal: { status: 500, message_hr: 'Nešto nije uspjelo. Pokušajte ponovno.', message_en: 'Something went wrong. Please try again.' },

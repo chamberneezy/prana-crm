@@ -12,7 +12,7 @@ import {
 } from '@prana/shared';
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { location, member, offering, session, staff, visit } from '../db/schema';
+import { booking, location, member, offering, session, staff, visit } from '../db/schema';
 import type { AppEnv } from '../env';
 import { ApiError } from '../errors';
 import { blankToNull, created, ctx, owned, parseBody, parseQuery, publicRow, removed, touched } from '../lib/http';
@@ -21,6 +21,15 @@ import { closureOn, firstLocationId, loadSessionView, loadSessionViews, startsBe
 
 export const sessions = new Hono<AppEnv>();
 export const visits = new Hono<AppEnv>();
+export const bookings = new Hono<AppEnv>();
+
+// Staff remove a najava, e.g. when the member says they won't come.
+bookings.delete('/:id', async (c) => {
+  const { db, businessId, now } = ctx(c);
+  const existing = await owned(db, booking, c.req.param('id'), businessId);
+  await db.update(booking).set(removed(now)).where(eq(booking.id, existing.id));
+  return c.body(null, 204);
+});
 
 sessions.get('/', async (c) => {
   const { db, businessId, today, timeZone } = ctx(c);
@@ -76,7 +85,18 @@ sessions.get('/:id', async (c) => {
     .innerJoin(member, eq(member.id, visit.member_id))
     .where(and(eq(visit.session_id, view.id), eq(visit.business_id, businessId), isNull(visit.deleted_at), isNull(member.deleted_at)))
     .orderBy(asc(member.full_name));
-  const body: SessionDetailResponse = { session: view, attendees: attendees.map((a) => ({ ...a, health_text: a.health_flag ? a.health_text : null })) };
+  const signedUp = await db
+    .select({ booking_id: booking.id, member_id: member.id, full_name: member.full_name, created_at: booking.created_at })
+    .from(booking)
+    .innerJoin(member, eq(member.id, booking.member_id))
+    .where(and(eq(booking.session_id, view.id), eq(booking.business_id, businessId), isNull(booking.deleted_at), isNull(member.deleted_at)))
+    .orderBy(asc(member.full_name));
+  const present = new Set(attendees.map((a) => a.member_id));
+  const body: SessionDetailResponse = {
+    session: view,
+    attendees: attendees.map((a) => ({ ...a, health_text: a.health_flag ? a.health_text : null })),
+    reservations: signedUp.map((r) => ({ ...r, checked_in: present.has(r.member_id) })),
+  };
   return c.json(body);
 });
 
@@ -115,6 +135,10 @@ sessions.delete('/:id', async (c) => {
       .update(visit)
       .set(removed(now))
       .where(and(eq(visit.session_id, existing.id), isNull(visit.deleted_at))),
+    db
+      .update(booking)
+      .set(removed(now))
+      .where(and(eq(booking.session_id, existing.id), isNull(booking.deleted_at))),
     db.update(session).set(removed(now)).where(eq(session.id, existing.id)),
   ]);
   return c.body(null, 204);

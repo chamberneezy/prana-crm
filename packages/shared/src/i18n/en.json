@@ -588,5 +588,11 @@
   "toast.closureAdded": "{date} is a closed day.",
   "toast.closureRemoved": "{date} is open again.",
   "session.cancelled": "Cancelled",
-  "session.cancelledNotice": "Closed day ({name}): the class is cancelled and nobody can be checked in."
+  "session.cancelledNotice": "Closed day ({name}): the class is cancelled and nobody can be checked in.",
+  "session.reservations": "Sign-ups from the app",
+  "session.reservationsHint": "Members who signed up in the studio's app. A visit counts only once you check them in.",
+  "session.removeReservationLabel": "Remove sign-up: {name}",
+  "reserved.one": "{n} signed up",
+  "reserved.few": "{n} signed up",
+  "reserved.other": "{n} signed up"
 }

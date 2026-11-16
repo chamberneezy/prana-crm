@@ -13,7 +13,8 @@ import { memberships, plans } from './routes/memberships';
 import { offeringGroups, offerings } from './routes/offerings';
 import { payments } from './routes/payments';
 import { closures, weekPlan, weekTemplate } from './routes/planner';
-import { sessions, visits } from './routes/sessions';
+import { publicApi } from './routes/public';
+import { bookings, sessions, visits } from './routes/sessions';
 import { sync } from './routes/sync';
 
 export interface AppOptions {
@@ -43,6 +44,7 @@ export function createApp(options: AppOptions = {}) {
   api.route('/offerings', offerings);
   api.route('/sessions', sessions);
   api.route('/visits', visits);
+  api.route('/bookings', bookings);
   api.route('/closures', closures);
   api.route('/week-plan', weekPlan);
   api.route('/week-template', weekTemplate);
@@ -53,6 +55,8 @@ export function createApp(options: AppOptions = {}) {
   api.route('/sync', sync);
 
   const app = new Hono<AppEnv>();
+  // The studio's public app needs no sign-in. It is mounted first, so the staff checks never run for it.
+  app.route('/api/public', publicApi);
   app.route('/api', api);
 
   app.notFound((c) => c.json(errorBody('not_found'), 404));

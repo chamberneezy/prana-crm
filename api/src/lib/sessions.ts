@@ -42,6 +42,7 @@ export async function loadSessionViews(db: Db, businessId: string, timeZone: str
       default_capacity: offering.default_capacity,
       teacher_name: staff.name,
       booked: sql<number>`(select count(*) from visit v where v.session_id = "session"."id" and v.deleted_at is null)`,
+      reserved: sql<number>`(select count(*) from booking b where b.session_id = "session"."id" and b.deleted_at is null)`,
     })
     .from(session)
     .innerJoin(offering, eq(offering.id, session.offering_id))
@@ -61,6 +62,7 @@ export async function loadSessionViews(db: Db, businessId: string, timeZone: str
     booked: r.booked,
     effective_capacity: r.row.capacity ?? r.default_capacity,
     closure_name: closed.get(days[i]!) ?? null,
+    reserved: r.reserved,
   }));
 }
 

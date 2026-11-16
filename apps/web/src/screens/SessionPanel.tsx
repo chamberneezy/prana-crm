@@ -2,7 +2,7 @@ import { formatDate, formatTimeRange, localDate, type OfferingView, weekdayIndex
 import { useEffect, useState } from 'react';
 import { useAccess } from '../auth/access';
 import { ApiClientError, errorMessage } from '../api/client';
-import { useCheckIn, useDeleteSession, useMembers, useRemoveVisit, useSession } from '../api/queries';
+import { useCheckIn, useDeleteSession, useMembers, useRemoveBooking, useRemoveVisit, useSession } from '../api/queries';
 import { useToast } from '../app/ToastProvider';
 import { Avatar, Button, Input, Notice, SidePanel, Tag } from '../components';
 import { useLang } from '../i18n';
@@ -28,6 +28,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
   const { data, error } = useSession(sessionId);
   const checkIn = useCheckIn(sessionId);
   const removeVisit = useRemoveVisit();
+  const removeBooking = useRemoveBooking();
   const remove = useDeleteSession();
   const [mode, setMode] = useState<'view' | 'edit' | 'confirmDelete'>('view');
   const [failure, setFailure] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
   }
   if (!data) return <SidePanel title={t('common.loading')} onClose={onClose} />;
 
-  const { session, attendees } = data;
+  const { session, attendees, reservations } = data;
   const lead = <span className={styles.pill} style={{ background: `var(--${session.color_token})` }} />;
 
   if (mode === 'edit') {
@@ -128,6 +129,38 @@ export function SessionPanel({ sessionId, offerings, onClose }: Props) {
           </div>
         )}
       </dl>
+
+      {reservations.length > 0 && (
+        <section className={styles.section}>
+          <h3 className={styles.overline}>
+            {t('session.reservations')} · {reservations.length}
+          </h3>
+          <p className={styles.none}>{t('session.reservationsHint')}</p>
+          <ul className={styles.list}>
+            {reservations.map((r) => (
+              <li key={r.booking_id} className={styles.person}>
+                <Avatar name={r.full_name} size={32} />
+                <span className={styles.personText}>
+                  <strong>{r.full_name}</strong>
+                </span>
+                {r.checked_in ? (
+                  <span className={styles.done}>{t('session.checkIn.done')}</span>
+                ) : (
+                  canEdit('schedule') &&
+                  !session.closure_name && (
+                    <Button variant="secondary" size="sm" aria-label={`${t('session.checkIn.action')}: ${r.full_name}`} disabled={checkIn.isPending} onClick={() => onCheckIn(r.member_id)}>
+                      {t('session.checkIn.action')}
+                    </Button>
+                  )
+                )}
+                <Button variant="ghost" size="sm" hidden={!canEdit('schedule')} aria-label={t('session.removeReservationLabel', { name: r.full_name })} disabled={removeBooking.isPending} onClick={() => removeBooking.mutate(r.booking_id)}>
+                  {t('session.removeVisit')}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className={styles.section}>
         <h3 className={styles.overline}>

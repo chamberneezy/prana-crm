@@ -16,10 +16,11 @@ export function entryNote(rule: string | null, startsAt: string, { t }: Strings)
 }
 
 /** The small line on a session card: "ulaz do 18:00 · 8 prijava". */
-export function sessionMeta(session: { entry_rule: string | null; starts_at: string; booked: number; closure_name: string | null }, strings: Strings): string {
+export function sessionMeta(session: { entry_rule: string | null; starts_at: string; booked: number; reserved: number; closure_name: string | null }, strings: Strings): string {
   // A holiday cancels the class: that is all there is to say about it.
   if (session.closure_name) return `${strings.t('session.cancelled')} · ${session.closure_name}`;
-  return [entryNote(session.entry_rule, session.starts_at, strings), strings.tn('signups', session.booked)].filter(Boolean).join(' · ');
+  const reserved = session.reserved > 0 ? strings.tn('reserved', session.reserved) : null;
+  return [entryNote(session.entry_rule, session.starts_at, strings), strings.tn('signups', session.booked), reserved].filter(Boolean).join(' · ');
 }
 
 /** Reads a whole number from a form field; null when empty, NaN when it isn't one. */

@@ -588,5 +588,11 @@
   "toast.closureAdded": "{date} je neradni dan.",
   "toast.closureRemoved": "{date} više nije neradni dan.",
   "session.cancelled": "Otkazano",
-  "session.cancelledNotice": "Neradni dan ({name}): sat je otkazan i dolazak se ne može evidentirati."
+  "session.cancelledNotice": "Neradni dan ({name}): sat je otkazan i dolazak se ne može evidentirati.",
+  "session.reservations": "Najave iz aplikacije",
+  "session.reservationsHint": "Članovi koji su se prijavili u aplikaciji studija. Dolazak se broji tek kad ga evidentirate.",
+  "session.removeReservationLabel": "Ukloni najavu: {name}",
+  "reserved.one": "{n} najava",
+  "reserved.few": "{n} najave",
+  "reserved.other": "{n} najava"
 }
