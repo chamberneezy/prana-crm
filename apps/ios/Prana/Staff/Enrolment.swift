@@ -230,7 +230,7 @@ struct DocumentScanner: UIViewControllerRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator(done: done, cancel: cancel) }
 
-    @MainActor final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+    @MainActor final class Coordinator: NSObject, @preconcurrency VNDocumentCameraViewControllerDelegate {
         let done: ([UIImage]) -> Void
         let cancel: () -> Void
         init(done: @escaping ([UIImage]) -> Void, cancel: @escaping () -> Void) {
