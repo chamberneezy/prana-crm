@@ -1,0 +1,73 @@
+# The Xcode project is generated from this file: `brew install xcodegen && xcodegen` (see README.md).
+name: Prana
+options:
+  bundleIdPrefix: hr.prana
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: hr
+  createIntermediateGroups: true
+packages:
+  PranaKit:
+    path: PranaKit
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: complete
+targets:
+  Prana:
+    type: application
+    platform: iOS
+    sources:
+      - path: Prana
+    dependencies:
+      - package: PranaKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: hr.prana.studio
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        # The studio this app shows (SEED.business), and the Firebase web API key (public by design).
+        PRANA_STUDIO_ID: 01900000-0000-7000-8000-000000000001
+      configs:
+        Debug:
+          # `npm run dev -w @prana/api` on this Mac, with the Firebase Auth emulator (`npm run dev:all`).
+          PRANA_API_URL: http://localhost:8787
+          PRANA_FIREBASE_API_KEY: fake-api-key
+          PRANA_AUTH_EMULATOR: localhost:9099
+        Release:
+          # Set to the deployed Worker's address once the API is deployed.
+          PRANA_API_URL: https://api.prana.example
+          PRANA_FIREBASE_API_KEY: AIzaSyAYKhGKg4AtF4eWXpGZDFptXsxCEgPd6d4
+          PRANA_AUTH_EMULATOR: ""
+    info:
+      path: Prana/Info.plist
+      properties:
+        CFBundleDisplayName: Prana
+        CFBundleDevelopmentRegion: hr
+        CFBundleLocalizations: [hr, en]
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIAppFonts: [Cinzel.ttf, Montserrat.ttf, CormorantGaramond-Italic.ttf]
+        ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: Kamera se koristi za fotografiranje upisnice. Tekst se prepoznaje na Vašem iPhoneu.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        PranaAPIURL: $(PRANA_API_URL)
+        PranaStudioID: $(PRANA_STUDIO_ID)
+        PranaFirebaseAPIKey: $(PRANA_FIREBASE_API_KEY)
+        PranaAuthEmulator: $(PRANA_AUTH_EMULATOR)
+schemes:
+  Prana:
+    build:
+      targets:
+        Prana: all
+    run:
+      config: Debug
+    archive:
+      config: Release

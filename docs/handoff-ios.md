@@ -354,6 +354,19 @@ Health notes are sensitive personal data (GDPR special category). Mario should c
 
 # PART B — iOS app
 
+> **Update 16.11.2026.** The app is built in `apps/ios` (see its README). It changes this plan in three ways:
+> 1. **Members use the app too, without an account** (this was "not in v1"). The default view is the week's classes
+>    with "Prijavi se" by first and last name, which must match a member; staff open the studio tool by tapping the
+>    studio's name five times. Sign-ups are *najave*: staff check people in from them.
+> 2. **Online first, no SwiftData sync yet.** The staff tool calls the same REST API as the web app. Offline work and the
+>    sync engine (B3) remain a later step.
+> 3. **Staff sign in with e-mail and password through Firebase Auth's REST API**, so there is no Firebase SDK and no
+>    dependency at all. The project is generated with XcodeGen; the tab bar is the system one (Liquid Glass on
+>    iOS 26), with "Upis člana" as its accessory instead of the raised centre button.
+>
+> Milestones I1 (parser, passing `fixtures/upisnica` on Linux and macOS), I2 (scan and import) and I4 (all screens) are
+> written; I3 is replaced by point 2; I5 (TestFlight) needs the Apple Developer membership and the deployed API.
+
 ## B1. Scope of this handoff
 
 - **This handoff covers `apps/ios/` only.** The backend (`api/`) and `packages/shared/` are built from `docs/handoff-web.md`.

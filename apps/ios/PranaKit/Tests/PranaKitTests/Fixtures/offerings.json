@@ -1,0 +1,94 @@
+{
+  "offerings": [
+    {
+      "id": "01900000-0000-7000-8000-000000000011",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "group_id": "01900000-0000-7000-8000-000000000003",
+      "name": "Joga za kralježnicu",
+      "color_token": "class-spine",
+      "default_duration_min": 60,
+      "entry_rule": null,
+      "default_capacity": null,
+      "active": true,
+      "teacher_ids": [
+        "01900000-0000-7000-8000-000000000031"
+      ],
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "sessions_this_week": 2
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000000012",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "group_id": "01900000-0000-7000-8000-000000000003",
+      "name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga",
+      "default_duration_min": 120,
+      "entry_rule": "Ulaz do 60 min nakon početka",
+      "default_capacity": null,
+      "active": true,
+      "teacher_ids": [
+        "01900000-0000-7000-8000-000000000004",
+        "01900000-0000-7000-8000-000000000032"
+      ],
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "sessions_this_week": 3
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000000013",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "group_id": "01900000-0000-7000-8000-000000000003",
+      "name": "Restorativna joga",
+      "color_token": "class-restorative",
+      "default_duration_min": 60,
+      "entry_rule": null,
+      "default_capacity": null,
+      "active": true,
+      "teacher_ids": [
+        "01900000-0000-7000-8000-000000000031",
+        "01900000-0000-7000-8000-000000000032"
+      ],
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "sessions_this_week": 2
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000000014",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "group_id": "01900000-0000-7000-8000-000000000003",
+      "name": "Black Lotus Yoga",
+      "color_token": "class-black-lotus",
+      "default_duration_min": 75,
+      "entry_rule": null,
+      "default_capacity": null,
+      "active": true,
+      "teacher_ids": [
+        "01900000-0000-7000-8000-000000000032"
+      ],
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "sessions_this_week": 2
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000000015",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "group_id": "01900000-0000-7000-8000-000000000003",
+      "name": "Pranayama & meditacija",
+      "color_token": "class-pranayama",
+      "default_duration_min": 30,
+      "entry_rule": "Slobodan ulaz",
+      "default_capacity": null,
+      "active": true,
+      "teacher_ids": [],
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "sessions_this_week": 1
+    }
+  ]
+}

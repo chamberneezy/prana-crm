@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "member_not_found",
+    "message_hr": "Ime i prezime ne odgovaraju nijednom članu studija. Upišite ih kao na upisnici ili se javite studiju.",
+    "message_en": "That first and last name don’t match any member of the studio. Enter them as on your enrolment form, or contact the studio."
+  }
+}

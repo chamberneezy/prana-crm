@@ -1,0 +1,59 @@
+{
+  "session": {
+    "id": "01900000-0000-7000-8000-000000001301",
+    "business_id": "01900000-0000-7000-8000-000000000001",
+    "location_id": "01900000-0000-7000-8000-000000000002",
+    "offering_id": "01900000-0000-7000-8000-000000000012",
+    "starts_at": "2026-11-16T16:00:00.000Z",
+    "ends_at": "2026-11-16T18:00:00.000Z",
+    "teacher_staff_id": "01900000-0000-7000-8000-000000000004",
+    "capacity": 12,
+    "note": null,
+    "created_at": "2026-11-16T17:34:50.741Z",
+    "updated_at": "2026-11-16T17:34:50.741Z",
+    "deleted_at": null,
+    "offering_name": "Ashtanga Mysore",
+    "color_token": "class-ashtanga",
+    "entry_rule": "Ulaz do 60 min nakon početka",
+    "teacher_name": "Mario",
+    "booked": 3,
+    "effective_capacity": 12,
+    "closure_name": null,
+    "reserved": 1
+  },
+  "attendees": [
+    {
+      "visit_id": "01900000-0000-7000-8000-000000010000",
+      "member_id": "01900000-0000-7000-8000-000000000100",
+      "full_name": "Ana Horvat",
+      "health_flag": false,
+      "health_text": null,
+      "checked_in_at": "2026-11-16T16:00:00.000Z"
+    },
+    {
+      "visit_id": "01900000-0000-7000-8000-000000010200",
+      "member_id": "01900000-0000-7000-8000-000000000102",
+      "full_name": "Iva Babić",
+      "health_flag": true,
+      "health_text": "Hernija L5, izbjegavati duboke pretklone.",
+      "checked_in_at": "2026-11-16T16:00:00.000Z"
+    },
+    {
+      "visit_id": "01900000-0000-7000-8000-000000010600",
+      "member_id": "01900000-0000-7000-8000-000000000106",
+      "full_name": "Nina Šimić",
+      "health_flag": true,
+      "health_text": "Operacija koljena 2024., bez dubokih čučnjeva.",
+      "checked_in_at": "2026-11-16T16:00:00.000Z"
+    }
+  ],
+  "reservations": [
+    {
+      "booking_id": "01a1e56d-0b6a-790e-a5e8-3d4f40deeeaa",
+      "member_id": "01900000-0000-7000-8000-000000000100",
+      "full_name": "Ana Horvat",
+      "created_at": "2026-11-16T17:34:51.205Z",
+      "checked_in": true
+    }
+  ]
+}

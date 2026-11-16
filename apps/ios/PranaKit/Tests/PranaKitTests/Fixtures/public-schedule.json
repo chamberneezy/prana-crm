@@ -1,0 +1,120 @@
+{
+  "studio": {
+    "name": "Prana Yoga Studio",
+    "timezone": "Europe/Zagreb"
+  },
+  "from": "2026-11-16",
+  "to": "2026-11-22",
+  "sessions": [
+    {
+      "id": "01900000-0000-7000-8000-000000001300",
+      "offering_id": "01900000-0000-7000-8000-000000000011",
+      "offering_name": "Joga za kralježnicu",
+      "color_token": "class-spine",
+      "entry_rule": null,
+      "starts_at": "2026-11-16T08:00:00.000Z",
+      "ends_at": "2026-11-16T09:00:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001301",
+      "offering_id": "01900000-0000-7000-8000-000000000012",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga",
+      "entry_rule": "Ulaz do 60 min nakon početka",
+      "starts_at": "2026-11-16T16:00:00.000Z",
+      "ends_at": "2026-11-16T18:00:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001302",
+      "offering_id": "01900000-0000-7000-8000-000000000013",
+      "offering_name": "Restorativna joga",
+      "color_token": "class-restorative",
+      "entry_rule": null,
+      "starts_at": "2026-11-17T18:15:00.000Z",
+      "ends_at": "2026-11-17T19:15:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001303",
+      "offering_id": "01900000-0000-7000-8000-000000000011",
+      "offering_name": "Joga za kralježnicu",
+      "color_token": "class-spine",
+      "entry_rule": null,
+      "starts_at": "2026-11-18T08:00:00.000Z",
+      "ends_at": "2026-11-18T09:00:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001304",
+      "offering_id": "01900000-0000-7000-8000-000000000014",
+      "offering_name": "Black Lotus Yoga",
+      "color_token": "class-black-lotus",
+      "entry_rule": null,
+      "starts_at": "2026-11-18T17:15:00.000Z",
+      "ends_at": "2026-11-18T18:30:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001305",
+      "offering_id": "01900000-0000-7000-8000-000000000012",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga",
+      "entry_rule": "Ulaz do 60 min nakon početka",
+      "starts_at": "2026-11-19T16:00:00.000Z",
+      "ends_at": "2026-11-19T18:00:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001306",
+      "offering_id": "01900000-0000-7000-8000-000000000013",
+      "offering_name": "Restorativna joga",
+      "color_token": "class-restorative",
+      "entry_rule": null,
+      "starts_at": "2026-11-19T18:15:00.000Z",
+      "ends_at": "2026-11-19T19:15:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001307",
+      "offering_id": "01900000-0000-7000-8000-000000000014",
+      "offering_name": "Black Lotus Yoga",
+      "color_token": "class-black-lotus",
+      "entry_rule": null,
+      "starts_at": "2026-11-20T17:15:00.000Z",
+      "ends_at": "2026-11-20T18:30:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001308",
+      "offering_id": "01900000-0000-7000-8000-000000000015",
+      "offering_name": "Pranayama & meditacija",
+      "color_token": "class-pranayama",
+      "entry_rule": "Slobodan ulaz",
+      "starts_at": "2026-11-20T18:45:00.000Z",
+      "ends_at": "2026-11-20T19:15:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000001309",
+      "offering_id": "01900000-0000-7000-8000-000000000012",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga",
+      "entry_rule": "Ulaz do 60 min nakon početka",
+      "starts_at": "2026-11-22T08:00:00.000Z",
+      "ends_at": "2026-11-22T10:00:00.000Z",
+      "teacher_name": "Mario",
+      "closure_name": null
+    }
+  ]
+}

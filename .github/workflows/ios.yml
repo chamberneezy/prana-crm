@@ -1,0 +1,36 @@
+name: iOS
+
+on:
+  push:
+    branches: [main]
+    paths: ['apps/ios/**', 'fixtures/upisnica/**', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['apps/ios/**', 'fixtures/upisnica/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+
+jobs:
+  # Models, API client, dates, sign-ups and the upisnica parser: the same tests run on Linux.
+  kit:
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+        working-directory: apps/ios/PranaKit
+
+  # The SwiftUI app, built for the simulator with the iOS 26 SDK (Liquid Glass). No signing.
+  app:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)" && xcodebuild -version
+      - run: brew install xcodegen
+      - run: xcodegen generate
+        working-directory: apps/ios
+      - run: swift test
+        working-directory: apps/ios/PranaKit
+      - run: >
+          xcodebuild build -project Prana.xcodeproj -scheme Prana -configuration Debug
+          -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO | xcbeautify || exit ${PIPESTATUS[0]}
+        working-directory: apps/ios
+        shell: bash -o pipefail {0}

@@ -1,0 +1,124 @@
+{
+  "member": {
+    "id": "01900000-0000-7000-8000-000000000100",
+    "business_id": "01900000-0000-7000-8000-000000000001",
+    "first_name": "Ana",
+    "last_name": "Horvat",
+    "full_name": "Ana Horvat",
+    "email": "ana.horvat@example.com",
+    "phone": "091 234 5678",
+    "dob": "1988-03-14",
+    "is_student_or_retired": true,
+    "health_flag": false,
+    "health_text": null,
+    "consent_accuracy": true,
+    "consent_news": true,
+    "signed_place": "Varaždin",
+    "signed_date": "2026-10-20",
+    "member_since": "2026-10-20",
+    "notes": null,
+    "created_at": "2026-11-16T17:34:50.741Z",
+    "updated_at": "2026-11-16T17:34:50.741Z",
+    "deleted_at": null
+  },
+  "summary": {
+    "id": "01900000-0000-7000-8000-000000000100",
+    "full_name": "Ana Horvat",
+    "email": "ana.horvat@example.com",
+    "phone": "091 234 5678",
+    "health_flag": false,
+    "health_text": null,
+    "status": "expiring",
+    "days_left": 3,
+    "debt_cents": 0,
+    "membership": {
+      "id": "01900000-0000-7000-8000-000000000200",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "member_id": "01900000-0000-7000-8000-000000000100",
+      "plan_id": "01900000-0000-7000-8000-000000000022",
+      "period_start": "2026-10-20",
+      "period_end": "2026-11-19",
+      "frozen_until": null,
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "plan_code": "2x",
+      "plan_name": "2× tjedno",
+      "visits_total": 8,
+      "visits_used": 6,
+      "price_cents": 8500,
+      "paid_cents": 8500,
+      "renewed_until": null
+    },
+    "last_visit_at": "2026-11-16T16:00:00.000Z"
+  },
+  "visits": [
+    {
+      "id": "01900000-0000-7000-8000-000000010000",
+      "session_id": "01900000-0000-7000-8000-000000001301",
+      "checked_in_at": "2026-11-16T16:00:00.000Z",
+      "starts_at": "2026-11-16T16:00:00.000Z",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga"
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000010001",
+      "session_id": "01900000-0000-7000-8000-000000001209",
+      "checked_in_at": "2026-11-15T08:00:00.000Z",
+      "starts_at": "2026-11-15T08:00:00.000Z",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga"
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000010002",
+      "session_id": "01900000-0000-7000-8000-000000001207",
+      "checked_in_at": "2026-11-13T17:15:00.000Z",
+      "starts_at": "2026-11-13T17:15:00.000Z",
+      "offering_name": "Black Lotus Yoga",
+      "color_token": "class-black-lotus"
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000010003",
+      "session_id": "01900000-0000-7000-8000-000000001205",
+      "checked_in_at": "2026-11-12T16:00:00.000Z",
+      "starts_at": "2026-11-12T16:00:00.000Z",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga"
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000010004",
+      "session_id": "01900000-0000-7000-8000-000000001203",
+      "checked_in_at": "2026-11-11T08:00:00.000Z",
+      "starts_at": "2026-11-11T08:00:00.000Z",
+      "offering_name": "Joga za kralježnicu",
+      "color_token": "class-spine"
+    },
+    {
+      "id": "01900000-0000-7000-8000-000000010005",
+      "session_id": "01900000-0000-7000-8000-000000001201",
+      "checked_in_at": "2026-11-09T16:00:00.000Z",
+      "starts_at": "2026-11-09T16:00:00.000Z",
+      "offering_name": "Ashtanga Mysore",
+      "color_token": "class-ashtanga"
+    }
+  ],
+  "payments": [
+    {
+      "id": "01900000-0000-7000-8000-000000000300",
+      "business_id": "01900000-0000-7000-8000-000000000001",
+      "member_id": "01900000-0000-7000-8000-000000000100",
+      "membership_id": "01900000-0000-7000-8000-000000000200",
+      "amount_cents": 8500,
+      "currency": "EUR",
+      "method": "cash",
+      "paid_at": "2026-10-20T08:00:00.000Z",
+      "note": null,
+      "created_at": "2026-11-16T17:34:50.741Z",
+      "updated_at": "2026-11-16T17:34:50.741Z",
+      "deleted_at": null,
+      "member_name": "Ana Horvat",
+      "plan_name": "2× tjedno"
+    }
+  ],
+  "documents": []
+}

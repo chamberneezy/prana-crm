@@ -27,6 +27,11 @@ To let another address into the preview, add the SHA-256 of its lower-cased e-ma
 `apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`), and to the list in `firestore.rules`
 so they can send feedback too (a test checks the two agree), then `npm run deploy:rules`.
 
+## iOS app
+
+`apps/ios`: one app for members (no account: the week's classes and sign-up by name, members only) and, behind a
+hidden sign-in (tap the studio's name five times), the whole studio tool. See `apps/ios/README.md`.
+
 ## Roles
 
 Who may see and change what is decided in one place, `ROLE_ACCESS` in `packages/shared/src/access.ts`: per role and
