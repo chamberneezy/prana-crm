@@ -26,7 +26,7 @@ struct StudioHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image("Logo").resizable().scaledToFit().frame(width: 40, height: 36).accessibilityHidden(true)
+            Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 40, height: 36).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Text(name).font(.display(17, relativeTo: .headline)).foregroundStyle(DS.ink)
                 Text("Varaždin").font(.ui(12)).foregroundStyle(DS.muted)

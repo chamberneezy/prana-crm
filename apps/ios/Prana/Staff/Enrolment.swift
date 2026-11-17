@@ -156,7 +156,7 @@ enum Recognition {
     /** Text lines with their boxes (top-left origin, pixels) from Vision, recognised off the main thread. */
     static func lines(in image: UIImage) async -> [ScanLine] {
         guard let cgImage = image.cgImage else { return [] }
-        nonisolated(unsafe) let picture = cgImage
+        nonisolated(unsafe) let picture = cgImage  // CGImage is Sendable only from the iOS 27 SDK on
         let orientation = CGImagePropertyOrientation(image.imageOrientation)
         return await Task.detached(priority: .userInitiated) { recognise(picture, orientation: orientation) }.value
     }

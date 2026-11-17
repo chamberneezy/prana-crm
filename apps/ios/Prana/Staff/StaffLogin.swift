@@ -15,7 +15,7 @@ struct StaffLoginSheet: View {
             Form {
                 Section {
                     VStack(spacing: 10) {
-                        Image("Logo").resizable().scaledToFit().frame(width: 64, height: 56)
+                        Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 64, height: 56)
                         Text("Prijava").font(.display(26))
                         Text("Samo za osoblje studija.").font(.ui(14)).foregroundStyle(DS.muted)
                     }

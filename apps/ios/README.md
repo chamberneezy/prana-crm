@@ -28,6 +28,20 @@ design system (linen ground, white cards, Cinzel titles, Montserrat text).
 | `Prana/Staff` | The studio tool |
 | `Prana/Resources` | Fonts (OFL), icon, logo |
 
+## Build on Linux (no Mac)
+
+On a machine with xtool and the Darwin SDK ([omarchy-apple-dev](https://github.com/joshuaswarren/omarchy-apple-dev)),
+`Package.swift`, `xtool.yml` and `xtool-Info.plist` build the same sources:
+
+```sh
+cd apps/ios && xtool dev build          # → xtool/Prana.app (compile check)
+bash ~/Projects/tools/omarchy-apple-dev/ship.sh            # signed .ipa + offline App Store checks
+bash ~/Projects/tools/omarchy-apple-dev/ship.sh --upload   # TestFlight (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH)
+```
+
+`xtool-Info.plist` carries the Release values (no build-setting expansion). In this build the logo and fonts live in
+SwiftPM's resource bundle, so the app reads them through `Bundle.prana` and registers the fonts itself.
+
 ## Run it
 
 On a Mac with Xcode 26:

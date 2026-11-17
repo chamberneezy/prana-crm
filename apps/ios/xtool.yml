@@ -1,0 +1,5 @@
+version: 1
+bundleID: hr.prana.studio
+product: Prana
+infoPath: xtool-Info.plist
+iconPath: Prana/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png

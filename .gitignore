@@ -32,3 +32,8 @@ apps/ios/PranaKit/.build/
 apps/ios/PranaKit/.swiftpm/
 xcuserdata/
 DerivedData/
+
+# xtool (Linux iOS build)
+apps/ios/xtool/
+apps/ios/.bsp/
+apps/ios/.build/
