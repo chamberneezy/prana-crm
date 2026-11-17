@@ -13,6 +13,9 @@ final class AppModel {
     let time = StudioTime()
     let bookings = SavedBookings.standard()
     private let session: SessionStore
+    /** The iOS OAuth client for Google sign-in; nil when it isn't set up (or against the local Auth emulator). */
+    let google: GoogleOAuth?
+    private let googleSignIn = GoogleSignIn()
 
     var mode = Mode.student
     var me: Me?
@@ -28,6 +31,8 @@ final class AppModel {
         let emulator = (info["PranaAuthEmulator"] as? String).flatMap { $0.isEmpty ? nil : $0 }
         let store = SessionStore(auth: StaffAuth(apiKey: config.firebaseAPIKey, emulatorHost: emulator))
         session = store
+        let googleClient = (info["PranaGoogleClientID"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+        google = emulator == nil ? googleClient.map { GoogleOAuth(clientID: $0) } : nil
         api = APIClient(config: config, token: { try await store.idToken() })
     }
 
@@ -52,6 +57,18 @@ final class AppModel {
 
     func signIn(email: String, password: String) async throws {
         try await session.signIn(email: email, password: password)
+        try await finishSignIn()
+    }
+
+    /** Google's account picker, then the same check as the website: the address must be on the staff list. Returns false if closed. */
+    func signInWithGoogle() async throws -> Bool {
+        guard let google, let idToken = try await googleSignIn.idToken(google) else { return false }
+        try await session.signIn(googleIDToken: idToken)
+        try await finishSignIn()
+        return true
+    }
+
+    private func finishSignIn() async throws {
         do {
             me = try await api.me()
         } catch {
@@ -94,7 +111,14 @@ actor SessionStore {
     var isSignedIn: Bool { session != nil }
 
     func signIn(email: String, password: String) async throws {
-        let new = try await auth.signIn(email: email, password: password)
+        store(try await auth.signIn(email: email, password: password))
+    }
+
+    func signIn(googleIDToken: String) async throws {
+        store(try await auth.signIn(googleIDToken: googleIDToken))
+    }
+
+    private func store(_ new: AuthSession) {
         session = new
         Keychain.save(new)
     }

@@ -1,7 +1,7 @@
 import PranaKit
 import SwiftUI
 
-/** The hidden staff sign-in: e-mail and password, for addresses on the studio's staff list only. */
+/** The hidden staff sign-in: Google (as on the website) or e-mail and password, for addresses on the studio's staff list only. */
 struct StaffLoginSheet: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +22,24 @@ struct StaffLoginSheet: View {
                     .frame(maxWidth: .infinity)
                     .listRowBackground(Color.clear)
                 }
+                if model.google != nil {
+                    Section {
+                        Button {
+                            Task { await signInWithGoogle() }
+                        } label: {
+                            HStack(spacing: 10) {
+                                if busy { ProgressView() } else { Image(systemName: "g.circle.fill").font(.system(size: 20)) }
+                                Text("Prijava s Googleom")
+                            }
+                        }
+                        .buttonStyle(.ds(.primary, fullWidth: true))
+                        .disabled(busy)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                    } footer: {
+                        Text("Ili e-mailom i lozinkom:").font(.ui(13)).foregroundStyle(DS.muted).frame(maxWidth: .infinity).padding(.top, 14)
+                    }
+                }
                 Section {
                     TextField("E-mail", text: $email)
                         .textContentType(.username)
@@ -41,7 +59,7 @@ struct StaffLoginSheet: View {
                     } label: {
                         if busy { ProgressView().tint(.white) } else { Text("Prijava") }
                     }
-                    .buttonStyle(.ds(.primary, fullWidth: true))
+                    .buttonStyle(.ds(model.google == nil ? .primary : .secondary, fullWidth: true))
                     .disabled(busy || email.isEmpty || password.isEmpty)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
@@ -49,10 +67,24 @@ struct StaffLoginSheet: View {
             }
             .font(.ui(16))
             .linenBackground()
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Odustani") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { CloseButton { dismiss() } } }
         }
         .presentationBackground(DS.linen)
         .interactiveDismissDisabled(busy)
+    }
+
+    private func signInWithGoogle() async {
+        guard !busy else { return }
+        busy = true
+        failure = nil
+        defer { busy = false }
+        do {
+            guard try await model.signInWithGoogle() else { return }
+            dismiss()
+            model.show("Prijavljeni ste kao \(model.me?.staff.name ?? "član osoblja").")
+        } catch {
+            failure = error.message
+        }
     }
 
     private func signIn() async {

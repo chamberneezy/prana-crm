@@ -32,6 +32,8 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         # The studio this app shows (SEED.business), and the Firebase web API key (public by design).
         PRANA_STUDIO_ID: 01900000-0000-7000-8000-000000000001
+        # Google sign-in: the iOS OAuth client Firebase made for hr.prana.studio (public, like the API key).
+        PRANA_GOOGLE_CLIENT_ID: 417668673455-tdnde637duukqs338km3svrsbas41kaf.apps.googleusercontent.com
       configs:
         Debug:
           # `npm run dev -w @prana/api` on this Mac, with the Firebase Auth emulator (`npm run dev:all`).
@@ -62,6 +64,7 @@ targets:
         PranaStudioID: $(PRANA_STUDIO_ID)
         PranaFirebaseAPIKey: $(PRANA_FIREBASE_API_KEY)
         PranaAuthEmulator: $(PRANA_AUTH_EMULATOR)
+        PranaGoogleClientID: $(PRANA_GOOGLE_CLIENT_ID)
 schemes:
   Prana:
     build:

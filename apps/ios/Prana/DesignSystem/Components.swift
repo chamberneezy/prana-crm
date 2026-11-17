@@ -417,3 +417,17 @@ func plural(_ n: Int, _ one: String, _ few: String, _ other: String) -> String {
     let word = mod10 == 1 && mod100 != 11 ? one : ((2 ... 4).contains(mod10) && !(12 ... 14).contains(mod100) ? few : other)
     return "\(n) \(word)"
 }
+
+/** The ✕ at the top right of a sheet: the system close button on iOS 26 (on glass), a plain xmark before. */
+struct CloseButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            Button(role: .close, action: action)
+        } else {
+            Button(action: action) { Image(systemName: "xmark").font(.system(size: 15, weight: .semibold)) }
+                .accessibilityLabel("Zatvori")
+        }
+    }
+}

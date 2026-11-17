@@ -73,6 +73,39 @@ import Testing
     }
 }
 
+@Suite struct Google {
+    let google = GoogleOAuth(clientID: "123-abc.apps.googleusercontent.com")
+
+    @Test func redirectsToTheReversedClientID() {
+        #expect(google.callbackScheme == "com.googleusercontent.apps.123-abc")
+        let url = google.authorizationURL(challenge: "ch", state: "st").absoluteString
+        #expect(url.hasPrefix("https://accounts.google.com/o/oauth2/v2/auth?"))
+        #expect(url.contains("redirect_uri=com.googleusercontent.apps.123-abc:/oauth2redirect"))
+        #expect(url.contains("code_challenge_method=S256") && url.contains("scope=openid%20email%20profile"))
+    }
+
+    @Test func takesTheCodeOnlyFromItsOwnRedirect() {
+        let back = URL(string: "com.googleusercontent.apps.123-abc:/oauth2redirect?state=st&code=4/xyz")!
+        #expect(google.code(from: back, state: "st") == "4/xyz")
+        #expect(google.code(from: back, state: "other") == nil)
+    }
+
+    @Test func exchangesTheCodeThenSignsInToFirebase() async throws {
+        let tokenStub = Client.Stub(status: 200, body: Data(#"{"id_token":"google-id","access_token":"a"}"#.utf8))
+        let idToken = try await GoogleOAuth(clientID: "123-abc.apps.googleusercontent.com", transport: tokenStub).exchange(code: "4/x+y", verifier: "v")
+        #expect(idToken == "google-id")
+        let form = String(decoding: tokenStub.last!.httpBody!, as: UTF8.self)
+        #expect(form.contains("code=4/x%2By") && form.contains("code_verifier=v") && form.contains("grant_type=authorization_code"))
+
+        let firebaseStub = Client.Stub(status: 200, body: Data(#"{"email":"mario@example.com","idToken":"fb","refreshToken":"r","expiresIn":"3600"}"#.utf8))
+        let session = try await StaffAuth(apiKey: "k", transport: firebaseStub).signIn(googleIDToken: idToken)
+        #expect(session.email == "mario@example.com" && session.idToken == "fb")
+        #expect(firebaseStub.last!.url!.absoluteString.contains("accounts:signInWithIdp?key=k"))
+        let body = String(decoding: firebaseStub.last!.httpBody!, as: UTF8.self)
+        #expect(body.contains("id_token=google-id&providerId=google.com"))
+    }
+}
+
 @Suite struct Saved {
     func session(_ id: String, endsIn: TimeInterval) -> PublicSession {
         PublicSession(id: id, offeringId: "o", offeringName: "Joga", colorToken: .spine, entryRule: nil, startsAt: Date().addingTimeInterval(endsIn - 3600), endsAt: Date().addingTimeInterval(endsIn), teacherName: nil, closureName: nil)

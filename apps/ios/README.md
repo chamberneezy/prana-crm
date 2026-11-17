@@ -7,7 +7,7 @@ One app for two kinds of people:
   otherwise the sign-up is refused. No limits. A sign-up is a *najava*: staff see it on the class and check the person
   in; it counts toward the membership only then. Sign-ups made on the phone are listed under **Moje prijave** and can
   be cancelled from there (the phone keeps a cancel token; nothing else identifies it).
-- **Staff.** Tap the **logo** at the top **seven times quickly** (each tap within 0.6 s; the studio's name does nothing) to open the sign-in. After signing in (an address on
+- **Staff.** Tap the **logo** at the top **seven times quickly** (each tap within 0.6 s; the studio's name does nothing) to open the sign-in. After signing in with Google (the iOS OAuth client Firebase made for `hr.prana.studio`) or e-mail and password (an address on
   the studio's staff list), the app is the studio tool: everything the web app has (Pregled, Raspored with najave and
   check-in, Neradni dani, Tjedni plan, Vrste satova, Učitelji, Članovi and profiles, Upis člana by photo, PDF or by
   hand, Članarine, Uplate, Analitika). "Prikaz za članove" goes back to the members' view without signing out.
@@ -21,7 +21,7 @@ design system (linen ground, white cards, Cinzel titles, Montserrat text).
 | Path | What |
 |---|---|
 | `project.yml` | The Xcode project, generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen) (the `.xcodeproj` isn't committed) |
-| `PranaKit/` | Swift package with everything that isn't UI: API models and client, staff sign-in (Firebase Auth REST, no SDK), studio-time dates, the phone's sign-ups, the upisnica parser. Builds and tests on Linux too. |
+| `PranaKit/` | Swift package with everything that isn't UI: API models and client, staff sign-in (Google via ASWebAuthenticationSession + Firebase Auth REST, no SDK), studio-time dates, the phone's sign-ups, the upisnica parser. Builds and tests on Linux too. |
 | `PranaKit/Tests/PranaKitTests/Fixtures/` | Real API answers, written by `IOS_FIXTURES=1 npx vitest run api/test/ios-fixtures.test.ts` |
 | `Prana/App`, `Prana/DesignSystem` | App state, Keychain, the design system in SwiftUI (with the iOS 26 glass helpers) |
 | `Prana/Student` | The members' view and sign-up |

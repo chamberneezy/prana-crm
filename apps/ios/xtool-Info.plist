@@ -18,6 +18,7 @@
 	<key>PranaAPIURL</key><string>https://prana-crm.prana-api.workers.dev</string>
 	<key>PranaStudioID</key><string>01900000-0000-7000-8000-000000000001</string>
 	<key>PranaFirebaseAPIKey</key><string>AIzaSyAYKhGKg4AtF4eWXpGZDFptXsxCEgPd6d4</string>
+	<key>PranaGoogleClientID</key><string>417668673455-tdnde637duukqs338km3svrsbas41kaf.apps.googleusercontent.com</string>
 	<key>PranaAuthEmulator</key><string></string>
 </dict>
 </plist>

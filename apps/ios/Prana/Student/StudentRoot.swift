@@ -2,11 +2,12 @@ import PranaKit
 import SwiftUI
 
 /**
- * What everyone sees, without an account: the week's classes and their own sign-ups. Tapping the studio's name five
- * times opens the staff sign-in (nothing on screen says so).
+ * What everyone sees, without an account: the week's classes and their own sign-ups. Tapping the logo seven times
+ * quickly opens the staff sign-in (nothing on screen says so). The first launch starts with a short welcome.
  */
 struct StudentRoot: View {
     @Environment(AppModel.self) private var model
+    @AppStorage("prana.welcomed") private var welcomed = false
 
     var body: some View {
         let count = { _ = model.bookingsVersion; return model.bookings.upcoming().count }()
@@ -16,6 +17,12 @@ struct StudentRoot: View {
                 .badge(count)
         }
         .minimizingTabBar()
+        .overlay {
+            if !welcomed {
+                WelcomeView { withAnimation(.smooth(duration: 0.6)) { welcomed = true } }
+                    .transition(.opacity.combined(with: .scale(scale: 1.04)))
+            }
+        }
     }
 }
 
@@ -30,23 +37,33 @@ struct StudioHeader: View {
     @State private var lastTap = Date.distantPast
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 40, height: 36)
-                .padding(4)
+        VStack(spacing: 6) {
+            Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 60, height: 54)
+                .padding(6)
                 .contentShape(Rectangle())
                 .onTapGesture { logoTapped() }
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 0) {
-                Text(name).font(.display(17, relativeTo: .headline)).foregroundStyle(DS.ink)
-                Text("Varaždin").font(.ui(12)).foregroundStyle(DS.muted)
-            }
-            Spacer()
+            Text(name).font(.display(22, relativeTo: .title2)).foregroundStyle(DS.ink)
+                .multilineTextAlignment(.center)
+            Text(greeting).font(.signature(20)).foregroundStyle(DS.sageDeep)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+        .overlay(alignment: .topTrailing) {
             if model.isSignedIn {
                 Button("Studio", systemImage: "person.badge.key") { model.mode = .staff }
                     .labelStyle(.iconOnly)
                     .glassButton()
                     .accessibilityLabel("Otvori alat studija")
             }
+        }
+    }
+
+    private var greeting: String {
+        switch Calendar.current.component(.hour, from: Date()) {
+        case 5 ..< 12: "Dobro jutro"
+        case 12 ..< 18: "Dobar dan"
+        default: "Dobra večer"
         }
     }
 
@@ -119,44 +136,54 @@ struct StudentSchedule: View {
         let sessions = schedule.state.value?.sessions ?? []
         let byDay = Dictionary(grouping: sessions) { time.day(of: $0.startsAt) }
 
-        HStack(alignment: .bottom) {
-            PageTitle(title: "Raspored", overline: "Tjedan \(time.weekRange(schedule.monday))")
-        }
-        WeekSwitcher(monday: schedule.monday, thisMonday: time.monday(of: today), time: time) { goTo($0, schedule) }
-            .frame(maxWidth: .infinity)
-        WeekStrip(
-            days: days,
-            selected: $schedule.selected,
+        WeekCalendar(
+            monday: schedule.monday,
+            thisMonday: time.monday(of: today),
             today: today,
-            hasClasses: { byDay[$0]?.isEmpty == false },
+            selected: $schedule.selected,
+            count: { day in byDay[day]?.filter { $0.closureName == nil }.count ?? 0 },
             isClosed: { day in byDay[day]?.contains { $0.closureName != nil } == true },
             time: time
-        )
-        .modifier(WeekSwipe(previous: { goTo(time.addDays(schedule.monday, -7), schedule) }, next: { goTo(time.addDays(schedule.monday, 7), schedule) }))
+        ) { goTo($0, schedule) }
 
-        Text(time.longDay(schedule.selected)).font(.ui(20, .semibold, relativeTo: .title3)).foregroundStyle(DS.ink)
+        let list = byDay[schedule.selected] ?? []
+        HStack(alignment: .firstTextBaseline) {
+            Text(time.longDay(schedule.selected)).font(.ui(20, .semibold, relativeTo: .title3)).foregroundStyle(DS.ink)
+            Spacer()
+            if schedule.state.value != nil, !list.isEmpty {
+                Text(plural(list.count, "sat", "sata", "satova")).font(.ui(14)).foregroundStyle(DS.muted)
+            }
+        }
+        .contentTransition(.numericText())
+        .animation(.smooth, value: schedule.selected)
 
         LoadingView(state: schedule.state, retry: { await schedule.load(model.api, time: model.time) }) { _ in
-            let list = byDay[schedule.selected] ?? []
-            if list.isEmpty {
-                EmptyStateView(title: "Nema satova", message: "Odaberite drugi dan u tjednu.", systemImage: "moon.zzz")
-            } else {
-                VStack(spacing: 12) {
-                    ForEach(list) { session in
-                        PublicSessionCard(session: session) { signingUp = session }
+            Group {
+                if list.isEmpty {
+                    EmptyStateView(title: "Nema satova", message: "Odaberite drugi dan u tjednu.", systemImage: "moon.zzz")
+                        .appearIn(0)
+                } else {
+                    VStack(spacing: 12) {
+                        ForEach(Array(list.enumerated()), id: \.element.id) { index, session in
+                            PublicSessionCard(session: session) { signingUp = session }
+                                .appearIn(index)
+                        }
                     }
                 }
             }
+            .id(schedule.selected + (schedule.state.value?.from ?? ""))
         }
     }
 
     private func goTo(_ monday: String, _ schedule: StudentScheduleModel) {
         let time = model.time
         let offset = time.weekday(schedule.selected) - 1
-        schedule.monday = monday
         // Today when it is in that week, otherwise the same weekday.
         let today = time.today()
-        schedule.selected = time.monday(of: today) == monday ? today : time.addDays(monday, offset)
+        withAnimation(.smooth(duration: 0.35)) {
+            schedule.monday = monday
+            schedule.selected = time.monday(of: today) == monday ? today : time.addDays(monday, offset)
+        }
     }
 }
 
@@ -227,5 +254,158 @@ struct PublicSessionCard: View {
         model.bookings.remove(id: booking.id)
         model.bookingsChanged()
         model.show("Odjavljeni ste: \(booking.offeringName)")
+    }
+}
+
+/**
+ * The week as a card: the month and which week it is, arrows on glass, and the seven days. The chosen day is a dark
+ * pill that slides between days; dots under a day count its classes (up to three), terracotta marks a closed day.
+ * Swiping across the days changes the week, and the days slide in from the side they came from.
+ */
+struct WeekCalendar: View {
+    let monday: String
+    let thisMonday: String
+    let today: String
+    @Binding var selected: String
+    var count: (String) -> Int
+    var isClosed: (String) -> Bool
+    let time: StudioTime
+    let go: (String) -> Void
+    @Namespace private var pill
+    @State private var forward = true
+
+    var body: some View {
+        VStack(spacing: 14) {
+            HStack(alignment: .center, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(monthTitle).font(.display(19, relativeTo: .title3)).foregroundStyle(DS.ink)
+                    Text(weekLabel).font(.ui(13)).foregroundStyle(DS.muted).monospacedDigit()
+                }
+                .contentTransition(.opacity)
+                Spacer(minLength: 0)
+                if monday != thisMonday {
+                    Button("Danas") { move(to: thisMonday) }
+                        .font(.ui(13, .semibold))
+                        .foregroundStyle(DS.ink)
+                        .padding(.horizontal, 12)
+                        .frame(height: 36)
+                        .glassSurface(in: Capsule(), interactive: true)
+                        .transition(.scale.combined(with: .opacity))
+                }
+                HStack(spacing: 0) {
+                    Button { move(to: time.addDays(monday, -7)) } label: { Image(systemName: "chevron.left").frame(width: 40, height: 36) }
+                        .accessibilityLabel("Prethodni tjedan")
+                    Button { move(to: time.addDays(monday, 7)) } label: { Image(systemName: "chevron.right").frame(width: 40, height: 36) }
+                        .accessibilityLabel("Sljedeći tjedan")
+                }
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(DS.ink)
+                .glassSurface(in: Capsule(), interactive: true)
+            }
+
+            days
+                .id(monday)
+                .transition(.asymmetric(
+                    insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
+                    removal: .move(edge: forward ? .leading : .trailing).combined(with: .opacity)
+                ))
+        }
+        .padding(14)
+        .background(DS.white, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(DS.line))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: DS.ink.opacity(0.05), radius: 14, y: 6)
+        .modifier(WeekSwipe(previous: { move(to: time.addDays(monday, -7)) }, next: { move(to: time.addDays(monday, 7)) }))
+        .sensoryFeedback(.selection, trigger: selected)
+        .animation(.smooth(duration: 0.35), value: monday)
+    }
+
+    private var days: some View {
+        HStack(spacing: 4) {
+            ForEach(time.week(of: monday), id: \.self) { day in
+                let chosen = day == selected
+                let n = count(day)
+                Button {
+                    withAnimation(.snappy(duration: 0.3)) { selected = day }
+                } label: {
+                    VStack(spacing: 4) {
+                        Text(Weekday.short[time.weekday(day)].uppercased())
+                            .font(.ui(10, .semibold, relativeTo: .caption2)).tracking(0.6)
+                            .foregroundStyle(chosen ? DS.white.opacity(0.8) : DS.muted)
+                        Text(time.dayOfMonth(day)).font(.ui(18, .semibold, relativeTo: .title3)).monospacedDigit()
+                            .foregroundStyle(chosen ? DS.white : DS.ink)
+                        HStack(spacing: 3) {
+                            if isClosed(day) {
+                                Circle().fill(DS.terracotta).frame(width: 5, height: 5)
+                            } else {
+                                ForEach(0 ..< min(n, 3), id: \.self) { _ in
+                                    Circle().fill(chosen ? DS.white : DS.sage).frame(width: 4, height: 4)
+                                }
+                            }
+                        }
+                        .frame(height: 5)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 66)
+                    .background {
+                        if chosen {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DS.ink)
+                                .matchedGeometryEffect(id: "pill", in: pill)
+                        } else if day == today {
+                            RoundedRectangle(cornerRadius: 14, style: .continuous).fill(DS.mist)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(Weekday.long[time.weekday(day)]), \(time.dayMonth(day))\(day == today ? ", danas" : ""), \(isClosed(day) ? "studio zatvoren" : plural(n, "sat", "sata", "satova"))")
+                .accessibilityAddTraits(chosen ? .isSelected : [])
+            }
+        }
+    }
+
+    private func move(to newMonday: String) {
+        guard newMonday != monday else { return }
+        forward = newMonday > monday
+        go(newMonday)
+    }
+
+    private static let months = ["", "Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj", "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"]
+
+    /** "Studeni 2026", or "Studeni – Prosinac 2026" for a week across two months. */
+    private var monthTitle: String {
+        let first = monday.split(separator: "-"), last = time.addDays(monday, 6).split(separator: "-")
+        let m1 = Self.months[Int(first[1])!], m2 = Self.months[Int(last[1])!]
+        if first[0] != last[0] { return "\(m1) \(first[0]) – \(m2) \(last[0])" }
+        return m1 == m2 ? "\(m1) \(first[0])" : "\(m1) – \(m2) \(first[0])"
+    }
+
+    private var weekLabel: String {
+        let range = time.weekRange(monday)
+        switch monday {
+        case thisMonday: return "Ovaj tjedan · \(range)"
+        case time.addDays(thisMonday, 7): return "Sljedeći tjedan · \(range)"
+        case time.addDays(thisMonday, -7): return "Prošli tjedan · \(range)"
+        default: return range
+        }
+    }
+}
+
+extension View {
+    /** Fades and lifts a list item in, each a moment after the one before. */
+    func appearIn(_ index: Int) -> some View { modifier(AppearIn(index: index)) }
+}
+
+private struct AppearIn: ViewModifier {
+    let index: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var shown = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(shown ? 1 : 0)
+            .offset(y: shown || reduceMotion ? 0 : 16)
+            .onAppear {
+                withAnimation(.spring(duration: 0.5, bounce: 0.2).delay(Double(min(index, 6)) * 0.06)) { shown = true }
+            }
     }
 }
