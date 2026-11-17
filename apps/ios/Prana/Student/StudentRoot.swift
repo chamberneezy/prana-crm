@@ -3,11 +3,14 @@ import SwiftUI
 
 /**
  * What everyone sees, without an account: the week's classes and their own sign-ups. Tapping the logo seven times
- * quickly opens the staff sign-in (nothing on screen says so). The first launch starts with a short welcome.
+ * quickly opens the staff sign-in (nothing on screen says so). The first launch starts with a short welcome; every
+ * launch after it opens with one breath (OpeningBreath.swift).
  */
 struct StudentRoot: View {
     @Environment(AppModel.self) private var model
     @AppStorage("prana.welcomed") private var welcomed = false
+    /** Decided once, at launch: not on the very first one (the welcome is the intro then), nor with Reduce Motion. */
+    @State private var breath = OpeningBreathModel(play: UserDefaults.standard.bool(forKey: "prana.welcomed") && !UIAccessibility.isReduceMotionEnabled)
 
     var body: some View {
         let count = { _ = model.bookingsVersion; return model.bookings.upcoming().count }()
@@ -17,6 +20,10 @@ struct StudentRoot: View {
                 .badge(count)
         }
         .minimizingTabBar()
+        .environment(\.openingBreath, breath)
+        .overlay {
+            if breath.running { OpeningBreathOverlay(breath: breath) }
+        }
         .overlay {
             if !welcomed {
                 WelcomeView { withAnimation(.smooth(duration: 0.6)) { welcomed = true } }
@@ -39,13 +46,16 @@ struct StudioHeader: View {
     var body: some View {
         VStack(spacing: 6) {
             Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 60, height: 54)
+                .breathTarget(.logo)
                 .padding(6)
                 .contentShape(Rectangle())
                 .onTapGesture { logoTapped() }
                 .accessibilityHidden(true)
             Text(name).font(.display(22, relativeTo: .title2)).foregroundStyle(DS.ink)
                 .multilineTextAlignment(.center)
+                .breathTarget(.name)
             Text(greeting).font(.signature(20)).foregroundStyle(DS.sageDeep)
+                .breathReveal(0, greeting: true)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 8)
@@ -145,6 +155,7 @@ struct StudentSchedule: View {
             isClosed: { day in byDay[day]?.contains { $0.closureName != nil } == true },
             time: time
         ) { goTo($0, schedule) }
+        .breathReveal(0)
 
         let list = byDay[schedule.selected] ?? []
         HStack(alignment: .firstTextBaseline) {
@@ -156,6 +167,7 @@ struct StudentSchedule: View {
         }
         .contentTransition(.numericText())
         .animation(.smooth, value: schedule.selected)
+        .breathReveal(1)
 
         LoadingView(state: schedule.state, retry: { await schedule.load(model.api, time: model.time) }) { _ in
             Group {
@@ -173,6 +185,7 @@ struct StudentSchedule: View {
             }
             .id(schedule.selected + (schedule.state.value?.from ?? ""))
         }
+        .breathReveal(2)
     }
 
     private func goTo(_ monday: String, _ schedule: StudentScheduleModel) {
