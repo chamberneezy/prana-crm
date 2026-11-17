@@ -19,7 +19,7 @@ from `main` by `.github/workflows/pages.yml`.
 
 | Build | Sign-in | Data |
 |---|---|---|
-| `npm run build` | Firebase | The Cloudflare Worker (not deployed yet) |
+| `npm run build` | Firebase project "Prana" | The live Worker: D1 in the EU |
 | `npm run build:preview` | Firebase project "Prana" | In the browser, sample data |
 | `npm run build:demo` | None: any button lets you in | In the browser, sample data |
 
@@ -27,10 +27,24 @@ To let another address into the preview, add the SHA-256 of its lower-cased e-ma
 `apps/web/.env.preview` (`printf '%s' name@example.com | shasum -a 256`), and to the list in `firestore.rules`
 so they can send feedback too (a test checks the two agree), then `npm run deploy:rules`.
 
+## Live
+
+**https://prana-crm.prana-api.workers.dev** — one Cloudflare Worker (`prana-crm`, `api/wrangler.toml` `[env.production]`)
+serves the web app and the API under `/api`; the iOS app talks to the same address. Free plan: hard daily caps
+(100,000 requests, 5M database row reads), no overage billing.
+
+- `npm run deploy` builds the web app, applies new migrations to the live database and deploys (`npx wrangler login` once).
+- Owners are the `staff` rows; more with `tsx api/scripts/seed.ts --prod --owner "Name <address>"` piped to
+  `npx wrangler d1 execute prana --remote --env production --file …` (the seed keeps existing rows).
+- **R2 is off**: scanned upisnice can be read but not stored (the API answers `storage_off`). To switch it on: enable R2 in
+  the Cloudflare dashboard, `npx wrangler r2 bucket create prana-documents --jurisdiction eu -c api/wrangler.toml`,
+  uncomment the bucket in `[env.production]`, `npm run deploy`.
+- A new address for sign-in goes in Firebase → Authentication → Settings → Authorized domains.
+
 ## iOS app
 
 `apps/ios`: one app for members (no account: the week's classes and sign-up by name, members only) and, behind a
-hidden sign-in (tap the studio's name five times), the whole studio tool. See `apps/ios/README.md`.
+hidden sign-in (tap the logo seven times quickly), the whole studio tool. See `apps/ios/README.md`.
 
 ## Roles
 

@@ -56,6 +56,7 @@ documents.post('/', async (c) => {
     ocr_json: null,
     created_by: staff.id,
   };
+  if (!c.env.BUCKET) throw new ApiError('storage_off');
   await c.env.BUCKET.put(row.r2_key, bytes, { httpMetadata: { contentType: mime } });
   await db.insert(document).values(row);
 
@@ -67,6 +68,7 @@ documents.post('/', async (c) => {
 documents.get('/:id/file', async (c) => {
   const { db, businessId } = ctx(c);
   const row = await owned(db, document, c.req.param('id'), businessId);
+  if (!c.env.BUCKET) throw new ApiError('storage_off');
   const object = await c.env.BUCKET.get(row.r2_key);
   if (!object) throw new ApiError('not_found');
   return new Response(object.body as ReadableStream, {
@@ -99,7 +101,7 @@ documents.patch('/:id', async (c) => {
 documents.delete('/:id', async (c) => {
   const { db, businessId, now } = ctx(c);
   const existing = await owned(db, document, c.req.param('id'), businessId);
-  await c.env.BUCKET.delete(existing.r2_key);
+  await c.env.BUCKET?.delete(existing.r2_key);
   await db
     .update(document)
     .set({ ...removed(now), ocr_json: null })

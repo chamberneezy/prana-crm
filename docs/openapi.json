@@ -132,6 +132,7 @@
                   "session_over",
                   "file_too_large",
                   "unsupported_file",
+                  "storage_off",
                   "internal"
                 ]
               },
@@ -5999,6 +6000,7 @@
                               "session_over",
                               "file_too_large",
                               "unsupported_file",
+                              "storage_off",
                               "internal"
                             ]
                           },

@@ -1,10 +1,11 @@
 // Prints seed SQL for `wrangler d1 execute --file`.
 //   tsx scripts/seed.ts --dev
 //   tsx scripts/seed.ts --prod --owner "Mario <mario@example.com>" --owner "Matija <matija@example.com>"
-//     [--teacher "Ana <ana@example.com>"]
+//     [--teacher "Ana <ana@example.com>"] [--weeks 4]
 // Each --owner is someone who may sign in as owner of the studio (everything); each --teacher signs in with a teacher's
 // access (ROLE_ACCESS in @prana/shared: view-only, for now nothing). Addresses are passed here, not kept in the repository.
-import { devSeed, prodSeed, toSql } from '../src/seed';
+import { localDate } from '@prana/shared';
+import { devSeed, prodSeed, standardWeekSessions, toSql } from '../src/seed';
 
 const args = process.argv.slice(2);
 /** Every value given for a repeatable option. */
@@ -28,7 +29,10 @@ function build(): string[] {
     const owners = options('--owner').map(parseOwner);
     if (!owners.length) return fail('The production seed needs at least one --owner "Name <address>": the people who sign in as owner.');
     const teachers = options('--teacher').map(parseOwner);
-    return toSql(prodSeed({ now, owners, teachers }), 'keep');
+    const weeks = Number(options('--weeks')[0] ?? 0);
+    // --weeks N: the standard week's classes on the calendar from this week on (run once, on an empty calendar).
+    const sessions = weeks > 0 ? standardWeekSessions({ now, today: localDate(new Date()), weeks }) : [];
+    return toSql([...prodSeed({ now, owners, teachers }), ...sessions], 'keep');
   }
   return fail('Pass --dev or --prod.');
 }

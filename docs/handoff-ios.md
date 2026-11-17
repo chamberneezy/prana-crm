@@ -357,7 +357,7 @@ Health notes are sensitive personal data (GDPR special category). Mario should c
 > **Update 16.11.2026.** The app is built in `apps/ios` (see its README). It changes this plan in three ways:
 > 1. **Members use the app too, without an account** (this was "not in v1"). The default view is the week's classes
 >    with "Prijavi se" by first and last name, which must match a member; staff open the studio tool by tapping the
->    studio's name five times. Sign-ups are *najave*: staff check people in from them.
+>    logo seven times quickly. Sign-ups are *najave*: staff check people in from them.
 > 2. **Online first, no SwiftData sync yet.** The staff tool calls the same REST API as the web app. Offline work and the
 >    sync engine (B3) remain a later step.
 > 3. **Staff sign in with e-mail and password through Firebase Auth's REST API**, so there is no Firebase SDK and no

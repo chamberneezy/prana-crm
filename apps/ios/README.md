@@ -7,7 +7,7 @@ One app for two kinds of people:
   otherwise the sign-up is refused. No limits. A sign-up is a *najava*: staff see it on the class and check the person
   in; it counts toward the membership only then. Sign-ups made on the phone are listed under **Moje prijave** and can
   be cancelled from there (the phone keeps a cancel token; nothing else identifies it).
-- **Staff.** Tap the studio's name at the top **five times quickly** to open the sign-in. After signing in (an address on
+- **Staff.** Tap the **logo** at the top **seven times quickly** (each tap within 0.6 s; the studio's name does nothing) to open the sign-in. After signing in (an address on
   the studio's staff list), the app is the studio tool: everything the web app has (Pregled, Raspored with najave and
   check-in, Neradni dani, Tjedni plan, Vrste satova, Učitelji, Članovi and profiles, Upis člana by photo, PDF or by
   hand, Članarine, Uplate, Analitika). "Prikaz za članove" goes back to the members' view without signing out.

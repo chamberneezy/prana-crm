@@ -19,7 +19,8 @@
     "e2e:demo": "playwright test -c playwright.demo.config.ts",
     "build:preview": "npm run build:preview -w @prana/web",
     "feedback": "node scripts/feedback.mjs",
-    "deploy:rules": "firebase deploy --only firestore:rules --project prana-studio-crm"
+    "deploy:rules": "firebase deploy --only firestore:rules --project prana-studio-crm",
+    "deploy": "npm run build -w @prana/web && npm run db:migrate:prod -w @prana/api && npm run deploy -w @prana/api"
   },
   "engines": {
     "node": ">=22"

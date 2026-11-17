@@ -23,10 +23,19 @@ struct StudentRoot: View {
 struct StudioHeader: View {
     @Environment(AppModel.self) private var model
     var name = "Prana Yoga Studio"
+    /** Staff sign-in: the logo tapped this many times, each tap within `tapGap` of the one before. Nothing hints at it. */
+    static let secretTaps = 7
+    static let tapGap: TimeInterval = 0.6
+    @State private var taps = 0
+    @State private var lastTap = Date.distantPast
 
     var body: some View {
         HStack(spacing: 12) {
-            Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 40, height: 36).accessibilityHidden(true)
+            Image("Logo", bundle: .prana).resizable().scaledToFit().frame(width: 40, height: 36)
+                .padding(4)
+                .contentShape(Rectangle())
+                .onTapGesture { logoTapped() }
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Text(name).font(.display(17, relativeTo: .headline)).foregroundStyle(DS.ink)
                 Text("Varaždin").font(.ui(12)).foregroundStyle(DS.muted)
@@ -39,8 +48,16 @@ struct StudioHeader: View {
                     .accessibilityLabel("Otvori alat studija")
             }
         }
-        .contentShape(Rectangle())
-        .onTapGesture(count: 5) { model.openStaff() }
+    }
+
+    private func logoTapped() {
+        let now = Date()
+        taps = now.timeIntervalSince(lastTap) <= Self.tapGap ? taps + 1 : 1
+        lastTap = now
+        if taps >= Self.secretTaps {
+            taps = 0
+            model.openStaff()
+        }
     }
 }
 

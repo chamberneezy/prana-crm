@@ -4,7 +4,8 @@ import type { BusinessRow, StaffRow } from './db/schema';
 
 export interface Env {
   DB: D1Database;
-  BUCKET: R2Bucket;
+  /** Scanned upisnice. Optional: without it the API runs and only storing files is refused (storage_off). */
+  BUCKET?: R2Bucket;
   FIREBASE_PROJECT_ID: string;
   /** "production" on the deployed Worker. */
   ENVIRONMENT?: string;

@@ -39,8 +39,8 @@ targets:
           PRANA_FIREBASE_API_KEY: fake-api-key
           PRANA_AUTH_EMULATOR: localhost:9099
         Release:
-          # Set to the deployed Worker's address once the API is deployed.
-          PRANA_API_URL: https://api.prana.example
+          # The live Worker (website + API), see api/wrangler.toml [env.production].
+          PRANA_API_URL: https://prana-crm.prana-api.workers.dev
           PRANA_FIREBASE_API_KEY: AIzaSyAYKhGKg4AtF4eWXpGZDFptXsxCEgPd6d4
           PRANA_AUTH_EMULATOR: ""
     info:

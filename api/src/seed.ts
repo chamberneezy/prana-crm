@@ -1,4 +1,4 @@
-import { STUDIO_PLACE, addDays, addMonths, type ColorToken, localDate, type PaymentMethod, type PlanCode, splitFullName, startOfWeek, TIME_ZONE, zonedTimeToUtc } from '@prana/shared';
+import { STUDIO_PLACE, addDays, addMonths, type ColorToken, localDate, type PaymentMethod, type PlanCode, splitFullName, startOfWeek, TIME_ZONE, uuidv7, zonedTimeToUtc } from '@prana/shared';
 
 /** The plans every studio starts with. The studio's own ones (`custom`) are added in the app. */
 type StandardPlan = Exclude<PlanCode, 'custom'>;
@@ -160,6 +160,37 @@ const DEV_MEMBERS: DevMember[] = [
   { name: 'Nina Šimić', email: 'nina.simic@example.com', phone: '097 222 9090', dob: '1975-04-17', health: 'Operacija koljena 2024., bez dubokih čučnjeva.', plan: 'unl', endsInDays: 12, paid: 'cash', visits: 7 },
   { name: 'Ivan Knežević', email: 'ivan.knezevic@example.com', phone: '098 101 2020', dob: '1983-07-26' },
 ];
+
+/**
+ * The standard week as sessions, for `weeks` weeks from the week of `today` (production starts with an empty calendar).
+ * Random ids: seeding again adds another copy, so run it once; later weeks come from the planner.
+ */
+export function standardWeekSessions({ now, today, weeks }: { now: string; today: string; weeks: number }): SeedRow[] {
+  const monday = startOfWeek(today);
+  const rows: SeedRow[] = [];
+  for (let week = 0; week < weeks; week++) {
+    for (const [day, time, key] of WEEK) {
+      const template = OFFERINGS.find((o) => o.key === key)!;
+      const starts_at = zonedTimeToUtc(addDays(monday, week * 7 + day), time);
+      rows.push({
+        table: 'session',
+        row: {
+          id: uuidv7(),
+          business_id: SEED.business,
+          location_id: SEED.location,
+          offering_id: SEED.offerings[key],
+          starts_at,
+          ends_at: new Date(Date.parse(starts_at) + template.minutes * 60_000).toISOString(),
+          teacher_staff_id: null,
+          capacity: 12,
+          note: null,
+          ...stamps(now),
+        },
+      });
+    }
+  }
+  return rows;
+}
 
 /** Dev seed: the production seed plus an owner, sample prices, five weeks of sessions and sample members. */
 export function devSeed({ now }: { now: string }): SeedRow[] {

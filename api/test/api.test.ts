@@ -421,6 +421,14 @@ describe('documents', () => {
     return t.call('POST', '/documents', { form });
   };
 
+  it('without file storage (R2 not switched on yet) refuses the upload with storage_off', async () => {
+    const form = new FormData();
+    form.append('file', new File([pdf], 'upisnica.pdf', { type: 'application/pdf' }));
+    const { status, body } = await t.call('POST', '/documents', { form, env: { BUCKET: undefined } });
+    expect(status).toBe(503);
+    expect(body.error.code).toBe('storage_off');
+  });
+
   it('stores an uploaded upisnica privately and serves it back only through the API', async () => {
     const { status, body } = await upload(pdf, 'upisnica-lucija.pdf', 'application/pdf');
     expect(status).toBe(201);
@@ -428,7 +436,7 @@ describe('documents', () => {
     expect(body.document).not.toHaveProperty('r2_key');
     documentId = body.document.id;
 
-    const stored = await t.env.BUCKET.get(`${SEED.business}/documents/${documentId}`);
+    const stored = await t.env.BUCKET!.get(`${SEED.business}/documents/${documentId}`);
     expect(stored).not.toBeNull();
 
     const file = await t.call('GET', `/documents/${documentId}/file`);
@@ -477,7 +485,7 @@ describe('documents', () => {
 
   it('deleting the member deletes their stored file', async () => {
     expect((await t.call('DELETE', `/members/${memberId}`)).status).toBe(204);
-    expect(await t.env.BUCKET.get(`${SEED.business}/documents/${documentId}`)).toBeNull();
+    expect(await t.env.BUCKET!.get(`${SEED.business}/documents/${documentId}`)).toBeNull();
     expect((await t.call('GET', `/documents/${documentId}/file`)).status).toBe(404);
     expect((await t.call('GET', `/members/${memberId}`)).status).toBe(404);
     expect((await t.call('GET', '/members?q=Dora')).body.members).toEqual([]);
@@ -486,7 +494,7 @@ describe('documents', () => {
   it('deletes a document that was never saved to a member', async () => {
     const { body } = await upload(pdf, 'odustao.pdf', 'application/pdf');
     expect((await t.call('DELETE', `/documents/${body.document.id}`)).status).toBe(204);
-    expect(await t.env.BUCKET.get(`${SEED.business}/documents/${body.document.id}`)).toBeNull();
+    expect(await t.env.BUCKET!.get(`${SEED.business}/documents/${body.document.id}`)).toBeNull();
   });
 });
 

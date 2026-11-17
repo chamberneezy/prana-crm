@@ -58,6 +58,7 @@ export const ERROR_CODES = [
   'session_over',
   'file_too_large',
   'unsupported_file',
+  'storage_off',
   'internal',
 ] as const;
 export const errorCodeSchema = z.enum(ERROR_CODES);

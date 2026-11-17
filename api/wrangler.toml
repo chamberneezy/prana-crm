@@ -18,3 +18,32 @@ bucket_name = "prana-documents"
 [vars]
 FIREBASE_PROJECT_ID = "prana-crm"
 ENVIRONMENT = "development"
+
+# Production: `npm run deploy` (root). One Worker serves the web app (apps/web/dist) and the API under /api,
+# so the site calls /api on its own address. D1 and R2 live in the EU. Free plan: hard daily caps, no overage.
+[env.production]
+name = "prana-crm"
+workers_dev = true
+
+[env.production.assets]
+directory = "../apps/web/dist"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "prana"
+database_id = "956d52c2-c43c-4d01-a565-11336ca7a952"
+migrations_dir = "migrations"
+
+# Scanned upisnice. Off until R2 is enabled on the account (dashboard → R2, asks for a card; free up to 10 GB).
+# Without it the API runs and only storing files is refused (storage_off). Then: `npx wrangler r2 bucket create
+# prana-documents --jurisdiction eu` and uncomment.
+# [[env.production.r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "prana-documents"
+# jurisdiction = "eu"
+
+[env.production.vars]
+FIREBASE_PROJECT_ID = "prana-studio-crm"
+ENVIRONMENT = "production"

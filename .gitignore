@@ -13,6 +13,7 @@ dist/
 !apps/web/.env.development
 !apps/web/.env.demo
 !apps/web/.env.preview
+!apps/web/.env.production
 .dev.vars
 
 # test output
