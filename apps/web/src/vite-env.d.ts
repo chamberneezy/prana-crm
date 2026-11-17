@@ -21,6 +21,8 @@ interface ImportMetaEnv {
   readonly VITE_FEEDBACK?: string;
   /** Set only for local development, e.g. 127.0.0.1:8080. */
   readonly VITE_FIRESTORE_EMULATOR_HOST?: string;
+  /** Set on the old preview (GitHub Pages): it forwards there, after sending the owner's own entries (src/moved). */
+  readonly VITE_MOVED_TO?: string;
   /** The commit the build was made from, recorded with feedback. */
   readonly VITE_BUILD?: string;
 }

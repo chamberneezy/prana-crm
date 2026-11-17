@@ -43,6 +43,18 @@ service cloud.firestore {
         && d.created_at == request.time;
     }
 
+    // The old preview kept data in each browser only. Before forwarding to the live studio it sends the owner's own
+    // entries here (apps/web/src/moved), to be moved into the live database by hand.
+    match /previewExports/{id} {
+      allow create: if isOwner()
+        && request.resource.data.keys().hasOnly(['author', 'count', 'rows', 'created_at'])
+        && request.resource.data.author.uid == request.auth.uid
+        && request.resource.data.author.email == request.auth.token.email.lower()
+        && request.resource.data.count is int
+        && request.resource.data.rows is string && request.resource.data.rows.size() < 900000
+        && request.resource.data.created_at == request.time;
+    }
+
     match /feedback/{id} {
       allow create: if isOwner() && validFeedback(request.resource.data);
     }
