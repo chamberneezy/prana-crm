@@ -1,5 +1,6 @@
 import { parseUpisnica, type UpisnicaScan } from '@prana/shared';
-import { Camera, FileUp, Pencil } from 'lucide-react';
+import type { MembersImportReadResponse } from '@prana/shared';
+import { Camera, FileUp, Pencil, Sheet } from 'lucide-react';
 import { type DragEvent, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { Button, Notice, PageHeader } from '../components';
@@ -8,6 +9,8 @@ import { DEMO } from '../auth/session';
 import { useLang } from '../i18n';
 import { checkFile, type Extracted, extractFile, type ImportStep } from '../import/extract';
 import styles from './ImportMember.module.css';
+import { ApiClientError } from '../api/client';
+import { LIST_ACCEPT, ListImport, MAX_LIST_BYTES, readList } from './ListImport';
 import { ReviewImport } from './ReviewImport';
 
 const STEPS: ImportStep[] = ['loading', 'reading', 'filling'];
@@ -22,8 +25,12 @@ export interface ImportedForm {
 
 /** "Novi član": import a filled-in upisnica, or go to manual entry. Nothing is saved before the review. */
 export function ImportMember() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const input = useRef<HTMLInputElement>(null);
+  const listInput = useRef<HTMLInputElement>(null);
+  const [list, setList] = useState<{ filename: string; preview: MembersImportReadResponse } | null>(null);
+  const [listProblem, setListProblem] = useState<string | null>(null);
+  const [readingList, setReadingList] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [step, setStep] = useState<ImportStep | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
@@ -52,12 +59,33 @@ export function ImportMember() {
     }
   };
 
+  /** A CSV or Excel list of members: read by the API, shown before anything is saved. */
+  const takeList = async (file: File | undefined) => {
+    setListProblem(null);
+    setProblem(null);
+    if (!file) return;
+    if (file.size > MAX_LIST_BYTES) return setListProblem(t('listImport.tooBig'));
+    setReadingList(true);
+    try {
+      setList({ filename: file.name, preview: await readList(file) });
+    } catch (error) {
+      setListProblem(error instanceof ApiClientError && error.messages ? error.messages[lang] : t('import.error.unreadable'));
+    } finally {
+      setReadingList(false);
+    }
+  };
+
+  const isList = (file: File) => /\.(csv|tsv|txt|xlsx|xls)$/i.test(file.name);
+
   const onDrop = (e: DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    void take(e.dataTransfer.files);
+    const first = e.dataTransfer.files[0];
+    if (e.dataTransfer.files.length === 1 && first && isList(first)) void takeList(first);
+    else void take(e.dataTransfer.files);
   };
 
+  if (list) return <ListImport filename={list.filename} preview={list.preview} onAnother={() => setList(null)} />;
   if (imported) return <ReviewImport imported={imported} onAnother={() => setImported(null)} />;
 
   return (
@@ -71,6 +99,7 @@ export function ImportMember() {
       </div>
 
       {problem && <Notice>{t(`import.error.${problem}`)}</Notice>}
+      {listProblem && <Notice>{listProblem}</Notice>}
 
       <section
         aria-label={t('import.zoneLabel')}
@@ -118,6 +147,27 @@ export function ImportMember() {
       </section>
 
       <div className={styles.options}>
+        <button type="button" className={styles.option} onClick={() => listInput.current?.click()} disabled={readingList}>
+          <span className={styles.optionIcon}>
+            <Sheet size={22} strokeWidth={1.5} aria-hidden />
+          </span>
+          <span className={styles.optionText}>
+            <strong>{readingList ? t('listImport.reading') : t('listImport.option.title')}</strong>
+            <span>{t('listImport.option.body')}</span>
+          </span>
+        </button>
+        <input
+          ref={listInput}
+          type="file"
+          accept={LIST_ACCEPT}
+          className={styles.fileInput}
+          aria-label={t('listImport.option.title')}
+          tabIndex={-1}
+          onChange={(e) => {
+            void takeList(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
         <Link to="/clanovi/novi/rucno" className={styles.option}>
           <span className={styles.optionIcon}>
             <Pencil size={22} strokeWidth={1.5} aria-hidden />

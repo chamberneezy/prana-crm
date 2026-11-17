@@ -68,5 +68,14 @@ import Testing
         let detail = try await api.member(id: second.member.id)
         #expect(!detail.payments.isEmpty)
         #expect(try await api.session(id: session.id).attendees.count == 1)
+
+        // Uvezi popis članova: a CSV read, previewed and added; Ana is already there.
+        let csv = "Ime;Prezime;E-mail;Datum rođenja;Student\nAna;Provjera;;;\nLea;Tablica;lea@example.test;3.4.1990.;da\n"
+        let preview = try await api.readMemberSpreadsheet(data: Data(csv.utf8), filename: "clanovi.csv")
+        #expect(preview.rows.map(\.duplicate) == [true, false])
+        #expect(preview.rows[1].dob == "1990-04-03" && preview.rows[1].isStudentOrRetired)
+        let result = try await api.importMembers(preview.rows)
+        #expect(result.created == 1)
+        #expect(try await api.members().members.count == 3)
     }
 }

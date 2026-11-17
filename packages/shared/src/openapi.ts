@@ -34,6 +34,14 @@ export const routes: RouteSpec[] = [
 
   { method: 'get', path: '/members', summary: 'Members with their derived status', query: s.membersQuerySchema, response: s.membersResponseSchema },
   { method: 'post', path: '/members', summary: 'Add a member (needs the accuracy consent)', body: s.memberInputSchema, response: s.memberResponseSchema, status: 201 },
+  {
+    method: 'post',
+    path: '/members/import/read',
+    summary: 'Read members from a CSV or Excel (.xlsx) file, for a preview; nothing is saved',
+    multipart: { file: { type: 'string', format: 'binary' } },
+    response: s.membersImportReadResponseSchema,
+  },
+  { method: 'post', path: '/members/import', summary: 'Add members from a spreadsheet; ones already there (same name or e-mail) are skipped', body: s.membersImportInputSchema, response: s.membersImportResponseSchema, status: 201 },
   { method: 'get', path: '/members/{id}', summary: 'A member with membership, last visits, payments and documents', response: s.memberDetailResponseSchema },
   { method: 'patch', path: '/members/{id}', summary: 'Change a member', body: s.memberPatchSchema, response: s.memberResponseSchema },
   { method: 'delete', path: '/members/{id}', summary: 'Delete a member and their stored files' },

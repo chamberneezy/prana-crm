@@ -59,6 +59,9 @@ export const ERROR_CODES = [
   'file_too_large',
   'unsupported_file',
   'storage_off',
+  'spreadsheet_unreadable',
+  'spreadsheet_old_excel',
+  'spreadsheet_no_names',
   'internal',
 ] as const;
 export const errorCodeSchema = z.enum(ERROR_CODES);
@@ -373,6 +376,22 @@ export const memberInputSchema = z.object({
   /** With a plan: how its price was paid at sign-up, recorded as a payment. Left out or null: not paid yet. */
   paid_with: paymentMethodSchema.nullable().optional(),
 });
+/** One member from a spreadsheet, as the preview showed it. */
+export const importMemberSchema = z.object({
+  first_name: shortText.min(1),
+  last_name: shortText,
+  email: z.email().max(200).nullable().optional(),
+  phone: z.string().trim().max(40).nullable().optional(),
+  dob: isoDate.nullable().optional(),
+  is_student_or_retired: z.boolean().optional(),
+  member_since: isoDate.nullable().optional(),
+  notes: longText.nullable().optional(),
+});
+export const membersImportInputSchema = z.object({
+  /** Whoever imports confirms every member signed the upisnica (accuracy consent). */
+  consent_accuracy: z.boolean(),
+  members: z.array(importMemberSchema).min(1).max(2000),
+});
 export const memberPatchSchema = memberInputSchema.omit({ plan_code: true, plan_id: true, paid_with: true }).partial();
 
 export const membersQuerySchema = z.object({
@@ -654,6 +673,28 @@ export const paymentsResponseSchema = z.object({
 });
 export const paymentResponseSchema = z.object({ payment: paymentSchema, summary: memberSummarySchema });
 
+export const importFieldSchema = z.enum(['full_name', 'first_name', 'last_name', 'email', 'phone', 'dob', 'is_student_or_retired', 'member_since', 'notes']);
+export const importRowSchema = z
+  .object({
+    line: z.number().int(),
+    first_name: z.string(),
+    last_name: z.string(),
+    email: z.string().nullable(),
+    phone: z.string().nullable(),
+    dob: z.string().nullable(),
+    is_student_or_retired: z.boolean(),
+    member_since: z.string().nullable(),
+    notes: z.string().nullable(),
+    problems: z.array(z.enum(['email', 'dob', 'member_since'])),
+    /** Already a member (same name or e-mail), or a repeat of an earlier line: not added again. */
+    duplicate: z.boolean(),
+  })
+  .meta({ id: 'ImportRow' });
+export const membersImportReadResponseSchema = z.object({
+  columns: z.array(z.object({ header: z.string(), field: importFieldSchema })),
+  rows: z.array(importRowSchema),
+});
+export const membersImportResponseSchema = z.object({ created: z.number().int(), skipped: z.number().int() });
 export const documentResponseSchema = z.object({ document: documentSchema });
 
 export const analyticsQuerySchema = z.object({
@@ -726,6 +767,9 @@ export type PlanResponse = z.infer<typeof planResponseSchema>;
 export type MembershipResponse = z.infer<typeof membershipResponseSchema>;
 export type PaymentsResponse = z.infer<typeof paymentsResponseSchema>;
 export type PaymentResponse = z.infer<typeof paymentResponseSchema>;
+export type MembersImportReadResponse = z.infer<typeof membersImportReadResponseSchema>;
+export type MembersImportResponse = z.infer<typeof membersImportResponseSchema>;
+export type MembersImportInput = z.infer<typeof membersImportInputSchema>;
 export type DocumentResponse = z.infer<typeof documentResponseSchema>;
 
 // ── Sync (iOS) ────────────────────────────────────────────────────────────────

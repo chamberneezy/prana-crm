@@ -23,6 +23,9 @@ export const ERRORS: Record<ErrorCode, ErrorSpec> = {
   file_too_large: { status: 413, message_hr: 'Datoteka je veća od 20 MB.', message_en: 'The file is larger than 20 MB.' },
   storage_off: { status: 503, message_hr: 'Spremanje datoteka još nije uključeno. Član je spremljen, datoteka nije.', message_en: 'File storage isn\'t switched on yet. The member is saved, the file isn\'t.' },
   unsupported_file: { status: 415, message_hr: 'Odaberite PDF, JPG, PNG ili HEIC datoteku.', message_en: 'Choose a PDF, JPG, PNG or HEIC file.' },
+  spreadsheet_unreadable: { status: 422, message_hr: 'Datoteku nismo mogli pročitati. Spremite tablicu kao .xlsx ili .csv i pokušajte ponovno.', message_en: "The file couldn't be read. Save the table as .xlsx or .csv and try again." },
+  spreadsheet_old_excel: { status: 422, message_hr: 'Ovo je stari Excel (.xls). U Excelu odaberite Spremi kao → .xlsx ili CSV pa pokušajte ponovno.', message_en: 'This is an old Excel file (.xls). In Excel choose Save As → .xlsx or CSV, then try again.' },
+  spreadsheet_no_names: { status: 422, message_hr: 'U tablici nismo našli stupac s imenom. Prvi red treba imati naslove, npr. „Ime i prezime” ili „Ime” i „Prezime”.', message_en: 'No name column found. The first row should have headings such as "Name" or "First name" and "Last name".' },
   internal: { status: 500, message_hr: 'Nešto nije uspjelo. Pokušajte ponovno.', message_en: 'Something went wrong. Please try again.' },
 };
 

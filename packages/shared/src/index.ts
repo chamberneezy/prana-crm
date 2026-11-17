@@ -8,4 +8,5 @@ export * from './access';
 export * from './schemas';
 export * from './openapi';
 export * from './upisnica';
+export * from './spreadsheet';
 export * from './i18n';

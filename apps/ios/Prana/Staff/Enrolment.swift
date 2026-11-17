@@ -6,17 +6,30 @@ import Vision
 import VisionKit
 
 /**
- * Novi član: photograph the upisnica, import a PDF or image, or type it in. The text is recognised on the iPhone
+ * Novi član: photograph the upisnica, import a PDF or image, type it in, or bring a whole list from a CSV or Excel file. The text is recognised on the iPhone
  * (Vision, or the PDF's own text layer), read by the same parser as the web, and always reviewed before saving.
  */
 struct EnrolmentFlow: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var scanning = false
-    @State private var importing = false
+    @State private var importing: Picking?
+    @State private var list: ListPreview?
+    @State private var readingList = false
     @State private var working = false
     @State private var failure: String?
     @State private var review: ReviewDraft?
+
+    /** What the file picker is open for; one picker, since SwiftUI honours only one per view. */
+    enum Picking { case upisnica, list }
+
+    struct ListPreview: Identifiable, Hashable {
+        let id = UUID()
+        let filename: String
+        let preview: ImportPreview
+        static func == (a: ListPreview, b: ListPreview) -> Bool { a.id == b.id }
+        func hash(into hasher: inout Hasher) { hasher.combine(id) }
+    }
 
     var body: some View {
         NavigationStack {
@@ -26,8 +39,9 @@ struct EnrolmentFlow: View {
                     Text("Kako želite upisati člana?").font(.ui(15)).foregroundStyle(DS.inkMuted)
                     option("Fotografiraj upisnicu", "Kamera prepozna list i tekst.", "camera.viewfinder", primary: true) { scanning = true }
                         .disabled(!VNDocumentCameraViewController.isSupported)
-                    option("Uvezi PDF ili sliku", "PDF, JPG, PNG ili HEIC.", "doc.badge.arrow.up") { importing = true }
+                    option("Uvezi PDF ili sliku", "PDF, JPG, PNG ili HEIC.", "doc.badge.arrow.up") { importing = .upisnica }
                     option("Upiši ručno", "Prazna upisnica.", "square.and.pencil") { review = ReviewDraft(input: MemberInput(signedDate: model.time.today())) }
+                    option("Uvezi popis članova", "CSV ili Excel tablica, više članova odjednom.", "tablecells") { importing = .list }
                     if let failure { NoticeView(message: failure) }
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Savjet").font(.ui(13, .semibold))
@@ -40,10 +54,13 @@ struct EnrolmentFlow: View {
                 .padding(.bottom, 32)
             }
             .linenBackground()
-            .overlay { if working { ProgressView("Čitanje teksta…").padding(24).glassSurface(in: RoundedRectangle(cornerRadius: 16)) } }
+            .overlay { if working { ProgressView(readingList ? "Čitanje tablice…" : "Čitanje teksta…").padding(24).glassSurface(in: RoundedRectangle(cornerRadius: 16)) } }
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Odustani") { dismiss() } } }
             .navigationDestination(item: $review) { draft in
                 MemberFormView(mode: .create(draft)) { dismiss() }
+            }
+            .navigationDestination(item: $list) { item in
+                MemberImportView(filename: item.filename, preview: item.preview) { dismiss() }
             }
         }
         .fullScreenCover(isPresented: $scanning) {
@@ -53,8 +70,13 @@ struct EnrolmentFlow: View {
             } cancel: { scanning = false }
                 .ignoresSafeArea()
         }
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.pdf, .jpeg, .png, .heic]) { result in
-            if case let .success(url) = result { Task { await recognise(file: url) } }
+        .fileImporter(
+            isPresented: Binding(get: { importing != nil }, set: { if !$0 { importing = nil } }),
+            allowedContentTypes: importing == .list ? MemberListFile.types : [.pdf, .jpeg, .png, .heic]
+        ) { result in
+            let picked = importing
+            guard case let .success(url) = result else { return }
+            Task { picked == .list ? await readList(url) : await recognise(file: url) }
         }
     }
 
@@ -76,6 +98,24 @@ struct EnrolmentFlow: View {
             .overlay(RoundedRectangle(cornerRadius: DS.radius).strokeBorder(primary ? .clear : DS.line))
         }
         .buttonStyle(.plain)
+    }
+
+    /** A CSV or Excel list: the API reads it and the next screen shows who it found. */
+    private func readList(_ url: URL) async {
+        failure = nil
+        working = true
+        readingList = true
+        defer { working = false; readingList = false }
+        let access = url.startAccessingSecurityScopedResource()
+        defer { if access { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url) else { failure = "Datoteka se nije mogla otvoriti. Pokušajte s drugom."; return }
+        guard data.count <= 5 * 1024 * 1024 else { failure = "Tablica je veća od 5 MB."; return }
+        do {
+            let preview = try await model.api.readMemberSpreadsheet(data: data, filename: url.lastPathComponent)
+            list = ListPreview(filename: url.lastPathComponent, preview: preview)
+        } catch {
+            failure = error.message
+        }
     }
 
     private func recognise(images: [UIImage]) async {

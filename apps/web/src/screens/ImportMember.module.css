@@ -116,12 +116,14 @@
   transition: var(--transition-color);
 }
 
-a.option:hover {
+a.option:hover,
+button.option:hover:not(:disabled) {
   border-color: var(--sage);
   color: var(--text-1);
 }
 
-a.option:focus-visible {
+a.option:focus-visible,
+button.option:focus-visible {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--focus-ring);
@@ -171,4 +173,15 @@ a.option:focus-visible {
 
 .sample:hover {
   color: var(--ink);
+}
+
+button.option {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.option:disabled {
+  cursor: progress;
+  opacity: 0.7;
 }

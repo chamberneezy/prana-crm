@@ -892,3 +892,57 @@ describe('the contract', () => {
     expect(((await res.json()) as { error: { code: string } }).error.code).toBe('invalid_input');
   });
 });
+
+describe('member import from a spreadsheet', () => {
+  const read = (text: string | Uint8Array, name = 'clanovi.csv') => {
+    const form = new FormData();
+    form.append('file', new File([typeof text === 'string' ? new TextEncoder().encode(text) : text], name));
+    return t.call('POST', '/members/import/read', { form });
+  };
+
+  it('reads a CSV for a preview, marking who is already a member, and saves nothing', async () => {
+    const before = (await t.call('GET', '/members')).body.counts.all;
+    const { status, body } = await read('Ime;Prezime;E-mail;Datum rođenja\nAna;Horvat;;\nTea;Uvezena;tea@example.com;05.04.1993.\nTEA;uvezena;;\nNoa;Uvezeni;krivo;\n');
+    expect(status).toBe(200);
+    expect(body.columns.map((c: { field: string }) => c.field)).toEqual(['first_name', 'last_name', 'email', 'dob']);
+    expect(body.rows.map((r: { first_name: string; duplicate: boolean }) => [r.first_name, r.duplicate])).toEqual([
+      ['Ana', true],
+      ['Tea', false],
+      ['TEA', true],
+      ['Noa', false],
+    ]);
+    expect(body.rows[1]).toMatchObject({ email: 'tea@example.com', dob: '1993-04-05', problems: [] });
+    expect(body.rows[3]).toMatchObject({ email: null, problems: ['email'] });
+    expect((await t.call('GET', '/members')).body.counts.all).toBe(before);
+  });
+
+  it('explains files it cannot use', async () => {
+    expect((await read(new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0, 0, 0, 0]), 'stari.xls')).body.error.code).toBe('spreadsheet_old_excel');
+    expect((await read('Datum,Iznos\n1.1.2026,30\n')).body.error.code).toBe('spreadsheet_no_names');
+  });
+
+  it('adds the members in one go, skipping anyone already there or listed twice', async () => {
+    const before = (await t.call('GET', '/members')).body.counts.all;
+    const members = [
+      { first_name: 'Ana', last_name: 'Horvat' },
+      { first_name: 'Tea', last_name: 'Uvezena', email: 'tea@example.com', dob: '1993-04-05', is_student_or_retired: true },
+      { first_name: 'Noa', last_name: 'Uvezeni', notes: 'iz tablice', member_since: '2025-09-01' },
+      { first_name: 'Noa', last_name: 'Uvezeni' },
+    ];
+    expect((await t.call('POST', '/members/import', { body: { consent_accuracy: false, members } })).body.error.code).toBe('consent_required');
+
+    const { status, body } = await t.call('POST', '/members/import', { body: { consent_accuracy: true, members } });
+    expect(status).toBe(201);
+    expect(body).toEqual({ created: 2, skipped: 2 });
+    const list = (await t.call('GET', '/members')).body;
+    expect(list.counts.all).toBe(before + 2);
+    const tea = byName(list.members, 'Tea Uvezena');
+    const detail = (await t.call('GET', `/members/${tea.id}`)).body.member;
+    expect(detail).toMatchObject({ email: 'tea@example.com', dob: '1993-04-05', is_student_or_retired: true, consent_accuracy: true, health_flag: false, member_since: today });
+    const noa = (await t.call('GET', `/members/${byName(list.members, 'Noa Uvezeni').id}`)).body.member;
+    expect(noa).toMatchObject({ notes: 'iz tablice', member_since: '2025-09-01', is_student_or_retired: false });
+
+    // Importing the same list again adds no one.
+    expect((await t.call('POST', '/members/import', { body: { consent_accuracy: true, members } })).body).toEqual({ created: 0, skipped: 4 });
+  });
+});

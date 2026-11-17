@@ -10,11 +10,17 @@ import {
   type MembersResponse,
   membersQuerySchema,
   membershipPeriod,
+  membersFromTable,
+  membersImportInputSchema,
+  type MembersImportReadResponse,
+  type MembersImportResponse,
+  readTable,
+  SpreadsheetError,
 } from '@prana/shared';
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { document, member, membership, offering, payment, plan, session, visit } from '../db/schema';
-import type { AppEnv } from '../env';
+import type { AppEnv, Db } from '../env';
 import { ApiError } from '../errors';
 import { deleteMemberDocuments } from '../lib/documents';
 import { blankToNull, created, ctx, owned, parseBody, parseQuery, publicRow, removed, touched } from '../lib/http';
@@ -126,6 +132,107 @@ members.post('/', async (c) => {
   }
 
   const body: MemberResponse = { member: publicRow(row), summary: await summaryFor(db, row, today) };
+  return c.json(body, 201);
+});
+
+const MAX_SPREADSHEET_BYTES = 5 * 1024 * 1024;
+
+type Person = { first_name: string; last_name: string; email?: string | null };
+
+/** Keys that make two members the same person: the folded full name, and the e-mail. */
+function sameness(existing: { full_name: string; email: string | null }[]) {
+  const names = new Set(existing.map((m) => foldText(m.full_name)));
+  const emails = new Set(existing.flatMap((m) => (m.email ? [m.email.toLowerCase()] : [])));
+  return {
+    has: (m: Person) => names.has(foldText(joinName(m.first_name, m.last_name))) || (!!m.email && emails.has(m.email.toLowerCase())),
+    add: (m: Person) => {
+      names.add(foldText(joinName(m.first_name, m.last_name)));
+      if (m.email) emails.add(m.email.toLowerCase());
+    },
+  };
+}
+
+function existingMembers(db: Db, businessId: string) {
+  return db
+    .select({ full_name: member.full_name, email: member.email })
+    .from(member)
+    .where(and(eq(member.business_id, businessId), isNull(member.deleted_at)));
+}
+
+/** A CSV or .xlsx file in, the members it lists out, marked when already there. Saves nothing. */
+members.post('/import/read', async (c) => {
+  const { db, businessId } = ctx(c);
+  let form: Record<string, string | File>;
+  try {
+    form = await c.req.parseBody();
+  } catch {
+    throw new ApiError('invalid_input', ['file']);
+  }
+  const file = form.file;
+  if (!(file instanceof File)) throw new ApiError('invalid_input', ['file']);
+  if (file.size > MAX_SPREADSHEET_BYTES) throw new ApiError('file_too_large');
+
+  let table;
+  try {
+    table = membersFromTable(await readTable(new Uint8Array(await file.arrayBuffer())));
+  } catch (error) {
+    const reason = error instanceof SpreadsheetError ? error.reason : 'unreadable';
+    throw new ApiError(reason === 'old_excel' ? 'spreadsheet_old_excel' : reason === 'no_name_column' ? 'spreadsheet_no_names' : 'spreadsheet_unreadable');
+  }
+
+  const known = sameness(await existingMembers(db, businessId));
+  const rows = table.rows.map((row) => {
+    const duplicate = known.has(row);
+    known.add(row);
+    return { ...row, duplicate };
+  });
+  const body: MembersImportReadResponse = { columns: table.columns, rows };
+  return c.json(body);
+});
+
+/** Adds the previewed members in one go; anyone already there (or listed twice) is skipped, not doubled. */
+members.post('/import', async (c) => {
+  const { db, businessId, now, today } = ctx(c);
+  const input = await parseBody(c, membersImportInputSchema);
+  if (!input.consent_accuracy) throw new ApiError('consent_required');
+
+  const known = sameness(await existingMembers(db, businessId));
+  const rows = [];
+  for (const m of input.members) {
+    if (known.has(m)) continue;
+    known.add(m);
+    const first_name = m.first_name.trim();
+    const last_name = m.last_name.trim();
+    rows.push({
+      ...created(businessId, now),
+      first_name,
+      last_name,
+      full_name: joinName(first_name, last_name),
+      email: blankToNull(m.email)?.toLowerCase() ?? null,
+      phone: blankToNull(m.phone),
+      dob: m.dob ?? null,
+      is_student_or_retired: m.is_student_or_retired ?? false,
+      health_flag: false,
+      health_text: null,
+      consent_accuracy: true,
+      consent_news: false,
+      signed_place: null,
+      signed_date: null,
+      member_since: m.member_since ?? today,
+      notes: blankToNull(m.notes),
+    });
+  }
+
+  // One statement for the lot: D1 limits bound values per statement and queries per request, so the rows go in as
+  // a single JSON value that SQLite unpacks. A statement is all or nothing.
+  if (rows.length) {
+    const columns = Object.keys(rows[0]!) as (keyof (typeof rows)[number])[];
+    const json = JSON.stringify(rows.map((row) => columns.map((k) => (typeof row[k] === 'boolean' ? (row[k] ? 1 : 0) : row[k]))));
+    const picks = columns.map((_, i) => `json_extract(value, '$[${i}]')`).join(', ');
+    await db.run(sql.raw(`INSERT INTO member (${columns.join(', ')}) SELECT ${picks} FROM json_each(`).append(sql`${json})`));
+  }
+
+  const body: MembersImportResponse = { created: rows.length, skipped: input.members.length - rows.length };
   return c.json(body, 201);
 });
 
