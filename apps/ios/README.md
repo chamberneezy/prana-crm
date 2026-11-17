@@ -35,8 +35,8 @@ On a machine with xtool and the Darwin SDK ([omarchy-apple-dev](https://github.c
 
 ```sh
 cd apps/ios && xtool dev build          # → xtool/Prana.app (compile check)
-bash ~/Projects/tools/omarchy-apple-dev/ship.sh            # signed .ipa + offline App Store checks
-bash ~/Projects/tools/omarchy-apple-dev/ship.sh --upload   # TestFlight (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH)
+bash scripts/linux-testflight.sh --check   # signed .ipa + 41 offline App Store checks
+bash scripts/linux-testflight.sh           # the same, then upload to TestFlight
 ```
 
 `xtool-Info.plist` carries the Release values (no build-setting expansion). In this build the logo and fonts live in
