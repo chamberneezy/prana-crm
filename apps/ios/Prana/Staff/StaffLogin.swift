@@ -34,6 +34,7 @@ struct StaffLoginSheet: View {
                         }
                         .buttonStyle(.ds(.primary, fullWidth: true))
                         .disabled(busy)
+                        .padding(.horizontal, 2)
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
                     } footer: {
@@ -61,6 +62,7 @@ struct StaffLoginSheet: View {
                     }
                     .buttonStyle(.ds(model.google == nil ? .primary : .secondary, fullWidth: true))
                     .disabled(busy || email.isEmpty || password.isEmpty)
+                    .padding(.horizontal, 2)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                 }
